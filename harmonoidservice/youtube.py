@@ -4,7 +4,7 @@ import json
 from urllib.request import urlopen
 from urllib.request import Request
 import os
-from flask import make_response
+from flask import make_response, Response
 
 
 class YoutubeHandler:
@@ -23,21 +23,19 @@ class YoutubeHandler:
     def SearchYoutube(self, keyword, offset, mode, maxResults):
         if keyword != None:
             search = SearchVideos(keyword, offset, mode, maxResults)
-            response =  make_response(search.result(), 200)
-            response.headers.set('Content-Type', 'application/json')
-            return response
+            return Response(search.result(), headers = {'Content-Type' : 'application/json'}, status = 200)
         else:
             return make_response('bad request', 400)
 
     def TrackDownload(self, trackId, trackName):
 
         if trackId != None:
-            trackInfo = json.loads(self.TrackInfo(trackId))        
+            trackInfo = self.TrackInfo(trackId).json        
             artists = ''
             for artist in trackInfo['album_artists']:
                 artists+=artist+' '
 
-            videoId = self.SearchYoutube(trackInfo['track_name'] + ' ' + artists + ' ' + trackInfo['album_name'], 1, 'dict', 1)['search_result'][0]['id']
+            videoId = self.SearchYoutube(trackInfo['track_name'] + ' ' + artists + ' ' + trackInfo['album_name'], 1, 'json', 1).json['search_result'][0]['id']
             audioUrl = self.AudioUrl(videoId)
 
             audioRequest = Request(
@@ -46,14 +44,14 @@ class YoutubeHandler:
             )
             audioResponse = urlopen(audioRequest)
             audioBytes = audioResponse.read()
-            print()
             response = make_response(audioBytes, 200)
             response.headers.set('Content-Type', 'audio/mp4')
             response.headers.set('Content-Length', audioResponse.headers['Content-Length'])
 
             return response
+        
         elif trackName != None:
-            videoId = self.SearchYoutube(trackName, 1, 'dict', 1)['search_result'][0]['id']
+            videoId = self.SearchYoutube(trackName, 1, 'json', 1).json['search_result'][0]['id']
             audioUrl = self.AudioUrl(videoId)
 
             audioRequest = Request(
