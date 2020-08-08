@@ -1,6 +1,6 @@
 youtube-search-python
-flask
 youtube-dl
+flask
 flask-cors
-gunicorn
 Flask-Cors
+gunicorn
