@@ -28,9 +28,18 @@ def AlbumInfo():
 @main.route('/trackinfo')
 def TrackInfo():
     return harmonoidService.TrackInfo(request.args.get('track_id', None))
+
 @main.route('/artistrelated')
 def ArtistRelated():
     return harmonoidService.ArtistRelated(request.args.get('artist_id', None))
+
+@main.route('/artistalbums')
+def ArtistAlbums():
+    return harmonoidService.ArtistAlbums(request.args.get('artist_id', None))
+
+@main.route('/artisttracks')
+def ArtistTracks():
+    return harmonoidService.ArtistTracks(request.args.get('artist_id', None))
 
 @main.route('/trackdownload')
 def TrackDownload():
