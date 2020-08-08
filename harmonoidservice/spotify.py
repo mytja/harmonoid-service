@@ -44,11 +44,11 @@ class SpotifyHandler:
             a_artists = track['album']['artists']
             album_artists = []
             for artist in a_artists:
-                album_artists+=[artist['name']]
+                album_artists+=[artist['name'].split('(')[0].trim().split('-')[0].trim()]
             t_artists = track['artists']
             track_artists = []
             for artist in t_artists:
-                track_artists+=[artist['name']] 
+                track_artists+=[artist['name'].split('(')[0].trim().split('-')[0].trim()] 
             return Response(json.dumps({   
                 'track_id': track['id'],
                 'track_name': track['name'],
@@ -84,7 +84,7 @@ class SpotifyHandler:
                 t_artists = track['artists']
                 track_artists = []
                 for artist in t_artists:
-                    track_artists+=[artist['name']]
+                    track_artists+=[artist['name'].split('(')[0].trim().split('-')[0].trim()]
                 result+=[
                     {
                         'track_id': track['id'],
@@ -124,7 +124,7 @@ class SpotifyHandler:
                 relatedArtists+=[
                     {   
                         'artist_id': artist['id'],
-                        'artist_name': artist['name'],
+                        'artist_name': artist['name'].split('(')[0].trim().split('-')[0].trim(),
                         'artist_popularity': artist['popularity'],
                         'artist_art_640': artist_art_640,
                         'artist_art_300': artist_art_300,
@@ -154,7 +154,7 @@ class SpotifyHandler:
                 album_artists = []
                 a_artists = album['artists']
                 for artist in a_artists:
-                    album_artists+=[artist['name']]
+                    album_artists+=[artist['name'].split('(')[0].trim().split('-')[0].trim()]
                 for image in album['images']:
                     if image['height'] == 640:
                         album_art_640 = image['url']
@@ -198,11 +198,11 @@ class SpotifyHandler:
                 album_artists = []
                 a_artists = track['artists']
                 for artist in a_artists:
-                    album_artists+=[artist['name']]
+                    album_artists+=[artist['name'].split('(')[0].trim().split('-')[0].trim()]
                 t_artists = track['artists']
                 track_artists = []
                 for artist in t_artists:
-                    track_artists+=[artist['name']]
+                    track_artists+=[artist['name'].split('(')[0].trim().split('-')[0].trim()]
                 for image in track['album']['images']:
                     if image['height'] == 640:
                         album_art_640 = image['url']
@@ -259,7 +259,7 @@ class SpotifyHandler:
                     a_artists = album['artists']
                     album_artists = []
                     for artist in a_artists:
-                        album_artists+=[artist['name']]
+                        album_artists+=[artist['name'].split('(')[0].trim().split('-')[0].trim()]
                     albums+=[
                         {   
                             'album_id': album['id'],
@@ -290,11 +290,11 @@ class SpotifyHandler:
                     a_artists = track['album']['artists']
                     album_artists = []
                     for artist in a_artists:
-                        album_artists+=[artist['name']]
+                        album_artists+=[artist['name'].split('(')[0].trim().split('-')[0].trim()]
                     t_artists = track['artists']
                     track_artists = []
                     for artist in t_artists:
-                        track_artists+=[artist['name']]
+                        track_artists+=[artist['name'].split('(')[0].trim().split('-')[0].trim()]
                     tracks+=[
                         {   
                             'track_id': track['id'],
@@ -330,7 +330,7 @@ class SpotifyHandler:
                     artists+=[
                         {   
                             'artist_id': artist['id'],
-                            'artist_name': artist['name'],
+                            'artist_name': artist['name'].split('(')[0].trim().split('-')[0].trim(),
                             'artist_popularity': artist['popularity'],
                             'artist_art_640': artist_art_640,
                             'artist_art_300': artist_art_300,
