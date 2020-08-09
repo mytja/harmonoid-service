@@ -33,9 +33,9 @@ class YoutubeHandler:
             trackInfo = self.TrackInfo(trackId).json        
             artists = ''
             for artist in trackInfo['album_artists']:
-                artists+=artist+' '
+                artists+=artist.split('(')[0].strip().split('-')[0].strip()+' '
 
-            videoId = self.SearchYoutube(trackInfo['track_name'] + ' ' + artists + ' ' + trackInfo['album_name'], 1, 'json', 1).json['search_result'][0]['id']
+            videoId = self.SearchYoutube(trackInfo['track_name'].split('(')[0].strip().split('-')[0].strip() + ' ' + artists + ' ' + trackInfo['album_name'].split('(')[0].strip().split('-')[0].strip(), 1, 'json', 1).json['search_result'][0]['id']
             audioUrl = self.AudioUrl(videoId)
 
             audioRequest = Request(
