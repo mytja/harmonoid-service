@@ -12,7 +12,7 @@ class YoutubeHandler:
     def AudioUrl(self, videoId):
         import youtube_dl
         ydl_opts = {
-            'format': '140',
+            'format': 'bestaudio/best',
         }
 
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
