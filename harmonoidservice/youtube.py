@@ -30,39 +30,45 @@ class YoutubeHandler:
     def TrackDownload(self, trackId, trackName):
 
         if trackId != None:
-            trackInfo = self.TrackInfo(trackId).json        
-            artists = ''
-            for artist in trackInfo['album_artists']:
-                artists+=artist.split('(')[0].strip().split('-')[0].strip()+' '
+            try:
+                trackInfo = self.TrackInfo(trackId).json        
+                artists = ''
+                for artist in trackInfo['album_artists']:
+                    artists+=artist.split('(')[0].strip().split('-')[0].strip()+' '
 
-            videoId = self.SearchYoutube(trackInfo['track_name'].split('(')[0].strip().split('-')[0].strip() + ' ' + artists + ' ' + trackInfo['album_name'].split('(')[0].strip().split('-')[0].strip(), 1, 'json', 1).json['search_result'][0]['id']
-            audioUrl = self.AudioUrl(videoId)
+                videoId = self.SearchYoutube(trackInfo['track_name'].split('(')[0].strip().split('-')[0].strip() + ' ' + artists + ' ' + trackInfo['album_name'].split('(')[0].strip().split('-')[0].strip(), 1, 'json', 1).json['search_result'][0]['id']
+                audioUrl = self.AudioUrl(videoId)
 
-            audioRequest = Request(
-                url = audioUrl,
-                data = None
-            )
-            audioResponse = urlopen(audioRequest)
-            audioBytes = audioResponse.read()
-            response = make_response(audioBytes, 200)
-            response.headers.set('Content-Type', 'audio/mp4')
-            response.headers.set('Content-Length', audioResponse.headers['Content-Length'])
+                audioRequest = Request(
+                    url = audioUrl,
+                    data = None
+                )
+                audioResponse = urlopen(audioRequest)
+                audioBytes = audioResponse.read()
+                response = make_response(audioBytes, 200)
+                response.headers.set('Content-Type', 'audio/mp4')
+                response.headers.set('Content-Length', audioResponse.headers['Content-Length'])
 
-            return response
+                return response
+            except(error):
+                return make_response('error', 400)
         
         elif trackName != None:
-            videoId = self.SearchYoutube(trackName, 1, 'json', 1).json['search_result'][0]['id']
-            audioUrl = self.AudioUrl(videoId)
+            try:
+                videoId = self.SearchYoutube(trackName, 1, 'json', 1).json['search_result'][0]['id']
+                audioUrl = self.AudioUrl(videoId)
 
-            audioRequest = Request(
-                url = audioUrl,
-                data = None
-            )
-            audioResponse = urlopen(audioRequest)
-            audioBytes = audioResponse.read()
-            response = make_response(audioBytes, 200)
-            response.headers.set('Content-Type', 'audio/mp4')
+                audioRequest = Request(
+                    url = audioUrl,
+                    data = None
+                )
+                audioResponse = urlopen(audioRequest)
+                audioBytes = audioResponse.read()
+                response = make_response(audioBytes, 200)
+                response.headers.set('Content-Type', 'audio/mp4')
 
-            return response
+                return response
+            except(error):
+                return make_response('error', 400)
         else:
             return make_response('bad request', 400)
