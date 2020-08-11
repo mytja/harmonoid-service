@@ -46,4 +46,4 @@ def TrackDownload():
     return harmonoidService.TrackDownload(request.args.get('track_id', None), request.args.get('track_name', None))
 
 if __name__ == '__main__':
-    main.run('localhost', 8000)
+    main.run()
