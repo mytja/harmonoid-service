@@ -13,6 +13,7 @@ class YoutubeHandler:
         import youtube_dl
         ydl_opts = {
             'format': 'bestaudio/best',
+            'cookiefile': 'cookies.txt',
         }
 
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
