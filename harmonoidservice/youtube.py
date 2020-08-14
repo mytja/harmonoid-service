@@ -50,7 +50,7 @@ class YoutubeHandler:
                 response.headers.set('Content-Length', audioResponse.headers['Content-Length'])
 
                 return response
-            except(error):
+            except:
                 return make_response('error', 400)
         
         elif trackName != None:
@@ -68,7 +68,7 @@ class YoutubeHandler:
                 response.headers.set('Content-Type', 'audio/mp4')
 
                 return response
-            except(error):
+            except:
                 return make_response('error', 400)
         else:
             return make_response('bad request', 400)
