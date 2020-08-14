@@ -51,7 +51,7 @@ class YoutubeHandler:
 
                 return response
             except:
-                return make_response('error', 400)
+                return make_response('error', 500)
         
         elif trackName != None:
             try:
@@ -69,6 +69,6 @@ class YoutubeHandler:
 
                 return response
             except:
-                return make_response('error', 400)
+                return make_response('error', 500)
         else:
             return make_response('bad request', 400)
