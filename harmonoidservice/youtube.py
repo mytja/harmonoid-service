@@ -57,6 +57,7 @@ class YoutubeHandler:
 
         if trackId != None:
             try:
+                print(f'[server] Download request in ID format.')
                 trackInfo = self.TrackInfo(trackId).json
                 print(f'[info] Successfully retrieved metadata of track ID: {trackId}.')       
                 artists = ' '.join(trackInfo['album_artists'])
@@ -80,13 +81,24 @@ class YoutubeHandler:
         
         elif trackName != None:
             try:
+                print(f'[server] Download request in name format.')
                 videoId = self.SearchYoutube(trackName, 1, 'json', 1).json['search_result'][0]['id']
-                self.SaveAudio(videoId, 'generic')
-                audioBinary = open('generic.m4a', 'rb').read()
-                os.remove(os.path.join(os.path.dirname, 'generic.m4a'))
+                print(f'[search] Search successful. Video ID: {videoId}.') 
+                trackId = self.SearchSpotify(trackName, 'track', 0, 1).json['tracks'][0]['track_id']
+                print(f'[tracksearch] Track Search successful. Track ID: {trackId}.') 
+                trackInfo = self.TrackInfo(trackId).json
+                print(f'[info] Successfully retrieved metadata of track ID: {trackId}.')
+                self.SaveAudio(videoId, trackId)
+                self.SaveMetaData(trackInfo)
+                audioFile = open(f'{trackId}.m4a', 'rb')
+                audioBinary = audioFile.read()
+                audioFile.close()
+                print(f'[server] Sending audio binary for track ID: {trackId}')
+                
                 response = make_response(audioBinary, 200)
                 response.headers['Content-Length'] = len(audioBinary)
                 response.headers['Content-Type'] = 'audio/mp4'
+                return response
             except:
                 return make_response('internal server error', 500)
         else:
