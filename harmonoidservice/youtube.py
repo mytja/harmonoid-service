@@ -82,7 +82,7 @@ class YoutubeHandler:
             try:
                 videoId = self.SearchYoutube(trackName, 1, 'json', 1).json['search_result'][0]['id']
                 self.SaveAudio(videoId, 'generic')
-                audioBinary = open('generic.m4a', 'r').read()
+                audioBinary = open('generic.m4a', 'rb').read()
                 os.remove(os.path.join(os.path.dirname, 'generic.m4a'))
                 response = make_response(audioBinary, 200)
                 response.headers['Content-Length'] = len(audioBinary)
