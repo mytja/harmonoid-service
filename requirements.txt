@@ -4,3 +4,4 @@ flask
 flask-cors
 Flask-Cors
 gunicorn
+mutagen
