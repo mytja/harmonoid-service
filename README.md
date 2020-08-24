@@ -3,13 +3,14 @@
 
 #### A little Flask app in Python 3 & Flask for searching & downloading music from YouTube using [Spotify Web API](https://developer.spotify.com/documentation/web-api/).
 
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
-###### This is used in the [Harmonoid](https://github.com/alexmercerind/harmonoid) music app.
+##### This is used in the 🎵 [Harmonoid](https://github.com/alexmercerind/harmonoid) music app.
 
 
 This repository has everything ready to be deployed on [Heroku](https://heroku.com).
 
-## What does this app do?
+## ❔ What does this app do?
 
 This flask app is a wrapper around the already publicly available Spotify Web API, to search for various tracks, albums & artists on Spotify & download music from YouTube using [youtube-dl](https://github.com/ytdl-org/youtube-dl) & [youtube-search-python](https://github.com/alexmercerind/youtube-search-python). The tracks you get in download, are M4A in format with exact metadata fetched from Spotify.
 
@@ -19,10 +20,12 @@ You can use this in your music app if you want.
 
 THIS PROJECT IS STRICTLY INTENDED FOR PERSONAL & NON-COMMERCIAL USAGE ONLY. IT, IN ANY WAY, DOES NOT SUPPORT PIRACY. BUY ARTISTS' MUSIC TO SUPPORT THEM.
 
-###### A track downloaded using this Flask app
+###### 🎶 A track downloaded using this Flask app
+
 ![A track downloaded](https://github.com/alexmercerind/harmonoid-service/blob/master/downloaded_track.PNG)
 
-## Setting Up
+
+## 🛠 Setting Up
 
 
 **1) Create a new personal app at Heroku**
@@ -62,7 +65,7 @@ git push heroku master
 Now, if you visit your app at https://yourapp.herokuapp.com/ in a browser, you will see 'service is running' on your screen, with a status code of 200.
 
 
-## Usage
+## 📐 Usage
 
 
 **This is a generic web app, so you can use something like [urllib] or [requests] to access it.**
@@ -178,7 +181,13 @@ if (audioResponse.status_code == 200):
 In that case you can simply re-push the code to the Heroku by making an empty commit. It will automatically update the dependencies at heroku and everything should be fixed. 
 
 
-## Big Thanks To These People And Organizations
+## ❤ Big Thanks To These People And Organizations
+
+- **Spotify**
+  - Thanks a lot for publicly giving your API to developers. It is really helpful for everyone who wants to develop something music related.
+
+- **Heroku**
+  - Thanks for providing a free place to deploy this web app.
 
 
 - [The Pallets Projects](https://github.com/pallets) for [flask](https://github.com/pallets/flask)
