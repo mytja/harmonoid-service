@@ -1,6 +1,9 @@
 from harmonoidservice import HarmonoidService
 from flask import Flask, request, Response
 from os import getenv
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 harmonoidService = HarmonoidService(
     getenv("SPOTIFY_CLIENT_ID"), getenv("SPOTIFY_CLIENT_SECRET")

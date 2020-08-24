@@ -4,9 +4,12 @@ import json
 from urllib.request import urlopen
 from urllib.request import Request
 import os
-import youtube_dl
 from mutagen.mp4 import MP4, MP4Cover
 from flask import make_response, Response
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class YoutubeHandler:
@@ -19,14 +22,14 @@ class YoutubeHandler:
 
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             ydl.download([f"https://www.youtube.com/watch?v={videoId}"])
-        print(f"[download] Track download successful for track ID: {trackId}.")
+        logger.info(f"[download] Track download successful for track ID: {trackId}.")
 
     def SaveMetaData(self, trackInfoJSON):
-        print("[metadata] Getting album art: " + trackInfoJSON["album_art_640"])
+        logger.info("[metadata] Getting album art: " + trackInfoJSON["album_art_640"])
 
         albumArtBinary = urlopen(trackInfoJSON["album_art_640"]).read()
 
-        print("[metadata] Album art retrieved.")
+        logger.info("[metadata] Album art retrieved.")
 
         trackId = trackInfoJSON["track_id"]
 
@@ -47,7 +50,7 @@ class YoutubeHandler:
         )
         audioFile.save()
 
-        print(f"[metadata] Successfully added meta data to track ID: {trackId}.")
+        logger.info(f"[metadata] Successfully added meta data to track ID: {trackId}.")
 
     def SearchYoutube(self, keyword, offset, mode, maxResults):
         if keyword != None:
@@ -64,9 +67,11 @@ class YoutubeHandler:
 
         if trackId != None:
             try:
-                print(f"[server] Download request in ID format.")
+                logger.info(f"[server] Download request in ID format.")
                 trackInfo = self.TrackInfo(trackId).json
-                print(f"[info] Successfully retrieved metadata of track ID: {trackId}.")
+                logger.info(
+                    f"[info] Successfully retrieved metadata of track ID: {trackId}."
+                )
                 artists = " ".join(trackInfo["album_artists"])
                 videoId = self.SearchYoutube(
                     "lyrics "
@@ -82,14 +87,14 @@ class YoutubeHandler:
                     1,
                 ).json["search_result"][0]["id"]
 
-                print(f"[search] Search successful. Video ID: {videoId}.")
+                logger.info(f"[search] Search successful. Video ID: {videoId}.")
 
                 self.SaveAudio(videoId, trackId)
                 self.SaveMetaData(trackInfo)
                 audioFile = open(f"{trackId}.m4a", "rb")
                 audioBinary = audioFile.read()
                 audioFile.close()
-                print(f"[server] Sending audio binary for track ID: {trackId}")
+                logger.info(f"[server] Sending audio binary for track ID: {trackId}")
 
                 response = make_response(audioBinary, 200)
                 response.headers["track_name"] = trackInfo["track_name"]
@@ -98,27 +103,32 @@ class YoutubeHandler:
                 response.headers["Content-Type"] = "audio/mp4"
                 return response
             except:
+                logger.exception("")
                 return make_response("internal server error", 500)
 
         elif trackName != None:
             try:
-                print(f"[server] Download request in name format.")
+                logger.info(f"[server] Download request in name format.")
                 videoId = self.SearchYoutube(trackName, 1, "json", 1).json[
                     "search_result"
                 ][0]["id"]
-                print(f"[search] Search successful. Video ID: {videoId}.")
+                logger.info(f"[search] Search successful. Video ID: {videoId}.")
                 trackId = self.SearchSpotify(trackName, "track", 0, 1).json["tracks"][
                     0
                 ]["track_id"]
-                print(f"[tracksearch] Track Search successful. Track ID: {trackId}.")
+                logger.info(
+                    f"[tracksearch] Track Search successful. Track ID: {trackId}."
+                )
                 trackInfo = self.TrackInfo(trackId).json
-                print(f"[info] Successfully retrieved metadata of track ID: {trackId}.")
+                logger.info(
+                    f"[info] Successfully retrieved metadata of track ID: {trackId}."
+                )
                 self.SaveAudio(videoId, trackId)
                 self.SaveMetaData(trackInfo)
                 audioFile = open(f"{trackId}.m4a", "rb")
                 audioBinary = audioFile.read()
                 audioFile.close()
-                print(f"[server] Sending audio binary for track ID: {trackId}")
+                logger.info(f"[server] Sending audio binary for track ID: {trackId}")
 
                 response = make_response(audioBinary, 200)
                 response.headers["track_name"] = trackInfo["track_name"]
@@ -127,6 +137,7 @@ class YoutubeHandler:
                 response.headers["Content-Type"] = "audio/mp4"
                 return response
             except:
+                logger.exception("")
                 return make_response("internal server error", 500)
         else:
             return make_response("bad request", 400)

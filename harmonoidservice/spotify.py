@@ -5,6 +5,10 @@ import json
 from flask import Response
 from urllib.request import Request
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class SpotifyHandler:
     def AccessToken(self):
