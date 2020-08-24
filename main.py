@@ -7,7 +7,7 @@ main = Flask(__name__)
 
 @main.route('/')
 def Hello():
-    return Response('harmonoid service is running', status=200, headers={'Content-Type' : 'text/html'})
+    return Response('service is running', status=200, headers={'Content-Type' : 'text/html'})
 
 @main.route('/accesstoken')
 def AccessToken():
