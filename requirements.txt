@@ -1,7 +1,5 @@
 youtube-search-python
 youtube-dl
 flask
-flask-cors
-Flask-Cors
 gunicorn
 mutagen
