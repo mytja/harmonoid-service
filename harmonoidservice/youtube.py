@@ -97,8 +97,6 @@ class YoutubeHandler:
                 logger.info(f"[server] Sending audio binary for track ID: {trackId}")
 
                 response = make_response(audioBinary, 200)
-                response.headers["track_name"] = trackInfo["track_name"]
-                response.headers["album_name"] = trackInfo["album_name"]
                 response.headers["Content-Length"] = len(audioBinary)
                 response.headers["Content-Type"] = "audio/mp4"
                 return response
@@ -131,8 +129,6 @@ class YoutubeHandler:
                 logger.info(f"[server] Sending audio binary for track ID: {trackId}")
 
                 response = make_response(audioBinary, 200)
-                response.headers["track_name"] = trackInfo["track_name"]
-                response.headers["album_name"] = trackInfo["album_name"]
                 response.headers["Content-Length"] = len(audioBinary)
                 response.headers["Content-Type"] = "audio/mp4"
                 return response
