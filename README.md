@@ -18,7 +18,7 @@ This uses [mutagen](https://github.com/quodlibet/mutagen) for adding metadata & 
 
 You can use this in your music app if you want.
 
-THIS PROJECT IS STRICTLY INTENDED FOR PERSONAL & NON-COMMERCIAL USAGE ONLY. IT, IN ANY WAY, DOES NOT SUPPORT PIRACY. BUY ARTISTS' MUSIC TO SUPPORT THEM.
+THIS PROJECT IS STRICTLY INTENDED FOR PERSONAL & NON-COMMERCIAL USAGE ONLY. THE PROJECT DOES NOT SUPPORT PIRACY. BUY ARTISTS' MUSIC TO SUPPORT THEM.
 
 ###### 🎶 A track downloaded using this Flask app
 
@@ -171,10 +171,12 @@ audioResponse = requests.get(
 )
 if (audioResponse.status_code == 200):
     audioTrackBinary = audioResponse.content
-    audioTrackFile = open(f'${audioResponse.headers["track_name"]} - ${audioResponse.headers["album_name"]}.m4a', 'wb')
+    audioTrackFile = open('download.m4a', 'wb')
     audioTrackFile.write(audioTrackBinary)
     audioTrackFile.close()
-    print('Download Complete!')
+    print('Download Successful!')
+else:
+    print('Download Unsuccessful!')
 ```
 
 **NOTE**: If something goes wrong during the runtime of the app, like [youtube-dl](https://github.com/ytdl-org/youtube-dl) or [youtube-search-python](https://github.com/alexmercerind/youtube-search-python) stop working or your server's IP gets blocked with 429 status codes from Google, you'll recieve status code 500 from this app.
