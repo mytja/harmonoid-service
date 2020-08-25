@@ -3,3 +3,4 @@ youtube-dl
 flask
 gunicorn
 mutagen
+aiofile
