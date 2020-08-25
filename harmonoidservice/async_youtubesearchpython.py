@@ -2,7 +2,7 @@ import httpx
 from youtubesearchpython import SearchVideos
 
 
-class AsyncSearchVideos(SearchVideos):
+class SearchVideos(SearchVideos):
     networkError = False
     validResponse = False
 
