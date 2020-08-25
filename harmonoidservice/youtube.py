@@ -45,7 +45,7 @@ class YoutubeHandler:
             (trackInfoJSON["track_number"], trackInfoJSON["album_length"])
         ]
         audioFile["\xa9cmt"] = (
-            "https://open.spotify.com/track/46qPfZshPjoitCKdKVD6k7/"
+            "https://open.spotify.com/track/"
             + trackInfoJSON["track_id"]
         )
         audioFile.save()
@@ -72,7 +72,7 @@ class YoutubeHandler:
                 logger.info(
                     f"[info] Successfully retrieved metadata of track ID: {trackId}."
                 )
-                artists = " ".join(trackInfo["album_artists"])
+                artists = " ".join(trackInfo["track_artists"])
                 videoId = self.SearchYoutube(
                     "lyrics "
                     + trackInfo["track_name"]
