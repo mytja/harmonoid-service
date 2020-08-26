@@ -1,15 +1,16 @@
 import httpx
 import base64
-import json
-from flask import Response
+from fastapi import HTTPException
 
 import logging
 
 logger = logging.getLogger(__name__)
 
+
 class ApiError(Exception):
     def __init__(self, message):
         self.message = message
+
 
 class SpotifyHandler:
     async def request(self, endpoint, parameters=None):
@@ -21,7 +22,7 @@ class SpotifyHandler:
             )
         json = response.json()
         if "error" in json:
-            raise ApiError(str(json))
+            raise ApiError(str(json["error"]))
         return json
 
     async def AccessToken(self):
@@ -39,9 +40,6 @@ class SpotifyHandler:
         return response.json()["access_token"]
 
     async def TrackInfo(self, trackId):
-        if trackId == None:
-            return Response("bad request", status=400)  # TODO: replace with FastAPI
-
         track = await self.request(f"tracks/{trackId}")
         album_art_640 = ""
         album_art_300 = ""
@@ -65,34 +63,24 @@ class SpotifyHandler:
             track_artists += [
                 artist["name"].split("(")[0].strip().split("-")[0].strip()
             ]
-        return Response(  # TODO: replace with FastAPI
-            json.dumps(
-                {
-                    "track_id": track["id"],
-                    "track_name": track["name"],
-                    "track_artists": track_artists,
-                    "track_number": track["track_number"],
-                    "track_duration": track["duration_ms"],
-                    "album_art_640": album_art_640,
-                    "album_art_300": album_art_300,
-                    "album_art_64": album_art_64,
-                    "album_id": track["album"]["id"],
-                    "album_name": track["album"]["name"],
-                    "year": track["album"]["release_date"].split("-")[0],
-                    "album_artists": album_artists,
-                    "album_length": track["album"]["total_tracks"],
-                    "album_type": track["album"]["album_type"],
-                },
-                indent=4,
-            ),
-            headers={"Content-Type": "application/json"},
-            status=200,
-        )
+        return {
+            "track_id": track["id"],
+            "track_name": track["name"],
+            "track_artists": track_artists,
+            "track_number": track["track_number"],
+            "track_duration": track["duration_ms"],
+            "album_art_640": album_art_640,
+            "album_art_300": album_art_300,
+            "album_art_64": album_art_64,
+            "album_id": track["album"]["id"],
+            "album_name": track["album"]["name"],
+            "year": track["album"]["release_date"].split("-")[0],
+            "album_artists": album_artists,
+            "album_length": track["album"]["total_tracks"],
+            "album_type": track["album"]["album_type"],
+        }
 
     async def AlbumInfo(self, albumId):
-        if albumId == None:
-            return Response("bad request", status=400)  # TODO: replace with FastAPI
-
         response = await self.request(
             f"albums/{albumId}/tracks", {"limit": 50, "offset": 0}
         )
@@ -114,16 +102,9 @@ class SpotifyHandler:
                     "track_duration": track["duration_ms"],
                 }
             ]
-        return Response(  # TODO: replace with FastAPI
-            json.dumps({"tracks": result}, indent=4),
-            headers={"Content-Type": "application/json"},
-            status=200,
-        )
+        return {"tracks": result}
 
     async def ArtistRelated(self, artistId):
-        if artistId == None:
-            return Response("bad request", status=400)  # TODO: replace with FastAPI
-
         relatedArtistsJson = await self.request(f"artists/{artistId}/related-artists")
         relatedArtists = []
         albums = []
@@ -152,16 +133,9 @@ class SpotifyHandler:
                     "artist_art_64": artist_art_64,
                 }
             ]
-        return Response(  # TODO: replace with FastAPI
-            json.dumps({"artists": relatedArtists}, indent=4),
-            headers={"Content-Type": "application/json"},
-            status=200,
-        )
+        return {"artists": relatedArtists}
 
     async def ArtistAlbums(self, artistId):
-        if artistId == None:
-            return Response("bad request", status=400)
-
         artistAlbumsJson = await self.request(f"artists/{artistId}/albums")
         artistAlbums = []
         albums = []
@@ -195,19 +169,12 @@ class SpotifyHandler:
                     "album_type": album["album_type"],
                 }
             ]
-        return Response(
-            json.dumps({"albums": artistAlbums}, indent=4),
-            headers={"Content-Type": "application/json"},
-            status=200,
-        )
+        return {"albums": artistAlbums}
 
-    async def ArtistTracks(self, artistId):
-        if artistId == None:
-            return Response("bad request", status=400)  # TODO: replace with FastAPI
-
+    async def ArtistTracks(self, artistId, country):
         artistTracksJson = await self.request(
-            f"artists/{artistId}/top-tracks?country=us"
-        )  # TODO: allow changing country
+            f"artists/{artistId}/top-tracks?country={country}"
+        )
         artistTracks = []
         albums = []
         for track in artistTracksJson["tracks"]:
@@ -251,16 +218,9 @@ class SpotifyHandler:
                     "album_type": track["album"]["album_type"],
                 }
             ]
-        return Response(  # TODO: replace with FastAPI
-            json.dumps({"albums": artistTracks}, indent=4),
-            headers={"Content-Type": "application/json"},
-            status=200,
-        )
+        return {"albums": artistTracks}
 
     async def SearchSpotify(self, keyword, mode, offset, limit):
-        if keyword == None:
-            return Response("bad request", status=400)
-
         response = await self.request(
             "search", {"q": keyword, "type": mode, "limit": limit, "offset": offset}
         )
@@ -296,11 +256,8 @@ class SpotifyHandler:
                         "album_type": album["album_type"],
                     }
                 ]
-            return Response(  # TODO: replace with FastAPI
-                json.dumps({"albums": albums}, indent=4),
-                headers={"Content-Type": "application/json"},
-                status=200,
-            )
+            return {"albums": albums}
+
         if mode == "track":
             tracks = []
             for track in response["tracks"]["items"]:
@@ -344,11 +301,8 @@ class SpotifyHandler:
                         "album_type": track["album"]["album_type"],
                     }
                 ]
-            return Response(  # TODO: replace with FastAPI
-                json.dumps({"tracks": tracks}, indent=4),
-                headers={"Content-Type": "application/json"},
-                status=200,
-            )
+            return {"tracks": tracks}
+
         if mode == "artist":
             artists = []
             for artist in response["artists"]["items"]:
@@ -376,10 +330,4 @@ class SpotifyHandler:
                         "artist_art_64": artist_art_64,
                     }
                 ]
-            return Response(  # TODO: replace with FastAPI
-                json.dumps({"artists": artists}, indent=4),
-                headers={"Content-Type": "application/json"},
-                status=200,
-            )
-
-        return Response("bad request", status=400)  # TODO: replace with FastAPI
+            return {"artists": artists}

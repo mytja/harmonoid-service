@@ -1,6 +1,8 @@
 youtube-search-python
 youtube-dl
-flask
+fastapi
+httpx
+uvicorn
 gunicorn
 mutagen
-aiofile
+aiofiles
