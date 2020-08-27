@@ -7,7 +7,6 @@ logger = logging.getLogger(__name__)
 
 
 COMMAND = 'youtube-dl --format "{format}" --no-progress --no-playlist --cookies {cookiefile} -x -o "{output}" "{url}"'
-# TODO: use aria2c to increase speed
 
 
 async def download(url, output, format="140", cookiefile="cookies.txt"):

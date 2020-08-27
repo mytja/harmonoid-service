@@ -6,7 +6,6 @@ import json
 
 import logging
 
-# TODO: use orjson to increase perfomance
 
 logging.basicConfig(level=logging.INFO)
 
