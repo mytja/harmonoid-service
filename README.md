@@ -46,15 +46,15 @@ And, if you're new into this... You can get them [here](https://developer.spotif
 
 **3) Clone this repository and enter it**
 
-```
-git clone https://github.com/alexmercerind/harmonoid-service --depth=1
+```bash
+git clone https://github.com/raitonoberu/spotiyt-server --depth=1
 
 cd harmonoid-service
 ```
 
 **4) Push changes to Heroku**
 
-```
+```bash
 git remote add heroku https://git.heroku.com/yourapp.git
 
 git push heroku master
