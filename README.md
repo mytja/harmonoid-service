@@ -192,7 +192,7 @@ In that case you can simply re-push the code to the Heroku by making an empty co
   - Thanks for providing a free place to deploy this web app.
 
 
-- [Sebastián Ramírez](https://github.com/pallets) for [fastapi](https://github.com/tiangolo/fastapi)
+- [Sebastián Ramírez](https://github.com/tiangolo) for [fastapi](https://github.com/tiangolo/fastapi)
 - [youtube-dl](https://github.com/ytdl-org) for [youtube-dl](https://github.com/ytdl-org/youtube-dl)
 - [Hitesh Kumar Saini](https://github.com/alexmercerind) for [youtube-search-python](https://github.com/alexmercerind/youtube-search-python)
 - [Quod Libet](https://github.com/quodlibet) for [mutagen](https://github.com/quodlibet/mutagen)
