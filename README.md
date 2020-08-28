@@ -1,7 +1,7 @@
-# harmonoid-service
+# spotiyt-server
 
 
-#### A little Flask app in Python 3 & Flask for searching & downloading music from YouTube using [Spotify Web API](https://developer.spotify.com/documentation/web-api/).
+#### An asynchronous FastAPI app for searching music in Spotify & downloading music from YouTube.
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
@@ -12,17 +12,17 @@ This repository has everything ready to be deployed on [Heroku](https://heroku.c
 
 ## ❔ What does this app do?
 
-This flask app is a wrapper around the already publicly available Spotify Web API, to search for various tracks, albums & artists on Spotify & download music from YouTube using [youtube-dl](https://github.com/ytdl-org/youtube-dl) & [youtube-search-python](https://github.com/alexmercerind/youtube-search-python). The tracks you get in download, are M4A in format with exact metadata fetched from Spotify.
+This app is a wrapper around the already publicly available Spotify Web API, to search for various tracks, albums & artists on Spotify & download music from YouTube using [youtube-dl](https://github.com/ytdl-org/youtube-dl) & [youtube-search-python](https://github.com/alexmercerind/youtube-search-python). The tracks you get in download, are M4A in format with exact metadata fetched from Spotify.
 
 This uses [mutagen](https://github.com/quodlibet/mutagen) for adding metadata & album art to the tracks.
 
 You can use this in your music app if you want.
 
-THIS PROJECT IS STRICTLY INTENDED FOR PERSONAL & NON-COMMERCIAL USAGE ONLY. THE PROJECT DOES NOT SUPPORT PIRACY. BUY ARTISTS' MUSIC TO SUPPORT THEM.
+**This project is strictly intended for personal & non-commercial usage only. The project does not support piracy. Buy artists' music to support them.**
 
 ###### 🎶 A track downloaded using this Flask app
 
-![A track downloaded](https://github.com/alexmercerind/harmonoid-service/blob/master/downloaded_track.PNG)
+![A track downloaded](/downloaded_track.PNG)
 
 
 ## 🛠 Setting Up
@@ -46,15 +46,15 @@ And, if you're new into this... You can get them [here](https://developer.spotif
 
 **3) Clone this repository and enter it**
 
-```
-git clone https://github.com/alexmercerind/harmonoid-service --depth=1
+```bash
+git clone https://github.com/raitonoberu/spotiyt-server --depth=1
 
 cd harmonoid-service
 ```
 
 **4) Push changes to Heroku**
 
-```
+```bash
 git remote add heroku https://git.heroku.com/yourapp.git
 
 git push heroku master
@@ -68,9 +68,9 @@ Now, if you visit your app at https://yourapp.herokuapp.com/ in a browser, you w
 ## 📐 Usage
 
 
-**This is a generic web app, so you can use something like [urllib] or [requests] to access it.**
+**This is a generic web app, so you can use something like [urllib](https://docs.python.org/3/library/urllib.html) or [requests](https://github.com/psf/requests) to access it.**
 
-I'll be using requests for the examples below. However, this project uses vanilla urllib internally.
+I'll be using requests for the examples below.
 
 ##### Searching For Music
 
@@ -79,7 +79,7 @@ import requests
 
 response = requests.get(
     'https://yourapp.herokuapp.com/search', {
-        'keyword': 'fade alan walker',        #Keyword for searching 
+        'keyword': 'fade alan walker',        #Keyword for searching
         'mode': 'album',                      #Your mode for searching. Valid modes are 'album', 'track', & 'artist'
         'offset': '0',                        #Search offset
         'limit': '50',                        #Limiting the amount of results
@@ -180,7 +180,7 @@ else:
 ```
 
 **NOTE**: If something goes wrong during the runtime of the app, like [youtube-dl](https://github.com/ytdl-org/youtube-dl) or [youtube-search-python](https://github.com/alexmercerind/youtube-search-python) stop working or your server's IP gets blocked with 429 status codes from Google, you'll recieve status code 500 from this app.
-In that case you can simply re-push the code to the Heroku by making an empty commit. It will automatically update the dependencies at heroku and everything should be fixed. 
+In that case you can simply re-push the code to the Heroku by making an empty commit. It will automatically update the dependencies at heroku and everything should be fixed.
 
 
 ## ❤ Big Thanks To These People And Organizations
@@ -192,8 +192,9 @@ In that case you can simply re-push the code to the Heroku by making an empty co
   - Thanks for providing a free place to deploy this web app.
 
 
-- [The Pallets Projects](https://github.com/pallets) for [flask](https://github.com/pallets/flask)
-- [Quod Libet](https://github.com/quodlibet) for [mutagen](https://github.com/quodlibet/mutagen)
+- [Sebastián Ramírez](https://github.com/tiangolo) for [fastapi](https://github.com/tiangolo/fastapi)
 - [youtube-dl](https://github.com/ytdl-org) for [youtube-dl](https://github.com/ytdl-org/youtube-dl)
-
-It also uses something I made the other day, [youtube-search-python](https://github.com/alexmercerind/youtube-search-python)
+- [Hitesh Kumar Saini](https://github.com/alexmercerind) for [youtube-search-python](https://github.com/alexmercerind/youtube-search-python)
+- [Quod Libet](https://github.com/quodlibet) for [mutagen](https://github.com/quodlibet/mutagen)
+- [Encode](https://github.com/encode) for [httpx](https://github.com/encode/httpx)
+- [Tin Tvrtković](https://github.com/Tinche) for [aiofiles](https://github.com/Tinche/aiofiles)

@@ -1,7 +1,7 @@
 {
-  "name": "harmonoid-service",
-  "description": "A little Flask backend in Python 3 & Flask for searching & downloading music from YouTube using Spotify Web API",
-  "repository": "https://github.com/alexmercerind/harmonoid-service",
+  "name": "spotiyt-server",
+  "description": "Python FastAPI app allowing you to search for tracks with Spotify and download them using YouTube. The backend working behind the Harmonoid music app.",
+  "repository": "https://github.com/raitonoberu/spotiyt-server",
   "logo": "https://github.com/alexmercerind/harmonoid/blob/master/README%20Assets/icon.png?raw=true",
-  "keywords": ["python", "flask", "spotify", "youtube"]
+  "keywords": ["python", "fastapi", "spotify", "youtube"]
 }
