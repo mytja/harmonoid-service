@@ -20,7 +20,7 @@ You can use this in your music app if you want.
 
 **This project is strictly intended for personal & non-commercial usage only. The project does not support piracy. Buy artists' music to support them.**
 
-###### 🎶 A track downloaded using this Flask app
+###### 🎶 A track downloaded using this app
 
 ![A track downloaded](/downloaded_track.PNG)
 
