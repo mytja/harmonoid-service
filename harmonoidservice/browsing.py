@@ -12,16 +12,11 @@ class ApiError(Exception):
 class BrowsingHandler:
     async def TrackInfo(self, trackId):
         track = await self.ytMusic._get_song(trackId)
-        album_art_640 = ""
-        album_art_300 = ""
-        album_art_64 = ""
-        for image in track["thumbnail"]["thumbnails"]: # UNDEFINED: 16:9 ratio
-            if image["height"] == 544:
-                album_art_640 = image["url"]
-            elif image["height"] == 226:
-                album_art_300 = image["url"]
-            elif image["height"] == 60:
-                album_art_64 = image["url"]
+
+        album_art_64, album_art_300, album_art_640 = sort_thumbnails(
+            track["thumbnail"]["thumbnails"]
+        )
+
         track_artists = track.get("artists", [track["author"]])
         album_artists = track_artists  # UNDEFINED so we use track_artists
         return {
@@ -43,6 +38,7 @@ class BrowsingHandler:
 
     async def AlbumInfo(self, albumId):
         response = await self.ytMusic._get_album(albumId)
+
         tracks = response["tracks"]
         result = []
         for track in tracks:
@@ -60,18 +56,12 @@ class BrowsingHandler:
     async def ArtistAlbums(self, artistId):
         # обьединить с singles
         artistJson = await self.ytMusic._get_artist(artistId)
+
         artistAlbums = []
         for album in artistJson["albums"]["results"]:
-            album_art_640 = ""
-            album_art_300 = ""
-            album_art_64 = ""
-            for image in album["thumbnails"]:
-                if image["height"] == 544:
-                    album_art_640 = image["url"]
-                elif image["height"] == 226:
-                    album_art_300 = image["url"]
-                elif image["height"] == 60:
-                    album_art_64 = image["url"]
+            album_art_64, album_art_300, album_art_640 = sort_thumbnails(
+                album["thumbnails"]
+            )
             artistAlbums += [
                 {
                     "album_id": album["browseId"],
@@ -89,20 +79,14 @@ class BrowsingHandler:
 
     async def ArtistTracks(self, artistId):
         artistJson = await self.ytMusic._get_artist(artistId)
+
         artistTracks = []
         for track in artistJson["songs"]["results"]:
-            album_art_640 = ""
-            album_art_300 = ""
-            album_art_64 = ""
             track_artists = [a["name"] for a in track["artists"]]
             album_artists = track_artists  # UNDEFINED so we use track_artists
-            for image in track["thumbnails"]:
-                if image["height"] == 544:
-                    album_art_640 = image["url"]
-                elif image["height"] == 120:
-                    album_art_300 = image["url"]
-                elif image["height"] == 60:
-                    album_art_64 = image["url"]
+            album_art_64, album_art_300, album_art_640 = sort_thumbnails(
+                track["thumbnails"]
+            )
             artistTracks += [
                 {
                     "track_id": track["videoId"],
@@ -126,18 +110,12 @@ class BrowsingHandler:
     async def SearchYoutube(self, keyword, mode):
         if mode == "album":
             youtubeResult = await self.ytMusic._search(keyword, "albums")
+
             albums = []
             for album in youtubeResult:
-                album_art_640 = ""
-                album_art_300 = ""
-                album_art_64 = ""
-                for image in album["thumbnails"]:
-                    if image["height"] == 544:
-                        album_art_640 = image["url"]
-                    elif image["height"] == 226:
-                        album_art_300 = image["url"]
-                    elif image["height"] == 60:
-                        album_art_64 = image["url"]
+                album_art_64, album_art_300, album_art_640 = sort_thumbnails(
+                    album["thumbnails"]
+                )
                 albums += [
                     {
                         "album_id": album["browseId"],
@@ -147,7 +125,7 @@ class BrowsingHandler:
                         "album_art_640": album_art_640,
                         "album_art_300": album_art_300,
                         "album_art_64": album_art_64,
-                        "album_length": 1, # UNDEFINED
+                        "album_length": 1,  # UNDEFINED
                         "album_type": album["type"].lower(),
                     }
                 ]
@@ -155,18 +133,12 @@ class BrowsingHandler:
 
         if mode == "track":
             youtubeResult = await self.ytMusic._search(keyword, "songs")
+
             tracks = []
             for track in youtubeResult:
-                album_art_640 = ""
-                album_art_300 = ""
-                album_art_64 = ""
-                for image in track["thumbnails"]:
-                    if image["height"] == 544:
-                        album_art_640 = image["url"]
-                    elif image["height"] == 226:
-                        album_art_300 = image["url"]
-                    elif image["height"] == 60:
-                        album_art_64 = image["url"]
+                album_art_64, album_art_300, album_art_640 = sort_thumbnails(
+                    track["thumbnails"]
+                )
                 track_artists = [a["name"] for a in track["artists"]]
                 tracks += [
                     {
@@ -189,18 +161,12 @@ class BrowsingHandler:
 
         if mode == "artist":
             youtubeResult = await self.ytMusic._search(keyword, "artists")
+
             artists = []
             for artist in youtubeResult:
-                artist_art_640 = ""
-                artist_art_300 = ""
-                artist_art_64 = ""
-                for image in artist["thumbnails"]:
-                    if image["height"] == 544:
-                        artist_art_640 = image["url"]
-                    elif image["height"] == 226:
-                        artist_art_300 = image["url"]
-                    elif image["height"] == 60:
-                        artist_art_64 = image["url"]
+                album_art_64, album_art_300, album_art_640 = sort_thumbnails(
+                    artist["thumbnails"]
+                )
                 artists += [
                     {
                         "artist_id": artist["browseId"],
@@ -211,3 +177,16 @@ class BrowsingHandler:
                     }
                 ]
             return {"artists": artists}
+
+
+def sort_thumbnails(thumbnails):
+    thumbs = {}
+    for thumbnail in thumbnails:
+        wh = thumbnail["width"] * thumbnail["height"]
+        thumbs[wh] = thumbnail["url"]
+    resolutions = sorted(list(thumbs.keys()))
+    max = resolutions[-1]
+    mid = resolutions[-2] if len(resolutions) > 2 else max
+    min = resolutions[0]
+
+    return (thumbs[min], thumbs[mid], thumbs[max])
