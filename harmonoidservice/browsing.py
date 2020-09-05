@@ -1,5 +1,3 @@
-import httpx
-import base64
 from fastapi import HTTPException
 import logging
 
