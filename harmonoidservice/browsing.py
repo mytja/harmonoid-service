@@ -13,139 +13,114 @@ class ApiError(Exception):
 
 class BrowsingHandler:
     async def TrackInfo(self, trackId):
-        track = await self.request(f"tracks/{trackId}")
+        track = await self.ytMusic._get_song(trackId)
         album_art_640 = ""
         album_art_300 = ""
         album_art_64 = ""
-        for image in track["album"]["images"]:
-            if image["height"] == 640:
+        for image in track["thumbnail"]["thumbnails"]: # UNDEFINED: 16:9 ratio
+            if image["height"] == 544:
                 album_art_640 = image["url"]
-            elif image["height"] == 300:
+            elif image["height"] == 226:
                 album_art_300 = image["url"]
-            elif image["height"] == 64:
+            elif image["height"] == 60:
                 album_art_64 = image["url"]
-        a_artists = track["album"]["artists"]
-        album_artists = []
-        for artist in a_artists:
-            album_artists += [artist["name"]]
-        t_artists = track["artists"]
-        track_artists = []
-        for artist in t_artists:
-            track_artists += [artist["name"]]
+        track_artists = track.get("artists", [track["author"]])
+        album_artists = track_artists  # UNDEFINED so we use track_artists
         return {
-            "track_id": track["id"],
-            "track_name": track["name"],
+            "track_id": track["videoId"],
+            "track_name": track["title"],
             "track_artists": track_artists,
-            "track_number": track["track_number"],
-            "track_duration": track["duration_ms"],
+            "track_number": 1,  # UNDEFINED
+            "track_duration": int(track["lengthSeconds"]) * 1000,
             "album_art_640": album_art_640,
             "album_art_300": album_art_300,
             "album_art_64": album_art_64,
-            "album_id": track["album"]["id"],
-            "album_name": track["album"]["name"],
-            "year": track["album"]["release_date"].split("-")[0],
+            "album_id": "",  # UNDEFINED
+            "album_name": "",  # UNDEFINED
+            "year": track["release"].split("-")[0] if "release" in track else "",
             "album_artists": album_artists,
-            "album_length": track["album"]["total_tracks"],
-            "album_type": track["album"]["album_type"],
+            "album_length": 1,  # UNDEFINED
+            "album_type": "album",  # UNDEFINED
         }
 
     async def AlbumInfo(self, albumId):
-        response = await self.request(
-            f"albums/{albumId}/tracks", {"limit": 50, "offset": 0}
-        )
-        tracks = response["items"]
+        response = await self.ytMusic._get_album(albumId)
+        tracks = response["tracks"]
         result = []
         for track in tracks:
-            t_artists = track["artists"]
-            track_artists = []
-            for artist in t_artists:
-                track_artists += [artist["name"]]
             result += [
                 {
-                    "track_id": track["id"],
-                    "track_name": track["name"],
-                    "track_artists": track_artists,
-                    "track_number": track["track_number"],
-                    "track_duration": track["duration_ms"],
+                    "track_id": track["videoId"],
+                    "track_name": track["title"],
+                    "track_artists": [track["artists"]],
+                    "track_number": track["index"],
+                    "track_duration": int(track["lengthMs"]),
                 }
             ]
         return {"tracks": result}
 
     async def ArtistAlbums(self, artistId):
-        artistAlbumsJson = await self.request(f"artists/{artistId}/albums")
+        # обьединить с singles
+        artistJson = await self.ytMusic._get_artist(artistId)
         artistAlbums = []
-        albums = []
-        for album in artistAlbumsJson["items"]:
+        for album in artistJson["albums"]["results"]:
             album_art_640 = ""
             album_art_300 = ""
             album_art_64 = ""
-            album_artists = []
-            a_artists = album["artists"]
-            for artist in a_artists:
-                album_artists += [artist["name"]]
-            for image in album["images"]:
-                if image["height"] == 640:
+            for image in album["thumbnails"]:
+                if image["height"] == 544:
                     album_art_640 = image["url"]
-                elif image["height"] == 300:
+                elif image["height"] == 226:
                     album_art_300 = image["url"]
-                elif image["height"] == 64:
+                elif image["height"] == 60:
                     album_art_64 = image["url"]
             artistAlbums += [
                 {
-                    "album_id": album["id"],
-                    "album_name": album["name"],
-                    "year": album["release_date"].split("-")[0],
-                    "album_artists": album_artists,
+                    "album_id": album["browseId"],
+                    "album_name": album["title"],
+                    "year": album["year"],
+                    "album_artists": [artistJson["name"]],
                     "album_art_640": album_art_640,
                     "album_art_300": album_art_300,
                     "album_art_64": album_art_64,
-                    "album_length": album["total_tracks"],
-                    "album_type": album["album_type"],
+                    "album_length": 1,  # UNDEFINED
+                    "album_type": "album",  # UNDEFINED
                 }
             ]
         return {"albums": artistAlbums}
 
-    async def ArtistTracks(self, artistId, country):
-        artistTracksJson = await self.request(
-            f"artists/{artistId}/top-tracks?country={country}"
-        )
+    async def ArtistTracks(self, artistId):
+        artistJson = await self.ytMusic._get_artist(artistId)
         artistTracks = []
-        albums = []
-        for track in artistTracksJson["tracks"]:
+        for track in artistJson["songs"]["results"]:
             album_art_640 = ""
             album_art_300 = ""
             album_art_64 = ""
-            album_artists = []
-            a_artists = track["artists"]
-            for artist in a_artists:
-                album_artists += [artist["name"]]
-            t_artists = track["artists"]
-            track_artists = []
-            for artist in t_artists:
-                track_artists += [artist["name"]]
-            for image in track["album"]["images"]:
-                if image["height"] == 640:
+            track_artists = [a["name"] for a in track["artists"]]
+            album_artists = track_artists  # UNDEFINED so we use track_artists
+            for image in track["thumbnails"]:
+                if image["height"] == 544:
                     album_art_640 = image["url"]
-                elif image["height"] == 300:
+                elif image["height"] == 120:
                     album_art_300 = image["url"]
-                elif image["height"] == 64:
+                elif image["height"] == 60:
                     album_art_64 = image["url"]
             artistTracks += [
                 {
-                    "track_id": track["id"],
-                    "track_name": track["name"],
+                    "track_id": track["videoId"],
+                    "track_name": track["title"],
                     "track_artists": track_artists,
-                    "track_number": track["track_number"],
-                    "track_duration": track["duration_ms"],
-                    "album_art_640": track["album"]["images"][0]["url"],
-                    "album_art_300": track["album"]["images"][1]["url"],
-                    "album_art_64": track["album"]["images"][2]["url"],
+                    "track_number": 1,  # UNDEFINED
+                    "track_duration": 1,  # UNDEFINED
+                    "album_art_640": album_art_640,
+                    "album_art_300": album_art_300,
+                    "album_art_64": album_art_64,
                     "album_id": track["album"]["id"],
                     "album_name": track["album"]["name"],
-                    "year": track["album"]["release_date"].split("-")[0],
+                    "year": "0000",  # UNDEFINED
                     "album_artists": album_artists,
-                    "album_length": track["album"]["total_tracks"],
-                    "album_type": track["album"]["album_type"],
+                    "album_length": 1,  # UNDEFINED
+                    "album_type": "album",  # UNDEFINED
                 }
             ]
         return {"albums": artistTracks}
@@ -170,10 +145,11 @@ class BrowsingHandler:
                         "album_id": album["browseId"],
                         "album_name": album["title"],
                         "year": album["year"],
-                        "album_artists": album["artist"],
+                        "album_artists": [album["artist"]],
                         "album_art_640": album_art_640,
                         "album_art_300": album_art_300,
                         "album_art_64": album_art_64,
+                        "album_length": 1, # UNDEFINED
                         "album_type": album["type"].lower(),
                     }
                 ]
@@ -193,10 +169,7 @@ class BrowsingHandler:
                         album_art_300 = image["url"]
                     elif image["height"] == 60:
                         album_art_64 = image["url"]
-                t_artists = track["artists"]
-                track_artists = []
-                for artist in t_artists:
-                    track_artists += [artist["name"]]
+                track_artists = [a["name"] for a in track["artists"]]
                 tracks += [
                     {
                         "track_id": track["videoId"],

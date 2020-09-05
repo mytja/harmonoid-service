@@ -47,8 +47,8 @@ async def ArtistAlbums(artist_id):
 
 
 @app.get("/artisttracks")
-async def ArtistTracks(artist_id, country="us"):
-    result = await harmonoidService.ArtistTracks(artist_id, country)
+async def ArtistTracks(artist_id):
+    result = await harmonoidService.ArtistTracks(artist_id)
     return dict_to_response(result)
 
 
