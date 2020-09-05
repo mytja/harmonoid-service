@@ -1,4 +1,5 @@
 from fastapi import HTTPException
+import asyncio
 import logging
 
 logger = logging.getLogger(__name__)
@@ -23,17 +24,17 @@ class BrowsingHandler:
             "track_id": track["videoId"],
             "track_name": track["title"],
             "track_artists": track_artists,
-            "track_number": 1,  # UNDEFINED
+            # "track_number": 1,  # UNDEFINED
             "track_duration": int(track["lengthSeconds"]) * 1000,
             "album_art_640": album_art_640,
             "album_art_300": album_art_300,
             "album_art_64": album_art_64,
-            "album_id": "",  # UNDEFINED
-            "album_name": "",  # UNDEFINED
+            # "album_id": "",  # UNDEFINED
+            # "album_name": "",  # UNDEFINED
             "year": track["release"].split("-")[0] if "release" in track else "",
             "album_artists": album_artists,
-            "album_length": 1,  # UNDEFINED
-            "album_type": "album",  # UNDEFINED
+            # "album_length": 1,  # UNDEFINED
+            # "album_type": "album",  # UNDEFINED
         }
 
     async def AlbumInfo(self, albumId):
@@ -47,7 +48,7 @@ class BrowsingHandler:
                     "track_id": track["videoId"],
                     "track_name": track["title"],
                     "track_artists": [track["artists"]],
-                    "track_number": track["index"],
+                    "track_number": int(track["index"]),
                     "track_duration": int(track["lengthMs"]),
                 }
             ]
@@ -71,8 +72,8 @@ class BrowsingHandler:
                     "album_art_640": album_art_640,
                     "album_art_300": album_art_300,
                     "album_art_64": album_art_64,
-                    "album_length": 1,  # UNDEFINED
-                    "album_type": "album",  # UNDEFINED
+                    # "album_length": 1,  # UNDEFINED
+                    # "album_type": "album",  # UNDEFINED
                 }
             ]
         return {"albums": artistAlbums}
@@ -92,17 +93,17 @@ class BrowsingHandler:
                     "track_id": track["videoId"],
                     "track_name": track["title"],
                     "track_artists": track_artists,
-                    "track_number": 1,  # UNDEFINED
-                    "track_duration": 1,  # UNDEFINED
+                    # "track_number": 1,  # UNDEFINED
+                    # "track_duration": 1,  # UNDEFINED
                     "album_art_640": album_art_640,
                     "album_art_300": album_art_300,
                     "album_art_64": album_art_64,
                     "album_id": track["album"]["id"],
                     "album_name": track["album"]["name"],
-                    "year": "0000",  # UNDEFINED
+                    # "year": "0000",  # UNDEFINED
                     "album_artists": album_artists,
-                    "album_length": 1,  # UNDEFINED
-                    "album_type": "album",  # UNDEFINED
+                    # "album_length": 1,  # UNDEFINED
+                    # "album_type": "album",  # UNDEFINED
                 }
             ]
         return {"albums": artistTracks}
@@ -125,7 +126,7 @@ class BrowsingHandler:
                         "album_art_640": album_art_640,
                         "album_art_300": album_art_300,
                         "album_art_64": album_art_64,
-                        "album_length": 1,  # UNDEFINED
+                        # "album_length": 1,  # UNDEFINED
                         "album_type": album["type"].lower(),
                     }
                 ]
@@ -140,11 +141,13 @@ class BrowsingHandler:
                     track["thumbnails"]
                 )
                 track_artists = [a["name"] for a in track["artists"]]
+                album_artists = track_artists  # UNDEFINED so we use track_artists
                 tracks += [
                     {
                         "track_id": track["videoId"],
                         "track_name": track["title"],
                         "track_artists": track_artists,
+                        # "track_number": 1, # UNDEFINED
                         "track_duration": (
                             int(track["duration"].split(":")[0]) * 60
                             + int(track["duration"].split(":")[1])
@@ -152,9 +155,13 @@ class BrowsingHandler:
                         * 1000,
                         "album_id": track["album"]["id"],
                         "album_name": track["album"]["name"],
+                        # "album_year": "", # UNDEFINED
+                        "album_artists": album_artists,
                         "album_art_640": album_art_640,
                         "album_art_300": album_art_300,
                         "album_art_64": album_art_64,
+                        # "album_length": 11, # UNDEFINED
+                        # "album_type": "album" # UNDEFINED
                     }
                 ]
             return {"tracks": tracks}
