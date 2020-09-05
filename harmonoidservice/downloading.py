@@ -11,7 +11,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class YoutubeHandler:
+class DownloadHandler:
     async def SaveAudio(self, videoId, trackId):
         result = await async_youtube_dl.download(
             f"https://www.youtube.com/watch?v={videoId}", f"{trackId}.m4a"

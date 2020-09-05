@@ -1,7 +1,6 @@
 from harmonoidservice import HarmonoidService
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.responses import PlainTextResponse
-from os import getenv
 import json
 
 import logging
@@ -9,9 +8,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-harmonoidService = HarmonoidService(
-    getenv("SPOTIFY_CLIENT_ID"), getenv("SPOTIFY_CLIENT_SECRET")
-)
+harmonoidService = HarmonoidService()
 
 app = FastAPI()
 
@@ -52,12 +49,6 @@ async def AlbumInfo(album_id):
 @app.get("/trackinfo")
 async def TrackInfo(track_id):
     result = await harmonoidService.TrackInfo(track_id)
-    return dict_to_response(result)
-
-
-@app.get("/artistrelated")
-async def ArtistRelated(artist_id):
-    result = await harmonoidService.ArtistRelated(artist_id)
     return dict_to_response(result)
 
 

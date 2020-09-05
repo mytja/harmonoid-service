@@ -1,7 +1,7 @@
 {
-  "name": "spotiyt-server",
-  "description": "Python FastAPI app allowing you to search for tracks with Spotify and download them using YouTube. The backend working behind the Harmonoid music app.",
+  "name": "harmonoid-service",
+  "description": "The Python based backend working behind the Harmonoid music app.",
   "repository": "https://github.com/raitonoberu/spotiyt-server",
   "logo": "https://github.com/alexmercerind/harmonoid/blob/master/README%20Assets/icon.png?raw=true",
-  "keywords": ["python", "fastapi", "spotify", "youtube"]
+  "keywords": ["python", "fastapi", "youtube", "youtube-music"]
 }

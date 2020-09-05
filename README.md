@@ -145,20 +145,6 @@ response = requests.get(
 print(response.json())
 ```
 
-##### Get Related Artists Of Artist
-
-```python
-import requests
-
-response = requests.get(
-    'https://yourapp.herokuapp.com/artistrelated', {
-        'artist_id': '7vk5e3vY1uw9plTHJAMwjN',        #Spotify Artist ID of the artist
-    }
-)
-
-print(response.json())
-```
-
 ##### Download A Track
 
 ```python
