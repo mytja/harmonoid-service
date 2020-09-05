@@ -22,21 +22,9 @@ async def hello():
     return PlainTextResponse("service is running")
 
 
-@app.get("/accesstoken")
-async def accesstoken():
-    token = await harmonoidService.AccessToken()
-    return PlainTextResponse(token)
-
-
 @app.get("/search")
-async def SearchSpotify(keyword, mode="album", offset: int = 0, limit: int = 50):
-    result = await harmonoidService.SearchSpotify(keyword, mode, offset, limit)
-    return dict_to_response(result)
-
-
-@app.get("/searchyoutube")
-async def SearchYoutube(keyword, offset: int = 1, max_results: int = 10):
-    result = await harmonoidService.SearchYoutube(keyword, offset, max_results)
+async def SearchYoutube(keyword, mode="album"):
+    result = await harmonoidService.SearchYoutube(keyword, mode)
     return dict_to_response(result)
 
 

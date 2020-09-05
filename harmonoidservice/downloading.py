@@ -1,4 +1,3 @@
-from .async_youtubesearchpython import SearchVideos
 import httpx
 from . import async_youtube_dl
 import os
@@ -57,15 +56,14 @@ class DownloadHandler:
 
         logger.info(f"[metadata] Successfully added meta data to track ID: {trackId}.")
 
-    async def SearchYoutube(self, keyword, offset, maxResults, mode="json"):
-        search = SearchVideos(keyword, offset, mode, maxResults)
-        await search.main()
-        return search.result()
-
     async def TrackDownload(self, trackId, trackName):
         if trackId:
             if os.path.isfile(f"{trackId}.m4a"):
-                return FileResponse(f"{trackId}.m4a")
+                return FileResponse(
+                    f"{trackId}.m4a",
+                    media_type="audio/mp4",
+                    headers={"Accept-Ranges": "bytes"},
+                )
 
             logger.info(f"[server] Download request in ID format.")
             trackInfo = await self.TrackInfo(trackId)
@@ -73,29 +71,26 @@ class DownloadHandler:
                 f"[info] Successfully retrieved metadata of track ID: {trackId}."
             )
             artists = " ".join(trackInfo["track_artists"])
-            videoId = await self.SearchYoutube(
-                "lyrics "
-                + trackInfo["track_name"].split("(")[0].strip().split("-")[0].strip()
-                + " "
-                + artists,
-                1,
-                1,
-                "dict",
-            )
-            videoId = videoId["search_result"][0]["id"]
+
+            videoId = await self.ytMusic._search(trackInfo["track_name"], "songs")
+            videoId = videoId[0]["videoId"]
 
             logger.info(f"[search] Search successful. Video ID: {videoId}.")
         if trackName:
             logger.info(f"[server] Download request in name format.")
-            videoId = await self.SearchYoutube(trackName, 1, "json", 1)
-            videoId = videoId["search_result"][0]["id"]
+            videoId = await self.ytMusic._search(trackInfo["track_name"], "songs")
+            videoId = videoId[0]["videoId"]
             logger.info(f"[search] Search successful. Video ID: {videoId}.")
             trackId = await self.SearchSpotify(trackName, "track", 0, 1)
             trackId = trackId["tracks"][0]["track_id"]
             logger.info(f"[tracksearch] Track Search successful. Track ID: {trackId}.")
 
             if os.path.isfile(f"{trackId}.m4a"):
-                return FileResponse(f"{trackId}.m4a")
+                return FileResponse(
+                    f"{trackId}.m4a",
+                    media_type="audio/mp4",
+                    headers={"Accept-Ranges": "bytes"},
+                )
 
             trackInfo = await self.TrackInfo(trackId)
             logger.info(
@@ -105,4 +100,9 @@ class DownloadHandler:
         await self.SaveAudio(videoId, trackId)
         await self.SaveMetaData(trackInfo)
         logger.info(f"[server] Sending audio binary for track ID: {trackId}")
-        return FileResponse(f"{trackId}.m4a")
+
+        return FileResponse(
+            f"{trackId}.m4a",
+            media_type="audio/mp4",
+            headers={"Accept-Ranges": "bytes"},
+        )

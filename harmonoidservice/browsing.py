@@ -2,7 +2,6 @@ import httpx
 import base64
 from fastapi import HTTPException
 import logging
-import ytmusicapi
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +12,6 @@ class ApiError(Exception):
 
 
 class BrowsingHandler:
-
     async def TrackInfo(self, trackId):
         track = await self.request(f"tracks/{trackId}")
         album_art_640 = ""
@@ -29,15 +27,11 @@ class BrowsingHandler:
         a_artists = track["album"]["artists"]
         album_artists = []
         for artist in a_artists:
-            album_artists += [
-                artist["name"]
-            ]
+            album_artists += [artist["name"]]
         t_artists = track["artists"]
         track_artists = []
         for artist in t_artists:
-            track_artists += [
-                artist["name"]
-            ]
+            track_artists += [artist["name"]]
         return {
             "track_id": track["id"],
             "track_name": track["name"],
@@ -65,9 +59,7 @@ class BrowsingHandler:
             t_artists = track["artists"]
             track_artists = []
             for artist in t_artists:
-                track_artists += [
-                    artist["name"]
-                ]
+                track_artists += [artist["name"]]
             result += [
                 {
                     "track_id": track["id"],
@@ -90,9 +82,7 @@ class BrowsingHandler:
             album_artists = []
             a_artists = album["artists"]
             for artist in a_artists:
-                album_artists += [
-                    artist["name"]
-                ]
+                album_artists += [artist["name"]]
             for image in album["images"]:
                 if image["height"] == 640:
                     album_art_640 = image["url"]
@@ -128,15 +118,11 @@ class BrowsingHandler:
             album_artists = []
             a_artists = track["artists"]
             for artist in a_artists:
-                album_artists += [
-                    artist["name"]
-                ]
+                album_artists += [artist["name"]]
             t_artists = track["artists"]
             track_artists = []
             for artist in t_artists:
-                track_artists += [
-                    artist["name"]
-                ]
+                track_artists += [artist["name"]]
             for image in track["album"]["images"]:
                 if image["height"] == 640:
                     album_art_640 = image["url"]
@@ -164,9 +150,9 @@ class BrowsingHandler:
             ]
         return {"albums": artistTracks}
 
-    async def SearchSpotify(self, keyword, mode, offset, limit):
+    async def SearchYoutube(self, keyword, mode):
         if mode == "album":
-            youtubeResult = self.ytmusic.search(keyword, filter = "albums")
+            youtubeResult = await self.ytMusic._search(keyword, "albums")
             albums = []
             for album in youtubeResult:
                 album_art_640 = ""
@@ -194,7 +180,7 @@ class BrowsingHandler:
             return {"albums": albums}
 
         if mode == "track":
-            youtubeResult = self.ytmusic.search(keyword, filter = "songs")
+            youtubeResult = await self.ytMusic._search(keyword, "songs")
             tracks = []
             for track in youtubeResult:
                 album_art_640 = ""
@@ -210,15 +196,17 @@ class BrowsingHandler:
                 t_artists = track["artists"]
                 track_artists = []
                 for artist in t_artists:
-                    track_artists += [
-                        artist["name"]
-                    ]
+                    track_artists += [artist["name"]]
                 tracks += [
                     {
                         "track_id": track["videoId"],
                         "track_name": track["title"],
                         "track_artists": track_artists,
-                        "track_duration": (int(track["duration"].split(":")[0]) * 60 + int(track["duration"].split(":")[1])) * 1000,
+                        "track_duration": (
+                            int(track["duration"].split(":")[0]) * 60
+                            + int(track["duration"].split(":")[1])
+                        )
+                        * 1000,
                         "album_id": track["album"]["id"],
                         "album_name": track["album"]["name"],
                         "album_art_640": album_art_640,
@@ -229,7 +217,7 @@ class BrowsingHandler:
             return {"tracks": tracks}
 
         if mode == "artist":
-            youtubeResult = self.ytmusic.search(keyword, filter = "artists")
+            youtubeResult = await self.ytMusic._search(keyword, "artists")
             artists = []
             for artist in youtubeResult:
                 artist_art_640 = ""

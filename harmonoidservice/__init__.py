@@ -1,6 +1,6 @@
 from .browsing import BrowsingHandler
 from .downloading import DownloadHandler
-import ytmusicapi
+from .async_ytmusicapi import YTMusic
 
 class HarmonoidService(BrowsingHandler, DownloadHandler):
-    ytmusic = ytmusicapi.YTMusic()
+    ytMusic = YTMusic()
