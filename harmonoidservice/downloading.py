@@ -16,7 +16,7 @@ class DownloadHandler:
         result = await async_youtube_dl.download(
             f"https://www.youtube.com/watch?v={trackId}", f"{trackId}.m4a"
         )
-    
+
     #👌 Fixed
     async def SaveMetaData(self, trackInfoJSON):
         art = (
@@ -59,15 +59,16 @@ class DownloadHandler:
 
     #👌 Fixed
     async def TrackDownload(self, trackId, albumId, trackName):
-        trackInfo = await self.TrackInfo(trackId, albumId)
-        logger.info(f"[info] Successfully retrieved metadata of track ID: {trackId}.")
-
         if trackId:
             logger.info(f"[server] Download request in ID format.")
         if trackName:
             logger.info(f"[server] Download request in name format.")
-            trackId = await self.ytMusic._search(trackInfo["track_name"], "songs")
+            trackId = await self.ytMusic._search(trackName, "songs")
             trackId = trackId[0]["videoId"]
+
+        trackInfo = await self.TrackInfo(trackId, albumId)
+        logger.info(f"[info] Successfully retrieved metadata of track ID: {trackId}.")
+
 
         if os.path.isfile(f"{trackId}.m4a"):
             return FileResponse(
