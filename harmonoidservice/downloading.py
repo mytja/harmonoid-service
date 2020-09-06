@@ -45,7 +45,7 @@ class DownloadHandler:
         audioFile["\xa9nam"] = trackInfoJSON["track_name"]
         audioFile["\xa9alb"] = trackInfoJSON["album_name"]
         audioFile["\xa9ART"] = "/".join(trackInfoJSON["track_artists"])
-        audioFile["aART"] = "/".join(trackInfoJSON["album_artists"])
+        audioFile["aART"] = trackInfoJSON["album_artists"][0]
         audioFile["\xa9day"] = trackInfoJSON["year"]
         audioFile["trkn"] = [
             (trackInfoJSON["track_number"], trackInfoJSON["album_length"])
