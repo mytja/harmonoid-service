@@ -42,7 +42,7 @@ class BrowsingHandler:
     
     async def ArrangeVideoIds(self, searchQueriesList, videoIdList, videoIdListIndex):
         youtubeResult = await self.ytMusic._search(searchQueriesList[videoIdListIndex], "songs")
-        videoIdList[videoIdListIndex] = youtubeResult[0]["videoId"]
+        videoIdList[videoIdListIndex] = youtubeResult[0]["videoId"] #✅
     
     async def AsyncAlbumSearch(self, searchQueriesList, videoIdList):
         args = [(searchQueriesList, videoIdList, index) for index in range(0, len(videoIdList))]
@@ -128,13 +128,28 @@ class BrowsingHandler:
 
     async def ArrangeAlbumLength(self, albumIdList, albumLengthList, albumLengthListIndex):
         youtubeResult = await self.ytMusic._get_album(albumIdList[albumLengthListIndex])
-        albumLengthList[albumLengthListIndex] = len(youtubeResult["tracks"])
+        albumLengthList[albumLengthListIndex] = int(youtubeResult["trackCount"]) #✅
 
     async def AsyncAlbumLength(self, albumIdList, albumLengthList):
         args = [(albumIdList, albumLengthList, index) for index in range(0, len(albumIdList))]
         asyncSearchTasks = itertools.starmap(self.ArrangeAlbumLength, args)
         await asyncio.gather(*asyncSearchTasks)
 
+    async def ArrangeTrackStuff(self, trackIdList, albumIdList, trackNumberList, yearList, albumLengthList, albumTypeList, albumLengthListIndex):
+        youtubeResult = await self.ytMusic._get_album(albumIdList[albumLengthListIndex])
+        for track in youtubeResult["tracks"]:
+            if track["title"] == trackIdList[albumLengthListIndex]:
+                trackNumberList[albumLengthListIndex] = int(track["index"]) #✅
+                break
+        yearList[albumLengthListIndex] = youtubeResult["releaseDate"]["year"] #✅
+        albumLengthList[albumLengthListIndex] = int(youtubeResult["trackCount"]) #✅
+        albumTypeList[albumLengthListIndex] = "single" if len(youtubeResult["tracks"]) == 1 else "album" #✅
+
+    async def AsyncTrackStuff(self, trackIdList, albumIdList, trackNumberList, yearList, albumLengthList, albumTypeList):
+        args = [(trackIdList, albumIdList, trackNumberList, yearList, albumLengthList, albumTypeList, index) for index in range(0, len(albumIdList))]
+        asyncSearchTasks = itertools.starmap(self.ArrangeTrackStuff, args)
+        await asyncio.gather(*asyncSearchTasks)
+    
     async def SearchYoutube(self, keyword, mode):
         if mode == "album":
             youtubeResult = await self.ytMusic._search(keyword, "albums")
@@ -167,19 +182,28 @@ class BrowsingHandler:
         if mode == "track":
             youtubeResult = await self.ytMusic._search(keyword, "songs")
 
+            albumIdList = [track["album"]["id"] for track in youtubeResult]
+            trackIdList = [track["title"] for track in youtubeResult]
+            trackNumberList = ["" for track in youtubeResult]
+            yearList = ["" for track in youtubeResult]
+            albumLengthList = ["" for track in youtubeResult]
+            albumTypeList = ["" for track in youtubeResult]
+            await self.AsyncTrackStuff(trackIdList, albumIdList, trackNumberList, yearList, albumLengthList, albumTypeList)
+
             tracks = []
-            for track in youtubeResult:
+            for index in range(0, len(youtubeResult)):
+                track = youtubeResult[index]
                 album_art_64, album_art_300, album_art_640 = sort_thumbnails(
                     track["thumbnails"]
                 )
                 track_artists = [a["name"] for a in track["artists"]]
-                album_artists = track_artists  # UNDEFINED so we use track_artists
+                album_artists = track_artists
                 tracks += [
                     {
                         "track_id": track["videoId"],
                         "track_name": track["title"],
                         "track_artists": track_artists,
-                        # "track_number": 1, # UNDEFINED
+                        "track_number": trackNumberList[index],
                         "track_duration": (
                             int(track["duration"].split(":")[0]) * 60
                             + int(track["duration"].split(":")[1])
@@ -187,13 +211,13 @@ class BrowsingHandler:
                         * 1000,
                         "album_id": track["album"]["id"],
                         "album_name": track["album"]["name"],
-                        # "year": "", # UNDEFINED
+                        "year": yearList[index],
                         "album_artists": album_artists,
                         "album_art_640": album_art_640,
                         "album_art_300": album_art_300,
                         "album_art_64": album_art_64,
-                        # "album_length": 11, # UNDEFINED
-                        # "album_type": "album" # UNDEFINED
+                        "album_length": albumLengthList[index],
+                        "album_type": albumTypeList[index],
                     }
                 ]
             return {"tracks": tracks}
