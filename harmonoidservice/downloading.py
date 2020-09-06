@@ -11,13 +11,11 @@ logger = logging.getLogger(__name__)
 
 
 class DownloadHandler:
-    #👌 Fixed
     async def SaveAudio(self, trackId):
         result = await async_youtube_dl.download(
             f"https://www.youtube.com/watch?v={trackId}", f"{trackId}.m4a"
         )
 
-    #👌 Fixed
     async def SaveMetaData(self, trackInfoJSON):
         art = (
             trackInfoJSON["album_art_640"]
@@ -57,7 +55,6 @@ class DownloadHandler:
 
         logger.info(f"[metadata] Successfully added meta data to track ID: {trackId}.")
 
-    #👌 Fixed
     async def TrackDownload(self, trackId, albumId, trackName):
         if trackId:
             logger.info(f"[server] Download request in ID format.")
@@ -68,7 +65,6 @@ class DownloadHandler:
 
         trackInfo = await self.TrackInfo(trackId, albumId)
         logger.info(f"[info] Successfully retrieved metadata of track ID: {trackId}.")
-
 
         if os.path.isfile(f"{trackId}.m4a"):
             return FileResponse(
