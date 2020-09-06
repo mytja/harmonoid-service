@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 import asyncio
 import logging
+import itertools
 
 logger = logging.getLogger(__name__)
 
@@ -37,15 +38,33 @@ class BrowsingHandler:
             # "album_type": "album",  # UNDEFINED
         }
 
+    
+    async def ArrangeVideoIds(self, searchQueriesList, videoIdList, videoIdListIndex):
+        youtubeResult = await self.ytMusic._search(searchQueriesList[videoIdListIndex], "songs")
+        logger.info('Required Index: ' + str(videoIdListIndex) + '\n' + 'Maximum Index : ' + str(len(videoIdList) - 1))
+        videoIdList[videoIdListIndex] = youtubeResult[0]["videoId"]
+    
+    async def AsyncAlbumSearch(self, searchQueriesList, videoIdList):
+        args = [(searchQueriesList, videoIdList, index) for index in range(0, len(videoIdList))]
+        asyncSearchTasks = itertools.starmap(self.ArrangeVideoIds, args)
+        await asyncio.gather(*asyncSearchTasks)
+
     async def AlbumInfo(self, albumId):
         response = await self.ytMusic._get_album(albumId)
 
         tracks = response["tracks"]
+
+        videoIdList = ["" for index in range(0, len(tracks))]
+        searchQueriesList = [track["title"] + " " + track["artists"] for track in tracks]
+        logger.info(searchQueriesList)
+        await self.AsyncAlbumSearch(searchQueriesList, videoIdList)
+
         result = []
-        for track in tracks:
+        for index in range(0, len(tracks)):
+            track = tracks[index]
             result += [
                 {
-                    "track_id": track["videoId"],
+                    "track_id": videoIdList[index],
                     "track_name": track["title"],
                     "track_artists": [track["artists"]],
                     "track_number": int(track["index"]),
@@ -155,7 +174,7 @@ class BrowsingHandler:
                         * 1000,
                         "album_id": track["album"]["id"],
                         "album_name": track["album"]["name"],
-                        # "album_year": "", # UNDEFINED
+                        # "year": "", # UNDEFINED
                         "album_artists": album_artists,
                         "album_art_640": album_art_640,
                         "album_art_300": album_art_300,
@@ -171,7 +190,7 @@ class BrowsingHandler:
 
             artists = []
             for artist in youtubeResult:
-                album_art_64, album_art_300, album_art_640 = sort_thumbnails(
+                artist_art_64, artist_art_300, artist_art_640 = sort_thumbnails(
                     artist["thumbnails"]
                 )
                 artists += [

@@ -62,6 +62,9 @@ class DownloadHandler:
         logger.info(f"[metadata] Successfully added meta data to track ID: {trackId}.")
 
     async def TrackDownload(self, trackId, trackName):
+        trackInfo = await self.TrackInfo(trackId)
+        logger.info(f"[info] Successfully retrieved metadata of track ID: {trackId}.")
+
         if trackId:
             logger.info(f"[server] Download request in ID format.")
         if trackName:
@@ -76,8 +79,6 @@ class DownloadHandler:
                 headers={"Accept-Ranges": "bytes"},
             )
 
-        trackInfo = await self.TrackInfo(trackId)
-        logger.info(f"[info] Successfully retrieved metadata of track ID: {trackId}.")
         await self.SaveAudio(trackId)
         await self.SaveMetaData(trackInfo)
 
