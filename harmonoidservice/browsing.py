@@ -1,8 +1,6 @@
-import httpx
-import base64
 from fastapi import HTTPException
+import asyncio
 import logging
-import ytmusicapi
 
 logger = logging.getLogger(__name__)
 
@@ -13,235 +11,169 @@ class ApiError(Exception):
 
 
 class BrowsingHandler:
-
     async def TrackInfo(self, trackId):
-        track = await self.request(f"tracks/{trackId}")
-        album_art_640 = ""
-        album_art_300 = ""
-        album_art_64 = ""
-        for image in track["album"]["images"]:
-            if image["height"] == 640:
-                album_art_640 = image["url"]
-            elif image["height"] == 300:
-                album_art_300 = image["url"]
-            elif image["height"] == 64:
-                album_art_64 = image["url"]
-        a_artists = track["album"]["artists"]
-        album_artists = []
-        for artist in a_artists:
-            album_artists += [
-                artist["name"]
-            ]
-        t_artists = track["artists"]
-        track_artists = []
-        for artist in t_artists:
-            track_artists += [
-                artist["name"]
-            ]
+        track = await self.ytMusic._get_song(trackId)
+
+        album_art_64, album_art_300, album_art_640 = sort_thumbnails(
+            track["thumbnail"]["thumbnails"]
+        )
+
+        track_artists = track.get("artists", [track["author"]])
+        album_artists = track_artists  # UNDEFINED so we use track_artists
         return {
-            "track_id": track["id"],
-            "track_name": track["name"],
+            "track_id": track["videoId"],
+            "track_name": track["title"],
             "track_artists": track_artists,
-            "track_number": track["track_number"],
-            "track_duration": track["duration_ms"],
+            # "track_number": 1,  # UNDEFINED
+            "track_duration": int(track["lengthSeconds"]) * 1000,
             "album_art_640": album_art_640,
             "album_art_300": album_art_300,
             "album_art_64": album_art_64,
-            "album_id": track["album"]["id"],
-            "album_name": track["album"]["name"],
-            "year": track["album"]["release_date"].split("-")[0],
+            # "album_id": "",  # UNDEFINED
+            # "album_name": "",  # UNDEFINED
+            "year": track["release"].split("-")[0] if "release" in track else "",
             "album_artists": album_artists,
-            "album_length": track["album"]["total_tracks"],
-            "album_type": track["album"]["album_type"],
+            # "album_length": 1,  # UNDEFINED
+            # "album_type": "album",  # UNDEFINED
         }
 
     async def AlbumInfo(self, albumId):
-        response = await self.request(
-            f"albums/{albumId}/tracks", {"limit": 50, "offset": 0}
-        )
-        tracks = response["items"]
+        response = await self.ytMusic._get_album(albumId)
+
+        tracks = response["tracks"]
         result = []
         for track in tracks:
-            t_artists = track["artists"]
-            track_artists = []
-            for artist in t_artists:
-                track_artists += [
-                    artist["name"]
-                ]
             result += [
                 {
-                    "track_id": track["id"],
-                    "track_name": track["name"],
-                    "track_artists": track_artists,
-                    "track_number": track["track_number"],
-                    "track_duration": track["duration_ms"],
+                    "track_id": track["videoId"],
+                    "track_name": track["title"],
+                    "track_artists": [track["artists"]],
+                    "track_number": int(track["index"]),
+                    "track_duration": int(track["lengthMs"]),
                 }
             ]
         return {"tracks": result}
 
     async def ArtistAlbums(self, artistId):
-        artistAlbumsJson = await self.request(f"artists/{artistId}/albums")
+        # обьединить с singles
+        artistJson = await self.ytMusic._get_artist(artistId)
+
         artistAlbums = []
-        albums = []
-        for album in artistAlbumsJson["items"]:
-            album_art_640 = ""
-            album_art_300 = ""
-            album_art_64 = ""
-            album_artists = []
-            a_artists = album["artists"]
-            for artist in a_artists:
-                album_artists += [
-                    artist["name"]
-                ]
-            for image in album["images"]:
-                if image["height"] == 640:
-                    album_art_640 = image["url"]
-                elif image["height"] == 300:
-                    album_art_300 = image["url"]
-                elif image["height"] == 64:
-                    album_art_64 = image["url"]
+        for album in artistJson["albums"]["results"]:
+            album_art_64, album_art_300, album_art_640 = sort_thumbnails(
+                album["thumbnails"]
+            )
             artistAlbums += [
                 {
-                    "album_id": album["id"],
-                    "album_name": album["name"],
-                    "year": album["release_date"].split("-")[0],
-                    "album_artists": album_artists,
+                    "album_id": album["browseId"],
+                    "album_name": album["title"],
+                    "year": album["year"],
+                    "album_artists": [artistJson["name"]],
                     "album_art_640": album_art_640,
                     "album_art_300": album_art_300,
                     "album_art_64": album_art_64,
-                    "album_length": album["total_tracks"],
-                    "album_type": album["album_type"],
+                    # "album_length": 1,  # UNDEFINED
+                    # "album_type": "album",  # UNDEFINED
                 }
             ]
         return {"albums": artistAlbums}
 
-    async def ArtistTracks(self, artistId, country):
-        artistTracksJson = await self.request(
-            f"artists/{artistId}/top-tracks?country={country}"
-        )
+    async def ArtistTracks(self, artistId):
+        artistJson = await self.ytMusic._get_artist(artistId)
+
         artistTracks = []
-        albums = []
-        for track in artistTracksJson["tracks"]:
-            album_art_640 = ""
-            album_art_300 = ""
-            album_art_64 = ""
-            album_artists = []
-            a_artists = track["artists"]
-            for artist in a_artists:
-                album_artists += [
-                    artist["name"]
-                ]
-            t_artists = track["artists"]
-            track_artists = []
-            for artist in t_artists:
-                track_artists += [
-                    artist["name"]
-                ]
-            for image in track["album"]["images"]:
-                if image["height"] == 640:
-                    album_art_640 = image["url"]
-                elif image["height"] == 300:
-                    album_art_300 = image["url"]
-                elif image["height"] == 64:
-                    album_art_64 = image["url"]
+        for track in artistJson["songs"]["results"]:
+            track_artists = [a["name"] for a in track["artists"]]
+            album_artists = track_artists  # UNDEFINED so we use track_artists
+            album_art_64, album_art_300, album_art_640 = sort_thumbnails(
+                track["thumbnails"]
+            )
             artistTracks += [
                 {
-                    "track_id": track["id"],
-                    "track_name": track["name"],
+                    "track_id": track["videoId"],
+                    "track_name": track["title"],
                     "track_artists": track_artists,
-                    "track_number": track["track_number"],
-                    "track_duration": track["duration_ms"],
-                    "album_art_640": track["album"]["images"][0]["url"],
-                    "album_art_300": track["album"]["images"][1]["url"],
-                    "album_art_64": track["album"]["images"][2]["url"],
+                    # "track_number": 1,  # UNDEFINED
+                    # "track_duration": 1,  # UNDEFINED
+                    "album_art_640": album_art_640,
+                    "album_art_300": album_art_300,
+                    "album_art_64": album_art_64,
                     "album_id": track["album"]["id"],
                     "album_name": track["album"]["name"],
-                    "year": track["album"]["release_date"].split("-")[0],
+                    # "year": "0000",  # UNDEFINED
                     "album_artists": album_artists,
-                    "album_length": track["album"]["total_tracks"],
-                    "album_type": track["album"]["album_type"],
+                    # "album_length": 1,  # UNDEFINED
+                    # "album_type": "album",  # UNDEFINED
                 }
             ]
         return {"albums": artistTracks}
 
-    async def SearchSpotify(self, keyword, mode, offset, limit):
+    async def SearchYoutube(self, keyword, mode):
         if mode == "album":
-            youtubeResult = self.ytmusic.search(keyword, filter = "albums")
+            youtubeResult = await self.ytMusic._search(keyword, "albums")
+
             albums = []
             for album in youtubeResult:
-                album_art_640 = ""
-                album_art_300 = ""
-                album_art_64 = ""
-                for image in album["thumbnails"]:
-                    if image["height"] == 544:
-                        album_art_640 = image["url"]
-                    elif image["height"] == 226:
-                        album_art_300 = image["url"]
-                    elif image["height"] == 60:
-                        album_art_64 = image["url"]
+                album_art_64, album_art_300, album_art_640 = sort_thumbnails(
+                    album["thumbnails"]
+                )
                 albums += [
                     {
                         "album_id": album["browseId"],
                         "album_name": album["title"],
                         "year": album["year"],
-                        "album_artists": album["artist"],
+                        "album_artists": [album["artist"]],
                         "album_art_640": album_art_640,
                         "album_art_300": album_art_300,
                         "album_art_64": album_art_64,
+                        # "album_length": 1,  # UNDEFINED
                         "album_type": album["type"].lower(),
                     }
                 ]
             return {"albums": albums}
 
         if mode == "track":
-            youtubeResult = self.ytmusic.search(keyword, filter = "songs")
+            youtubeResult = await self.ytMusic._search(keyword, "songs")
+
             tracks = []
             for track in youtubeResult:
-                album_art_640 = ""
-                album_art_300 = ""
-                album_art_64 = ""
-                for image in track["thumbnails"]:
-                    if image["height"] == 544:
-                        album_art_640 = image["url"]
-                    elif image["height"] == 226:
-                        album_art_300 = image["url"]
-                    elif image["height"] == 60:
-                        album_art_64 = image["url"]
-                t_artists = track["artists"]
-                track_artists = []
-                for artist in t_artists:
-                    track_artists += [
-                        artist["name"]
-                    ]
+                album_art_64, album_art_300, album_art_640 = sort_thumbnails(
+                    track["thumbnails"]
+                )
+                track_artists = [a["name"] for a in track["artists"]]
+                album_artists = track_artists  # UNDEFINED so we use track_artists
                 tracks += [
                     {
                         "track_id": track["videoId"],
                         "track_name": track["title"],
                         "track_artists": track_artists,
-                        "track_duration": (int(track["duration"].split(":")[0]) * 60 + int(track["duration"].split(":")[1])) * 1000,
+                        # "track_number": 1, # UNDEFINED
+                        "track_duration": (
+                            int(track["duration"].split(":")[0]) * 60
+                            + int(track["duration"].split(":")[1])
+                        )
+                        * 1000,
                         "album_id": track["album"]["id"],
                         "album_name": track["album"]["name"],
+                        # "album_year": "", # UNDEFINED
+                        "album_artists": album_artists,
                         "album_art_640": album_art_640,
                         "album_art_300": album_art_300,
                         "album_art_64": album_art_64,
+                        # "album_length": 11, # UNDEFINED
+                        # "album_type": "album" # UNDEFINED
                     }
                 ]
             return {"tracks": tracks}
 
         if mode == "artist":
-            youtubeResult = self.ytmusic.search(keyword, filter = "artists")
+            youtubeResult = await self.ytMusic._search(keyword, "artists")
+
             artists = []
             for artist in youtubeResult:
-                artist_art_640 = ""
-                artist_art_300 = ""
-                artist_art_64 = ""
-                for image in artist["thumbnails"]:
-                    if image["height"] == 544:
-                        artist_art_640 = image["url"]
-                    elif image["height"] == 226:
-                        artist_art_300 = image["url"]
-                    elif image["height"] == 60:
-                        artist_art_64 = image["url"]
+                album_art_64, album_art_300, album_art_640 = sort_thumbnails(
+                    artist["thumbnails"]
+                )
                 artists += [
                     {
                         "artist_id": artist["browseId"],
@@ -252,3 +184,16 @@ class BrowsingHandler:
                     }
                 ]
             return {"artists": artists}
+
+
+def sort_thumbnails(thumbnails):
+    thumbs = {}
+    for thumbnail in thumbnails:
+        wh = thumbnail["width"] * thumbnail["height"]
+        thumbs[wh] = thumbnail["url"]
+    resolutions = sorted(list(thumbs.keys()))
+    max = resolutions[-1]
+    mid = resolutions[-2] if len(resolutions) > 2 else max
+    min = resolutions[0]
+
+    return (thumbs[min], thumbs[mid], thumbs[max])
