@@ -35,8 +35,8 @@ async def AlbumInfo(album_id):
 
 
 @app.get("/trackinfo")
-async def TrackInfo(track_id):
-    result = await harmonoidService.TrackInfo(track_id)
+async def TrackInfo(track_id, album_id):
+    result = await harmonoidService.TrackInfo(track_id, album_id)
     return dict_to_response(result)
 
 
@@ -53,12 +53,14 @@ async def ArtistTracks(artist_id):
 
 
 @app.get("/trackdownload")
-async def TrackDownload(track_id=None, track_name=None):
+async def TrackDownload(track_id=None, album_id=None, track_name=None):
     if not any((track_id, track_name)):
         raise HTTPException(422, "Neither track_id nor track_name is specified")
+    if not any((track_id, album_id)):
+        raise HTTPException(422, "track_id nor album_id both should be specified")
     if track_id and track_name:
         raise HTTPException(422, "Both track_id and track_name is specified")
-    return await harmonoidService.TrackDownload(track_id, track_name)
+    return await harmonoidService.TrackDownload(track_id, album_id, track_name)
 
 
 if __name__ == "__main__":
