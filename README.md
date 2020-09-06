@@ -164,7 +164,7 @@ In that case you can simply re-push the code to the Heroku by making an empty co
 - **Heroku**
   - Thanks for providing a free place to deploy this web app.
 
-- [sigmatics](https://github.com/sigma67) for [youtube-search-python](https://github.com/sigma67/ytmusicapi)
+- [sigmatics](https://github.com/sigma67) for [ytmusicapi](https://github.com/sigma67/ytmusicapi)
 - [Sebastián Ramírez](https://github.com/tiangolo) for [fastapi](https://github.com/tiangolo/fastapi)
 - [youtube-dl](https://github.com/ytdl-org) for [youtube-dl](https://github.com/ytdl-org/youtube-dl)
 - [Quod Libet](https://github.com/quodlibet) for [mutagen](https://github.com/quodlibet/mutagen)
