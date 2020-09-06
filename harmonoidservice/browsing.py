@@ -11,6 +11,12 @@ class BrowsingHandler:
     #👌 Fixed
     async def TrackInfo(self, trackId, albumId):
         track = await self.ytMusic._get_song(trackId)
+        track_artists = track.get("artists", [track["author"]])
+        if not albumId:
+            albumId = await self.ytMusic._search(
+                " ".join(track_artists) + " " + track["title"], "songs"
+            )
+            albumId = albumId[0]["album"]["id"]
         album = await self.ytMusic._get_album(albumId)
         trackNumber = 1
 
@@ -23,8 +29,7 @@ class BrowsingHandler:
                 trackNumber = int(albumTrack["index"])
                 break
 
-        track_artists = track.get("artists", [track["author"]])
-        album_artists = track_artists
+        album_artists = [a["name"] for a in album["artist"]]
         return {
             "track_id": track["videoId"],
             "track_name": track["title"],
@@ -126,7 +131,7 @@ class BrowsingHandler:
         #👌 Fixed
         if mode == "album":
             youtubeResult = await self.ytMusic._search(keyword, "albums")
-            
+
             albumIdList = [album["browseId"] for album in youtubeResult]
             albumLengthList = ["" for album in youtubeResult]
             await self.AsyncAlbumLength(albumIdList, albumLengthList)
@@ -151,7 +156,7 @@ class BrowsingHandler:
                     }
                 ]
             return {"albums": albums}
-        
+
         #👌 Fixed
         if mode == "track":
             youtubeResult = await self.ytMusic._search(keyword, "songs")
@@ -195,7 +200,7 @@ class BrowsingHandler:
                     }
                 ]
             return {"tracks": tracks}
-        
+
         #👌 Fixed
         if mode == "artist":
             youtubeResult = await self.ytMusic._search(keyword, "artists")
@@ -220,12 +225,12 @@ class BrowsingHandler:
     async def ArrangeVideoIds(self, searchQueriesList, videoIdList, videoIdListIndex):
         youtubeResult = await self.ytMusic._search(searchQueriesList[videoIdListIndex], "songs")
         videoIdList[videoIdListIndex] = youtubeResult[0]["videoId"]
-    
+
     async def AsyncAlbumSearch(self, searchQueriesList, videoIdList):
         args = [(searchQueriesList, videoIdList, index) for index in range(0, len(videoIdList))]
         asyncSearchTasks = itertools.starmap(self.ArrangeVideoIds, args)
         await asyncio.gather(*asyncSearchTasks)
-    
+
     async def ArrangeAlbumLength(self, albumIdList, albumLengthList, albumLengthListIndex):
         youtubeResult = await self.ytMusic._get_album(albumIdList[albumLengthListIndex])
         albumLengthList[albumLengthListIndex] = int(youtubeResult["trackCount"])

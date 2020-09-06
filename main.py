@@ -35,7 +35,7 @@ async def AlbumInfo(album_id):
 
 
 @app.get("/trackinfo")
-async def TrackInfo(track_id, album_id):
+async def TrackInfo(track_id, album_id=None):
     result = await harmonoidService.TrackInfo(track_id, album_id)
     return dict_to_response(result)
 
