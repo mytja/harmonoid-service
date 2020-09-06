@@ -3,6 +3,7 @@ import asyncio
 import logging
 import itertools
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -41,7 +42,6 @@ class BrowsingHandler:
     
     async def ArrangeVideoIds(self, searchQueriesList, videoIdList, videoIdListIndex):
         youtubeResult = await self.ytMusic._search(searchQueriesList[videoIdListIndex], "songs")
-        logger.info('Required Index: ' + str(videoIdListIndex) + '\n' + 'Maximum Index : ' + str(len(videoIdList) - 1))
         videoIdList[videoIdListIndex] = youtubeResult[0]["videoId"]
     
     async def AsyncAlbumSearch(self, searchQueriesList, videoIdList):
@@ -56,7 +56,6 @@ class BrowsingHandler:
 
         videoIdList = ["" for index in range(0, len(tracks))]
         searchQueriesList = [track["title"] + " " + track["artists"] for track in tracks]
-        logger.info(searchQueriesList)
         await self.AsyncAlbumSearch(searchQueriesList, videoIdList)
 
         result = []
@@ -127,12 +126,26 @@ class BrowsingHandler:
             ]
         return {"albums": artistTracks}
 
+    async def ArrangeAlbumLength(self, albumIdList, albumLengthList, albumLengthListIndex):
+        youtubeResult = await self.ytMusic._get_album(albumIdList[albumLengthListIndex])
+        albumLengthList[albumLengthListIndex] = len(youtubeResult["tracks"])
+
+    async def AsyncAlbumLength(self, albumIdList, albumLengthList):
+        args = [(albumIdList, albumLengthList, index) for index in range(0, len(albumIdList))]
+        asyncSearchTasks = itertools.starmap(self.ArrangeAlbumLength, args)
+        await asyncio.gather(*asyncSearchTasks)
+
     async def SearchYoutube(self, keyword, mode):
         if mode == "album":
             youtubeResult = await self.ytMusic._search(keyword, "albums")
+            
+            albumIdList = [album["browseId"] for album in youtubeResult]
+            albumLengthList = ["" for album in youtubeResult]
+            await self.AsyncAlbumLength(albumIdList, albumLengthList)
 
             albums = []
-            for album in youtubeResult:
+            for index in range(0, len(youtubeResult)):
+                album = youtubeResult[index]
                 album_art_64, album_art_300, album_art_640 = sort_thumbnails(
                     album["thumbnails"]
                 )
@@ -145,8 +158,8 @@ class BrowsingHandler:
                         "album_art_640": album_art_640,
                         "album_art_300": album_art_300,
                         "album_art_64": album_art_64,
-                        # "album_length": 1,  # UNDEFINED
-                        "album_type": album["type"].lower(),
+                        "album_length": albumLengthList[index],
+                        "album_type": "album" if album["type"].lower() == "ep" else album["type"].lower(),
                     }
                 ]
             return {"albums": albums}
