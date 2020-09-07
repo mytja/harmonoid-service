@@ -1,4 +1,4 @@
-# spotiyt-server
+# harmonoid-service
 
 
 #### An asynchronous FastAPI app for searching & downloading music from [YouTube Music](https://music.youtube.com).
@@ -35,7 +35,7 @@ Let's assume that, you created an app with name 'yourapp' for the rest of proces
 **2) Clone this repository and enter it**
 
 ```bash
-git clone https://github.com/raitonoberu/spotiyt-server --depth=1
+git clone https://github.com/raitonoberu/harmonoid-service --depth=1
 
 cd harmonoid-service
 ```

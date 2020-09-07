@@ -1,7 +1,7 @@
 {
   "name": "harmonoid-service",
   "description": "The Python based backend working behind the Harmonoid music app.",
-  "repository": "https://github.com/raitonoberu/spotiyt-server",
+  "repository": "https://github.com/raitonoberu/harmonoid-service",
   "logo": "https://github.com/alexmercerind/harmonoid/blob/master/README%20Assets/icon.png?raw=true",
   "keywords": ["python", "fastapi", "youtube", "youtube-music"]
 }
