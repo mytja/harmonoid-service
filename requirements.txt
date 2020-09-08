@@ -1,8 +1,8 @@
-youtube-search-python
+ytmusicapi
 youtube-dl
 fastapi
-httpx
 uvicorn
 gunicorn
 mutagen
 aiofiles
+httpx

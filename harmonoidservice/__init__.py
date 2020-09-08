@@ -1,8 +1,6 @@
-from harmonoidservice.spotify import SpotifyHandler
-from harmonoidservice.youtube import YoutubeHandler
+from .browsing import BrowsingHandler
+from .downloading import DownloadHandler
+from .async_ytmusicapi import YTMusic
 
-
-class HarmonoidService(SpotifyHandler, YoutubeHandler):
-    def __init__(self, clientId, clientSecret):
-        self.clientId = clientId
-        self.clientSecret = clientSecret
+class HarmonoidService(BrowsingHandler, DownloadHandler):
+    ytMusic = YTMusic()
