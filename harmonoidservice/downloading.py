@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class DownloadHandler:
     async def SaveAudio(self, trackId):
-        result = await async_youtube_dl.download(
+        await async_youtube_dl.download(
             f"https://www.youtube.com/watch?v={trackId}", f"{trackId}.m4a"
         )
 
@@ -43,7 +43,8 @@ class DownloadHandler:
         audioFile["\xa9nam"] = trackInfoJSON["track_name"]
         audioFile["\xa9alb"] = trackInfoJSON["album_name"]
         audioFile["\xa9ART"] = "/".join(trackInfoJSON["track_artists"])
-        audioFile["aART"] = trackInfoJSON["album_artists"][0]
+        if len(trackInfoJSON["album_artists"]) != 0:
+            audioFile["aART"] = trackInfoJSON["album_artists"][0]
         audioFile["\xa9day"] = trackInfoJSON["year"]
         audioFile["trkn"] = [
             (trackInfoJSON["track_number"], trackInfoJSON["album_length"])
