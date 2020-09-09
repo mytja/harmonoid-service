@@ -70,12 +70,17 @@ class BrowsingHandler:
             ]
         return {"tracks": result}
 
-    # ❌ Needs Improvement
     async def ArtistAlbums(self, artistId):
         artistJson = await self.ytMusic._get_artist(artistId)
 
+        albums = artistJson["albums"]["results"] + artistJson["singles"]["results"]
+
+        albumIdList = [album["browseId"] for album in albums]
+        albumLengthList = ["" for album in albums]
+        await self.AsyncAlbumLength(albumIdList, albumLengthList)
+
         artistAlbums = []
-        for album in artistJson["albums"]["results"]:
+        for index, album in enumerate(albums):
             album_art_64, album_art_300, album_art_640 = sort_thumbnails(
                 album["thumbnails"]
             )
@@ -88,8 +93,10 @@ class BrowsingHandler:
                     "album_art_640": album_art_640,
                     "album_art_300": album_art_300,
                     "album_art_64": album_art_64,
-                    # "album_length": 1,  # UNDEFINED
-                    # "album_type": "album",  # UNDEFINED
+                    "album_length": albumLengthList[index],
+                    "album_type": "single"
+                    if albumLengthList[index] == 1
+                    else "album",
                 }
             ]
         return {"albums": artistAlbums}
