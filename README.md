@@ -1,12 +1,10 @@
 # harmonoid-service
 
-
 #### An asynchronous FastAPI app for searching & downloading music from [YouTube Music](https://music.youtube.com).
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 ##### This is used in the 🎵 [Harmonoid](https://github.com/alexmercerind/harmonoid) music app.
-
 
 This repository has everything ready to be deployed on [Heroku](https://heroku.com).
 
@@ -24,9 +22,7 @@ You can use this in your music app if you want.
 
 ![A track downloaded](/downloaded_track.PNG)
 
-
-## 🛠 Setting Up
-
+## 🔧 Setting Up
 
 **1) Create a new personal app at Heroku**
 
@@ -40,21 +36,33 @@ git clone https://github.com/raitonoberu/harmonoid-service --depth=1
 cd harmonoid-service
 ```
 
-**3) Push changes to Heroku**
+**3) Add remote to Heroku**
 
 ```bash
 git remote add heroku https://git.heroku.com/yourapp.git
+```
 
+**4) Add buildpacks to the app**
+
+```bash
+heroku buildpacks:add https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git
+
+heroku buildpacks:add heroku/python
+```
+
+You can add buildpacks directly from the settings page of your app if you don't want to install & use the heroku CLI.
+
+**5) Push changes to heroku**
+
+```bash
 git push heroku master
 ```
 
-**4) Verify that you did everything correct**
+**6) Verify that you did everything correct**
 
 Now, if you visit your app at https://yourapp.herokuapp.com/ in a browser, you will see 'service is running' on your screen, with a status code of 200.
 
-
 ## 📐 Usage
-
 
 **This is a generic web app, so you can use something like [urllib](https://docs.python.org/3/library/urllib.html) or [requests](https://github.com/psf/requests) to access it.**
 
@@ -158,10 +166,10 @@ else:
 **NOTE**: If something goes wrong during the runtime of the app, like [youtube-dl](https://github.com/ytdl-org/youtube-dl) stops working or your server's IP gets blocked with 429 status codes from Google, you'll recieve status code 500 from this app.
 In that case you can simply re-push the code to the Heroku by making an empty commit. It will automatically update the dependencies at heroku and everything should be fixed.
 
-
-## ❤ Big Thanks To These People And Organizations
+## 💌 Big Thanks To These People And Organizations
 
 - **Heroku**
+
   - Thanks for providing a free place to deploy this web app.
 
 - [sigmatics](https://github.com/sigma67) for [ytmusicapi](https://github.com/sigma67/ytmusicapi)
