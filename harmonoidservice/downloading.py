@@ -70,7 +70,7 @@ class DownloadHandler:
         if os.path.isfile(f"{trackId}.m4a"):
             return FileResponse(
                 f"{trackId}.m4a",
-                media_type="audio/mp4",
+                media_type="audio/mpeg",
                 headers={"Accept-Ranges": "bytes"},
             )
 
@@ -80,6 +80,6 @@ class DownloadHandler:
         logger.info(f"[server] Sending audio binary for track ID: {trackId}")
         return FileResponse(
             f"{trackId}.m4a",
-            media_type="audio/mp4",
+            media_type="audio/mpeg",
             headers={"Accept-Ranges": "bytes"},
         )

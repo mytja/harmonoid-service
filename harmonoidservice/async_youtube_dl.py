@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-COMMAND = 'youtube-dl --format "{format}" --no-playlist --cookies {cookiefile} -x -o "{output}" "{url}"'
+COMMAND = 'youtube-dl --format "{format}" --audio-format mp3 --no-playlist --cookies {cookiefile} -x -o "{output}" "{url}"'
 
 
 async def download(url, output, format="140", cookiefile="cookies.txt"):
