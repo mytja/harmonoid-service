@@ -5,6 +5,7 @@ harmonoidservice/__pycache__/*
 #audio
 
 *.m4a
+*.mp3
 
 #vscode
 
