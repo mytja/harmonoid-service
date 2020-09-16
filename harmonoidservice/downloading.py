@@ -2,9 +2,7 @@ import httpx
 from . import async_youtube_dl
 import os
 from fastapi.responses import FileResponse
-from mutagen.mp3 import MP3
-from mutagen.id3 import ID3, TIT2, TALB, TPE1, COMM, TDRC, TRCK, APIC, TPE2
-
+from .async_mutagen import MP3
 import logging
 
 logger = logging.getLogger(__name__)
@@ -25,42 +23,8 @@ class DownloadHandler:
 
         trackId = trackInfoJSON["track_id"]
 
-        audioFile = MP3(f"{trackId}.mp3", ID3 = ID3)
-
-        if art:
-            logger.info("[metadata] Getting album art: " + art)
-            async with httpx.AsyncClient() as client:
-                response = await client.get(art)
-            albumArtBinary = response.content
-            logger.info("[metadata] Album art retrieved.")
-            audioFile.tags.add(
-                APIC(
-                    mime="image/jpeg",
-                    type=3,
-                    desc="Cover",
-                    data=albumArtBinary,
-                )
-            )
-        else:
-            logger.info("[metadata] Album art is not found.")
-
-        audioFile["TIT2"] = TIT2(encoding=3, text=trackInfoJSON["track_name"])
-        audioFile["TALB"] = TALB(encoding=3, text=trackInfoJSON["album_name"])
-        audioFile["COMM"] = COMM(
-            encoding=3,
-            lang="eng",
-            desc="https://music.youtube.com/watch?v=" + trackInfoJSON["track_id"],
-            text="https://music.youtube.com/watch?v=" + trackInfoJSON["track_id"],
-        )
-        audioFile["TPE1"] = TPE1(
-            encoding=3, text="/".join(trackInfoJSON["track_artists"])
-        )
-        if len(trackInfoJSON["album_artists"]) != 0:
-            audioFile["TPE2"] = TPE2(encoding=3, text=trackInfoJSON["album_artists"][0])
-        audioFile["TDRC"] = TDRC(encoding=3, text=trackInfoJSON["year"])
-        audioFile["TRCK"] = TRCK(encoding=3, text=str(trackInfoJSON["track_number"]))
-
-        audioFile.save()
+        mutagen = MP3(f"{trackId}.mp3", trackInfoJSON, art)
+        await mutagen.init()
 
         logger.info(f"[metadata] Successfully added meta data to track ID: {trackId}.")
 
