@@ -10,7 +10,7 @@ This repository has everything ready to be deployed on [Heroku](https://heroku.c
 
 ## ❔ What does this app do?
 
-This app is a simple backend that can be used to browse & download music from [YouTube Music](https://music.youtube.com) using [youtube-dl](https://github.com/ytdl-org/youtube-dl) & [ytmusicapi](https://github.com/sigma67/ytmusicapi). The tracks you get in download, are M4A in format with exact metadata.
+This app is a simple backend that can be used to browse & download music from [YouTube Music](https://music.youtube.com) using [youtube-dl](https://github.com/ytdl-org/youtube-dl) & [ytmusicapi](https://github.com/sigma67/ytmusicapi). The tracks you get in download, are MP3 in format with exact metadata.
 
 This uses [mutagen](https://github.com/quodlibet/mutagen) for adding metadata & album art to the tracks.
 
