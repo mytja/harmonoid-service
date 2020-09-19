@@ -52,6 +52,12 @@ async def ArtistTracks(artist_id):
     return dict_to_response(result)
 
 
+@app.get("/artistinfo")
+async def ArtistAlbums(artist_id):
+    result = await harmonoidService.ArtistInfo(artist_id)
+    return dict_to_response(result)
+
+
 @app.get("/trackdownload")
 async def TrackDownload(track_id=None, album_id=None, track_name=None):
     if not any((track_id, track_name)):

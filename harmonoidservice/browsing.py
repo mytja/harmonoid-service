@@ -151,6 +151,15 @@ class BrowsingHandler:
             ]
         return {"albums": artistTracks}
 
+    async def ArtistInfo(self, artistId):
+        artistJson = await self.ytMusic._get_artist(artistId)
+        print(artistJson["description"])
+        return {
+            "description": artistJson["description"],
+            "subscribers": artistJson["subscribers"],
+            "views": artistJson["views"],
+        }
+
     async def SearchYoutube(self, keyword, mode):
         if mode == "album":
             youtubeResult = await self.ytMusic._search(keyword, "albums")
