@@ -70,12 +70,17 @@ class BrowsingHandler:
             ]
         return {"tracks": result}
 
-    # ❌ Needs Improvement
     async def ArtistAlbums(self, artistId):
         artistJson = await self.ytMusic._get_artist(artistId)
 
+        albums = artistJson["albums"]["results"] + artistJson["singles"]["results"]
+
+        albumIdList = [album["browseId"] for album in albums]
+        albumLengthList = ["" for album in albums]
+        await self.AsyncAlbumLength(albumIdList, albumLengthList)
+
         artistAlbums = []
-        for album in artistJson["albums"]["results"]:
+        for index, album in enumerate(albums):
             album_art_64, album_art_300, album_art_640 = sort_thumbnails(
                 album["thumbnails"]
             )
@@ -88,18 +93,39 @@ class BrowsingHandler:
                     "album_art_640": album_art_640,
                     "album_art_300": album_art_300,
                     "album_art_64": album_art_64,
-                    # "album_length": 1,  # UNDEFINED
-                    # "album_type": "album",  # UNDEFINED
+                    "album_length": albumLengthList[index],
+                    "album_type": "single" if albumLengthList[index] == 1 else "album",
                 }
             ]
         return {"albums": artistAlbums}
 
-    # ❌ Needs Improvement
     async def ArtistTracks(self, artistId):
         artistJson = await self.ytMusic._get_artist(artistId)
 
+        tracks = artistJson["songs"]["results"]
+
+        trackTitleList = [track["title"] for track in tracks]
+        albumIdList = [track["album"]["id"] for track in tracks]
+        trackNumberList = ["" for track in tracks]
+        yearList = ["" for track in tracks]
+        albumLengthList = ["" for track in tracks]
+        albumTypeList = ["" for track in tracks]
+        trackIdList = [track["videoId"] for track in tracks]
+        trackDurationList = ["" for track in tracks]
+        await asyncio.gather(
+            self.AsyncTrackStuff(
+                trackTitleList,
+                albumIdList,
+                trackNumberList,
+                yearList,
+                albumLengthList,
+                albumTypeList,
+            ),
+            self.AsyncTrackDuration(trackIdList, trackDurationList),
+        )
+
         artistTracks = []
-        for track in artistJson["songs"]["results"]:
+        for index, track in enumerate(tracks):
             track_artists = [a["name"] for a in track["artists"]]
             album_artists = track_artists  # UNDEFINED so we use track_artists
             album_art_64, album_art_300, album_art_640 = sort_thumbnails(
@@ -110,17 +136,17 @@ class BrowsingHandler:
                     "track_id": track["videoId"],
                     "track_name": track["title"],
                     "track_artists": track_artists,
-                    # "track_number": 1,  # UNDEFINED
-                    # "track_duration": 1,  # UNDEFINED
+                    "track_number": trackNumberList[index],
+                    "track_duration": trackDurationList[index],
                     "album_art_640": album_art_640,
                     "album_art_300": album_art_300,
                     "album_art_64": album_art_64,
                     "album_id": track["album"]["id"],
                     "album_name": track["album"]["name"],
-                    # "year": "0000",  # UNDEFINED
+                    "year": yearList[index],
                     "album_artists": album_artists,
-                    # "album_length": 1,  # UNDEFINED
-                    # "album_type": "album",  # UNDEFINED
+                    "album_length": albumLengthList[index],
+                    "album_type": albumTypeList[index],
                 }
             ]
         return {"albums": artistTracks}
@@ -158,14 +184,14 @@ class BrowsingHandler:
         if mode == "track":
             youtubeResult = await self.ytMusic._search(keyword, "songs")
 
+            trackTitleList = [track["title"] for track in youtubeResult]
             albumIdList = [track["album"]["id"] for track in youtubeResult]
-            trackIdList = [track["title"] for track in youtubeResult]
             trackNumberList = ["" for track in youtubeResult]
             yearList = ["" for track in youtubeResult]
             albumLengthList = ["" for track in youtubeResult]
             albumTypeList = ["" for track in youtubeResult]
             await self.AsyncTrackStuff(
-                trackIdList,
+                trackTitleList,
                 albumIdList,
                 trackNumberList,
                 yearList,
@@ -252,9 +278,25 @@ class BrowsingHandler:
         asyncSearchTasks = itertools.starmap(self.ArrangeAlbumLength, args)
         await asyncio.gather(*asyncSearchTasks)
 
+    async def ArrangeTrackDuration(
+        self, trackIdList, trackDurationList, trackDurationListIndex
+    ):
+        trackInfo = await self.ytMusic._get_song(trackIdList[trackDurationListIndex])
+        trackDurationList[trackDurationListIndex] = (
+            int(trackInfo["lengthSeconds"]) * 1000
+        )
+
+    async def AsyncTrackDuration(self, trackIdList, trackDurationList):
+        args = [
+            (trackIdList, trackDurationList, index)
+            for index in range(0, len(trackIdList))
+        ]
+        asyncSearchTasks = itertools.starmap(self.ArrangeTrackDuration, args)
+        await asyncio.gather(*asyncSearchTasks)
+
     async def ArrangeTrackStuff(
         self,
-        trackIdList,
+        trackTitleList,
         albumIdList,
         trackNumberList,
         yearList,
@@ -264,7 +306,7 @@ class BrowsingHandler:
     ):
         youtubeResult = await self.ytMusic._get_album(albumIdList[albumLengthListIndex])
         for track in youtubeResult["tracks"]:
-            if track["title"] == trackIdList[albumLengthListIndex]:
+            if track["title"] == trackTitleList[albumLengthListIndex]:
                 trackNumberList[albumLengthListIndex] = int(track["index"])
                 break
         yearList[albumLengthListIndex] = youtubeResult["releaseDate"]["year"]
@@ -275,7 +317,7 @@ class BrowsingHandler:
 
     async def AsyncTrackStuff(
         self,
-        trackIdList,
+        trackTitleList,
         albumIdList,
         trackNumberList,
         yearList,
@@ -284,7 +326,7 @@ class BrowsingHandler:
     ):
         args = [
             (
-                trackIdList,
+                trackTitleList,
                 albumIdList,
                 trackNumberList,
                 yearList,
