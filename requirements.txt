@@ -1,7 +1,7 @@
 git+https://github.com/sigma67/ytmusicapi@master
 youtube-dl
 fastapi
-uvicorn
+uvicorn[standard]
 gunicorn
 mutagen
 aiofiles
