@@ -1,6 +1,6 @@
 #python
 
-harmonoidservice/__pycache__/*
+*.pyc
 
 #audio
 
@@ -11,6 +11,6 @@ harmonoidservice/__pycache__/*
 
 .vscode
 
-#uvicorn
+#cookies
 
-__pycache__
+cookies.txt
