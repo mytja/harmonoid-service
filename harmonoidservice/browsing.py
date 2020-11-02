@@ -4,47 +4,46 @@ import logging
 import itertools
 
 
-logger = logging.getLogger(__name__)
-
-
 class BrowsingHandler:
     async def TrackInfo(self, trackId, albumId):
-        track = await self.ytMusic._get_song(trackId)
-        track_artists = track.get("artists", [track["author"]])
-        if not albumId:
-            albumId = await self.ytMusic._search(
-                " ".join(track_artists) + " " + track["title"], "songs"
+        try:
+            track = await self.ytMusic._get_song(trackId)
+            track_artists = [a for a in track["artists"]]
+            if not albumId:
+                albumId = await self.ytMusic._search(
+                    " ".join(track_artists) + " " + track["title"], "songs"
+                )
+                albumId = albumId[0]["album"]["id"]
+            album = await self.ytMusic._get_album(albumId)
+            trackNumber = 1
+
+            album_art_64, album_art_300, album_art_640 = SortThumbnails(
+                album["thumbnails"]
             )
-            albumId = albumId[0]["album"]["id"]
-        album = await self.ytMusic._get_album(albumId)
-        trackNumber = 1
 
-        album_art_64, album_art_300, album_art_640 = sort_thumbnails(
-            album["thumbnails"]
-        )
-
-        for albumTrack in album["tracks"]:
-            if albumTrack["title"] == track["title"]:
-                trackNumber = int(albumTrack["index"])
-                break
-
-        album_artists = [a["name"] for a in album["artist"]]
-        return {
-            "track_id": track["videoId"],
-            "track_name": track["title"],
-            "track_artists": track_artists,
-            "track_number": trackNumber,
-            "track_duration": int(track["lengthSeconds"]) * 1000,
-            "album_art_640": album_art_640,
-            "album_art_300": album_art_300,
-            "album_art_64": album_art_64,
-            "album_id": albumId,
-            "album_name": album["title"],
-            "year": track["release"].split("-")[0] if "release" in track else "",
-            "album_artists": album_artists,
-            "album_length": int(album["trackCount"]),
-            "album_type": "single" if len(album["tracks"]) == 1 else "album",
-        }
+            for albumTrack in album["tracks"]:
+                if albumTrack["title"] == track["title"]:
+                    trackNumber = int(albumTrack["index"])
+                    break
+            album_artists = [a["name"] for a in album["artist"]]
+            return {
+                "track_id": track["videoId"],
+                "track_name": track["title"],
+                "track_artists": track_artists,
+                "track_number": trackNumber,
+                "track_duration": int(track["lengthSeconds"]) * 1000,
+                "album_art_640": album_art_640,
+                "album_art_300": album_art_300,
+                "album_art_64": album_art_64,
+                "album_id": albumId,
+                "album_name": album["title"],
+                "year": track["release"].split("-")[0] if "release" in track else "",
+                "album_artists": album_artists,
+                "album_length": int(album["trackCount"]),
+                "album_type": "single" if len(album["tracks"]) == 1 else "album",
+            }
+        except:
+            return "Internal Server Error.\nytmusicapi Failed.\nERROR: This error has no explaination at the moment & restarting dynos is a possible fix."
 
     async def AlbumInfo(self, albumId):
         response = await self.ytMusic._get_album(albumId)
@@ -81,7 +80,7 @@ class BrowsingHandler:
 
         artistAlbums = []
         for index, album in enumerate(albums):
-            album_art_64, album_art_300, album_art_640 = sort_thumbnails(
+            album_art_64, album_art_300, album_art_640 = SortThumbnails(
                 album["thumbnails"]
             )
             artistAlbums += [
@@ -128,7 +127,7 @@ class BrowsingHandler:
         for index, track in enumerate(tracks):
             track_artists = [a["name"] for a in track["artists"]]
             album_artists = track_artists  # UNDEFINED so we use track_artists
-            album_art_64, album_art_300, album_art_640 = sort_thumbnails(
+            album_art_64, album_art_300, album_art_640 = SortThumbnails(
                 track["thumbnails"]
             )
             artistTracks += [
@@ -161,7 +160,7 @@ class BrowsingHandler:
 
             albums = []
             for index, album in enumerate(youtubeResult):
-                album_art_64, album_art_300, album_art_640 = sort_thumbnails(
+                album_art_64, album_art_300, album_art_640 = SortThumbnails(
                     album["thumbnails"]
                 )
                 albums += [
@@ -201,7 +200,7 @@ class BrowsingHandler:
 
             tracks = []
             for index, track in enumerate(youtubeResult):
-                album_art_64, album_art_300, album_art_640 = sort_thumbnails(
+                album_art_64, album_art_300, album_art_640 = SortThumbnails(
                     track["thumbnails"]
                 )
                 track_artists = [a["name"] for a in track["artists"]]
@@ -235,7 +234,7 @@ class BrowsingHandler:
 
             artists = []
             for artist in youtubeResult:
-                artist_art_64, artist_art_300, artist_art_640 = sort_thumbnails(
+                artist_art_64, artist_art_300, artist_art_640 = SortThumbnails(
                     artist["thumbnails"]
                 )
                 artists += [
@@ -249,7 +248,6 @@ class BrowsingHandler:
                 ]
             return {"artists": artists}
 
-    # 🎉 Other Functions For YouTube Music
     async def ArrangeVideoIds(self, searchQueriesList, videoIdList, videoIdListIndex):
         youtubeResult = await self.ytMusic._search(
             searchQueriesList[videoIdListIndex], "songs"
@@ -340,7 +338,7 @@ class BrowsingHandler:
         await asyncio.gather(*asyncSearchTasks)
 
 
-def sort_thumbnails(thumbnails):
+def SortThumbnails(thumbnails):
     thumbs = {}
     for thumbnail in thumbnails:
         wh = thumbnail["width"] * thumbnail["height"]

@@ -1,20 +1,69 @@
 import httpx
-from . import async_youtube_dl
+from urllib.request import urlopen
+from fastapi.responses import FileResponse, PlainTextResponse
+import subprocess
 import os
+import sys
 from .async_mutagen import MP4, MP4Cover
-from fastapi import HTTPException
-from fastapi.responses import FileResponse
-
-import logging
-
-logger = logging.getLogger(__name__)
 
 
 class DownloadHandler:
-    async def SaveAudio(self, trackId):
-        await async_youtube_dl.download(
-            f"https://www.youtube.com/watch?v={trackId}", f"{trackId}.m4a"
+    def UpdateYoutubeDl(self):
+        import youtube_dl
+
+        latestVersion = [
+            element[2:-1]
+            for element in urlopen("http://youtube-dl.org/")
+            .read()
+            .decode("utf_8")
+            .split(" ")
+            if element[0:2] == "(v"
+        ][0]
+        updated = latestVersion == youtube_dl.version.__version__
+        print(
+            f"[update] Installed YouTube-DL version  : {youtube_dl.version.__version__}.\n[update] Latest YouTube-DL Version     : {latestVersion}."
         )
+        if not updated:
+            print("[update] Updating YouTube-DL...")
+            subprocess.check_call(
+                [sys.executable, "-m", "pip", "install", "--upgrade", "youtube_dl"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.STDOUT,
+            )
+
+            modules = []
+            for module in sys.modules.keys():
+                if module.startswith("youtube_dl"):
+                    modules += [module]
+            for module in modules:
+                del sys.modules[module]
+            import youtube_dl
+
+            print(
+                f"[update] Updated To YouTube-DL version : {youtube_dl.version.__version__}"
+            )
+        else:
+            print("[update] YouTube-DL is already updated.")
+
+    async def SaveAudio(self, trackId):
+        import youtube_dl
+
+        try:
+            ydl_opts = {
+                "format": "140",
+                "cookiefile": "cookies.txt",
+                "outtmpl": f"{trackId}.m4a",
+            }
+
+            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([f"https://www.youtube.com/watch?v={trackId}"])
+            print(f"[youtube] Track download successful for track ID: {trackId}.")
+            return [True, None]
+        except Exception as error:
+            print(
+                f"[youtube] Track download unsuccessful for track ID: {trackId}.\n[metadata] Skipped adding metadata to track ID: {trackId}."
+            )
+            return [False, error]
 
     async def SaveMetaData(self, trackInfoJSON):
         art = (
@@ -29,16 +78,16 @@ class DownloadHandler:
         await audioFile.init()
 
         if art:
-            logger.info("[metadata] Getting album art: " + art)
+            print("[metadata] Getting album art: " + art)
             async with httpx.AsyncClient() as client:
                 response = await client.get(art)
             albumArtBinary = response.content
-            logger.info("[metadata] Album art retrieved.")
+            print("[metadata] Album art retrieved.")
             cover = MP4Cover(albumArtBinary, imageformat=MP4Cover.FORMAT_JPEG)
             await cover.init()
             audioFile["covr"] = [cover]
         else:
-            logger.info("[metadata] Album art is not found.")
+            print("[metadata] Album art is not found.")
 
         audioFile["\xa9nam"] = trackInfoJSON["track_name"]
         audioFile["\xa9alb"] = trackInfoJSON["album_name"]
@@ -54,32 +103,62 @@ class DownloadHandler:
         )
         await audioFile._save()
 
-        logger.info(f"[metadata] Successfully added meta data to track ID: {trackId}.")
+        print(f"[metadata] Successfully added metadata to track ID: {trackId}.")
 
-    async def TrackDownload(self, trackId, albumId, trackName):
-        if trackId:
-            logger.info(f"[server] Download request in ID format.")
-        if trackName:
-            logger.info(f"[server] Download request in name format.")
-            trackId = await self.ytMusic._search(trackName, "songs")
-            trackId = trackId[0]["videoId"]
+    async def TrackDownload(self, trackId, albumId, trackName, reTry=True):
 
-        trackInfo = await self.TrackInfo(trackId, albumId)
-        logger.info(f"[info] Successfully retrieved metadata of track ID: {trackId}.")
-
-        if os.path.isfile(f"{trackId}.m4a"):
+        if os.path.exists(f"{trackId}.m4a"):
+            print(
+                f"[youtube] Track already downloaded for track ID: {trackId}.\n[server] Sending audio binary for track ID: {trackId}."
+            )
             return FileResponse(
                 f"{trackId}.m4a",
                 media_type="audio/mp4",
                 headers={"Accept-Ranges": "bytes"},
             )
 
-        await self.SaveAudio(trackId)
-        await self.SaveMetaData(trackInfo)
+        if trackId:
+            print(f"[server] Download request in ID format.")
+        if trackName:
+            print(f"[server] Download request in name format.")
+            trackId = await self.ytMusic._search(trackName, "songs")
+            trackId = trackId[0]["videoId"]
 
-        logger.info(f"[server] Sending audio binary for track ID: {trackId}")
-        return FileResponse(
-            f"{trackId}.m4a",
-            media_type="audio/mp4",
-            headers={"Accept-Ranges": "bytes"},
-        )
+        trackInfo = await self.TrackInfo(trackId, albumId)
+
+        if type(trackInfo) == dict:
+            print(f"[youtube] Successfully retrieved metadata of track ID: {trackId}.")
+
+            downloadResult = await self.SaveAudio(trackId)
+            if downloadResult[0]:
+                await self.SaveMetaData(trackInfo)
+                print(f"[server] Sending audio binary for track ID: {trackId}.")
+                return FileResponse(
+                    f"{trackId}.m4a",
+                    media_type="audio/mp4",
+                    headers={"Accept-Ranges": "bytes"},
+                )
+            else:
+                if reTry:
+                    print("\n[diagnosis] (1/2) Deleting cookies file.")
+                    os.remove("cookies.txt")
+                    print("[diagnosis] (2/2) Attempting to update YouTube-DL.")
+                    self.UpdateYoutubeDl()
+                    print(f"[diagnosis] Retrying download for track ID: {trackId}.\n")
+                    updatedResponse = await self.TrackDownload(
+                        trackId, albumId, trackName, reTry=False
+                    )
+                    return updatedResponse
+                else:
+                    print(f"[server] Sending status code 500 for track ID: {trackId}.")
+                    return PlainTextResponse(
+                        content=f"Internal Server Error.\nYouTube-DL Failed.\n{str(downloadResult[1])}",
+                        status_code=500,
+                    )
+        else:
+            print(f"[youtube] Could not retrieve metadata of track ID: {trackId}.")
+            print(f"[server] Sending status code 500 for track ID: {trackId}.")
+            return PlainTextResponse(
+                content=trackInfo,
+                status_code=500,
+            )
