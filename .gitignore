@@ -13,3 +13,7 @@ harmonoidservice/__pycache__/*
 #uvicorn
 
 __pycache__
+
+#cookies
+
+cookies.txt

@@ -67,10 +67,10 @@ import requests
 
 response = requests.get(
     'https://yourapp.herokuapp.com/search', {
-        'keyword': 'Tobu Sunburst',                    #Keyword for searching
-        'mode': 'album',                               #Your mode for searching. Valid modes are 'album', 'track', & 'artist'
-        'offset': '0',                                 #Search offset
-        'limit': '50',                                 #Limiting the amount of results
+        'keyword': 'Tobu Sunburst',         #Keyword for searching
+        'mode': 'album',                    #Your mode for searching. Valid modes are 'album', 'track', & 'artist'
+        'offset': '0',                      #Search offset
+        'limit': '50',                      #Limiting the amount of results
     }
 )
 
@@ -142,7 +142,6 @@ import requests
 audioResponse = requests.get(
     'https://yourapp.herokuapp.com/trackdownload', {
         'track_id': '9j81j90jkKU',                     #Track ID of the track
-        'album_id': 'MPREb_PvefrisSxRq',                #Album ID of the track
     }
 )
 if (audioResponse.status_code == 200):
