@@ -62,4 +62,4 @@ async def TrackDownload(track_id=None, album_id=None, track_name=None):
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("main:app", reload=True)
+    uvicorn.run("main:app")

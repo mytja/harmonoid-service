@@ -1,69 +1,71 @@
 import httpx
-from urllib.request import urlopen
 from fastapi.responses import FileResponse, PlainTextResponse
 import subprocess
+import aiofiles.os
 import os
 import sys
+import asyncio
 from .async_mutagen import MP4, MP4Cover
+import youtube_dl
 
+CURRENT_VERSION = youtube_dl.version.__version__  # just to avoid reimports
 
 class DownloadHandler:
-    def UpdateYoutubeDl(self):
-        import youtube_dl
+    async def UpdateYoutubeDl(self):
+        async with httpx.AsyncClient() as client:
+            latestVersion = await client.get("https://yt-dl.org/update/LATEST_VERSION")
+        latestVersion = latestVersion.text
 
-        latestVersion = [
-            element[2:-1]
-            for element in urlopen("http://youtube-dl.org/")
-            .read()
-            .decode("utf_8")
-            .split(" ")
-            if element[0:2] == "(v"
-        ][0]
-        updated = latestVersion == youtube_dl.version.__version__
-        print(
-            f"[update] Installed YouTube-DL version  : {youtube_dl.version.__version__}.\n[update] Latest YouTube-DL Version     : {latestVersion}."
-        )
+        global CURRENT_VERSION
+        updated = (latestVersion == CURRENT_VERSION)
+        print(f"[update] Installed YouTube-DL version  : {CURRENT_VERSION}.")
+        print(f"[update] Latest YouTube-DL Version     : {latestVersion}.")
         if not updated:
             print("[update] Updating YouTube-DL...")
-            subprocess.check_call(
-                [sys.executable, "-m", "pip", "install", "--upgrade", "youtube_dl"],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.STDOUT,
-            )
+            cmd = f"{sys.executable} -m pip install --upgrade youtube_dl"
 
-            modules = []
-            for module in sys.modules.keys():
-                if module.startswith("youtube_dl"):
-                    modules += [module]
-            for module in modules:
-                del sys.modules[module]
-            import youtube_dl
-
-            print(
-                f"[update] Updated To YouTube-DL version : {youtube_dl.version.__version__}"
+            process = subprocess.Popen(
+                cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
             )
+            while process.poll() is None:
+                await asyncio.sleep(0.1)
+            stdout, stderr = process.communicate()
+            stdout, stderr = stdout.decode(), stderr.decode()
+
+            if process.poll() == 0:
+                CURRENT_VERSION = latestVersion
+                print(
+                    f"[update] Updated To YouTube-DL version : {latestVersion}"
+                )
+            else:
+                print("[update] Failed to update.")
+                print("[stdout]", stdout)
+                print("[stderr]", stderr)
         else:
             print("[update] YouTube-DL is already updated.")
 
     async def SaveAudio(self, trackId):
-        import youtube_dl
+        COMMAND = 'youtube-dl -i --format "140" --extract-audio --audio-format m4a --no-playlist --cookies cookies.txt -x -o "{output}.%(ext)s" "{url}"'
 
-        try:
-            ydl_opts = {
-                "format": "140",
-                "cookiefile": "cookies.txt",
-                "outtmpl": f"{trackId}.m4a",
-            }
+        cmd = COMMAND.format(output=trackId, url=f"https://www.youtube.com/watch?v={trackId}")
+        process = subprocess.Popen(
+            cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
+        while process.poll() is None:
+            await asyncio.sleep(0.1)
+        stdout, stderr = process.communicate()
+        stdout, stderr = stdout.decode(), stderr.decode()
 
-            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-                ydl.download([f"https://www.youtube.com/watch?v={trackId}"])
+        print("[stdout]", stdout)
+        print("[stderr]", stderr)  # sometimes YT-DL returns status code 0 even with an error occurred
+
+        if process.poll() == 0 and not ("ERROR" in stderr):
             print(f"[youtube] Track download successful for track ID: {trackId}.")
-            return [True, None]
-        except Exception as error:
-            print(
-                f"[youtube] Track download unsuccessful for track ID: {trackId}.\n[metadata] Skipped adding metadata to track ID: {trackId}."
-            )
-            return [False, error]
+            return (True, None)
+        else:
+            print(f"[youtube] Track download unsuccessful for track ID: {trackId}.")
+            print(f"[metadata] Skipped adding metadata to track ID: {trackId}.")
+            return (False, stderr)
 
     async def SaveMetaData(self, trackInfoJSON):
         art = (
@@ -105,7 +107,13 @@ class DownloadHandler:
 
         print(f"[metadata] Successfully added metadata to track ID: {trackId}.")
 
-    async def TrackDownload(self, trackId, albumId, trackName, reTry=True):
+    async def TrackDownload(self, trackId, albumId, trackName, retry=True):
+        if trackId:
+            print(f"[server] Download request in ID format.")
+        if trackName:
+            print(f"[server] Download request in name format.")
+            trackId = await self.ytMusic._search(trackName, "songs")
+            trackId = trackId[0]["videoId"]
 
         if os.path.exists(f"{trackId}.m4a"):
             print(
@@ -117,20 +125,13 @@ class DownloadHandler:
                 headers={"Accept-Ranges": "bytes"},
             )
 
-        if trackId:
-            print(f"[server] Download request in ID format.")
-        if trackName:
-            print(f"[server] Download request in name format.")
-            trackId = await self.ytMusic._search(trackName, "songs")
-            trackId = trackId[0]["videoId"]
-
         trackInfo = await self.TrackInfo(trackId, albumId)
 
         if type(trackInfo) == dict:
             print(f"[youtube] Successfully retrieved metadata of track ID: {trackId}.")
 
-            downloadResult = await self.SaveAudio(trackId)
-            if downloadResult[0]:
+            status, error = await self.SaveAudio(trackId)
+            if status is True:
                 await self.SaveMetaData(trackInfo)
                 print(f"[server] Sending audio binary for track ID: {trackId}.")
                 return FileResponse(
@@ -139,20 +140,20 @@ class DownloadHandler:
                     headers={"Accept-Ranges": "bytes"},
                 )
             else:
-                if reTry:
+                if retry:
                     print("\n[diagnosis] (1/2) Deleting cookies file.")
-                    os.remove("cookies.txt")
+                    await aiofiles.os.remove("cookies.txt")
                     print("[diagnosis] (2/2) Attempting to update YouTube-DL.")
-                    self.UpdateYoutubeDl()
+                    await self.UpdateYoutubeDl()
                     print(f"[diagnosis] Retrying download for track ID: {trackId}.\n")
                     updatedResponse = await self.TrackDownload(
-                        trackId, albumId, trackName, reTry=False
+                        trackId, albumId, trackName, retry=False
                     )
                     return updatedResponse
                 else:
                     print(f"[server] Sending status code 500 for track ID: {trackId}.")
                     return PlainTextResponse(
-                        content=f"Internal Server Error.\nYouTube-DL Failed.\n{str(downloadResult[1])}",
+                        content=f"Internal Server Error.\nYouTube-DL Failed.\n{str(error)}",
                         status_code=500,
                     )
         else:
