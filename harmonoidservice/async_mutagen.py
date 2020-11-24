@@ -2,9 +2,6 @@ import asyncio
 from mutagen.mp3 import MP3
 from mutagen.id3 import TIT2, TALB, TPE1, COMM, TDRC, TRCK, APIC, TPE2
 import httpx
-import logging
-
-logger = logging.getLogger(__name__)
 
 
 class MP3(MP3):
@@ -18,11 +15,11 @@ class MP3(MP3):
         await loop.run_in_executor(None, super().__init__, self.filename)
 
         if self.art:
-            logger.info("[metadata] Getting album art: " + self.art)
+            print("[metadata] Getting album art: " + self.art)
             async with httpx.AsyncClient() as client:
                 response = await client.get(self.art)
             albumArtBinary = response.content
-            logger.info("[metadata] Album art retrieved.")
+            print("[metadata] Album art retrieved.")
             self["APIC"] = APIC(
                 mime="image/jpeg",
                 type=3,
@@ -30,7 +27,7 @@ class MP3(MP3):
                 data=albumArtBinary,
             )
         else:
-            logger.info("[metadata] Album art is not found.")
+            print("[metadata] Album art is not found.")
 
         self["TIT2"] = TIT2(encoding=3, text=self.trackInfoJSON["track_name"])
         self["TALB"] = TALB(encoding=3, text=self.trackInfoJSON["album_name"])

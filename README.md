@@ -150,7 +150,6 @@ import requests
 audioResponse = requests.get(
     'https://yourapp.herokuapp.com/trackdownload', {
         'track_id': '9j81j90jkKU',                     #Track ID of the track
-        'album_id': 'MPREb_PvefrisSxRq',                #Album ID of the track
     }
 )
 if (audioResponse.status_code == 200):

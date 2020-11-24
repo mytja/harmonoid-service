@@ -11,6 +11,10 @@
 
 .vscode
 
+#pycharm
+
+.idea
+
 #cookies
 
 cookies.txt
