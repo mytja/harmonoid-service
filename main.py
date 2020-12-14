@@ -69,19 +69,19 @@ async def TrackDownload(track_id=None, album_id=None, track_name=None):
 async def Test():
     import time
     
-    response = SearchYoutube("NCS", "track")
+    response = await SearchYoutube("NCS", "track")
     if (response != None):
         __musicsearchtest = "OK!"
     else:
         __musicsearchtest = "Fail!"
     
-    response = SearchYoutube("NCS", "album")
+    response = await SearchYoutube("NCS", "album")
     if (response != None):
         __albumsearchtest = "OK!"
     else:
         __albumsearchtest = "Fail!"
     
-    response = SearchYoutube("NCS", "artist")
+    response = await SearchYoutube("NCS", "artist")
     if (response != None):
         __artistsearchtest = "OK!"
     else:
