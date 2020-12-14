@@ -103,7 +103,7 @@ def Test():
         "artistsearch": __artistsearchtest
     }
     
-    return Response(json.dumps(__json), media_type="application/json")
+    return ReturnResponse(__json)
     
 
 
