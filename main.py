@@ -3,18 +3,17 @@ from fastapi import FastAPI, HTTPException, Response
 from fastapi.responses import PlainTextResponse
 import json
 
-import logging
-
-
-logging.basicConfig(level=logging.INFO)
-
 harmonoidService = HarmonoidService()
 
 app = FastAPI()
 
 
-def dict_to_response(dict):
-    return Response(json.dumps(dict, indent=4), media_type="application/json")
+def ReturnResponse(response):
+    if type(response) == dict:
+        return Response(json.dumps(response, indent=4), media_type="application/json")
+    if type(response) == str:
+        return PlainTextResponse(response)
+    return response
 
 
 @app.get("/")
@@ -25,31 +24,37 @@ async def hello():
 @app.get("/search")
 async def SearchYoutube(keyword, mode="album"):
     result = await harmonoidService.SearchYoutube(keyword, mode)
-    return dict_to_response(result)
+    return ReturnResponse(result)
 
 
 @app.get("/albuminfo")
 async def AlbumInfo(album_id):
     result = await harmonoidService.AlbumInfo(album_id)
-    return dict_to_response(result)
+    return ReturnResponse(result)
 
 
 @app.get("/trackinfo")
 async def TrackInfo(track_id, album_id=None):
     result = await harmonoidService.TrackInfo(track_id, album_id)
-    return dict_to_response(result)
+    return ReturnResponse(result)
 
 
 @app.get("/artistalbums")
 async def ArtistAlbums(artist_id):
     result = await harmonoidService.ArtistAlbums(artist_id)
-    return dict_to_response(result)
+    return ReturnResponse(result)
 
 
 @app.get("/artisttracks")
 async def ArtistTracks(artist_id):
     result = await harmonoidService.ArtistTracks(artist_id)
-    return dict_to_response(result)
+    return ReturnResponse(result)
+
+
+@app.get("/artistinfo")
+async def ArtistAlbums(artist_id):
+    result = await harmonoidService.ArtistInfo(artist_id)
+    return ReturnResponse(result)
 
 
 @app.get("/trackdownload")
