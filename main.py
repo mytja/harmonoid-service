@@ -103,7 +103,7 @@ def Test():
         "artistsearch": __artistsearchtest
     }
     
-    __json = json.dumps(__json)
+    return json.dumps(__json)
     
 
 
