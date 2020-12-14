@@ -65,6 +65,47 @@ async def TrackDownload(track_id=None, album_id=None, track_name=None):
         raise HTTPException(422, "Both track_id and track_name is specified")
     return await harmonoidService.TrackDownload(track_id, album_id, track_name)
 
+@app.get("/test")
+async def Test():
+    import time
+    
+    response = SearchYoutube("NCS", "track")
+    if (response != None and len(response)>0):
+        __musicsearchtest = "OK!"
+    else:
+        __musicsearchtest = "Fail!"
+    
+    response = SearchYoutube("NCS", "album")
+    if (response != None and len(response)>0):
+        __albumsearchtest = "OK!"
+    else:
+        __albumsearchtest = "Fail!"
+    
+    response = SearchYoutube("NCS", "artist")
+    if (response != None and len(response)>0):
+        __artistsearchtest = "OK!"
+    else:
+        __artistsearchtest = "Fail!"
+        
+    if (__artistsearchtest=="Fail!" or __musicsearchtest=="Fail!" or __albumsearchtest=="Fail!"):
+        __testfail = True
+    else:
+        __testfail = False
+    
+    __timesec = time.time()
+    __lt = time.ctime(__timesec)
+    
+    __json = {
+        "endtime": __lt,
+        "fail": __testfail,
+        "tracksearch": __musicsearchtest,
+        "albumsearch": __albumsearchtest,
+        "artistsearch": __artistsearchtest
+    }
+    
+    __json = json.dumps(__json)
+    
+
 
 if __name__ == "__main__":
     import uvicorn
