@@ -70,19 +70,19 @@ async def Test():
     import time
     
     response = SearchYoutube("NCS", "track")
-    if (response != None and len(response)>0):
+    if (response != None):
         __musicsearchtest = "OK!"
     else:
         __musicsearchtest = "Fail!"
     
     response = SearchYoutube("NCS", "album")
-    if (response != None and len(response)>0):
+    if (response != None):
         __albumsearchtest = "OK!"
     else:
         __albumsearchtest = "Fail!"
     
     response = SearchYoutube("NCS", "artist")
-    if (response != None and len(response)>0):
+    if (response != None):
         __artistsearchtest = "OK!"
     else:
         __artistsearchtest = "Fail!"
