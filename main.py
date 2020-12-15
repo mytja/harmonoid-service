@@ -88,7 +88,7 @@ async def Test():
         __artistsearchtest = "Fail!"
         
     response = await TrackDownload(track_name="NCS")
-    if (response != None or response.find("Internal server error") == -1):
+    if (response != None or response.find("Internal Server Error") == -1):
         __tdtest = "OK!"
     else:
         __tdtest = "Fail!"
