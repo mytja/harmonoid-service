@@ -66,8 +66,8 @@ async def TrackDownload(track_id=None, album_id=None, track_name=None):
     return await harmonoidService.TrackDownload(track_id, album_id, track_name)
 
 @app.get("/test/download")
-def TrackDownloadTest():
-    return harmonoidService.TrackDownload(track_id=None, album_id=None, track_name="NCS")
+def TrackDownloadTest(track_id=None, album_id=None, track_name=None):
+    return harmonoidService.TrackDownload(track_id, album_id, track_name)
 
 @app.get("/test")
 def Test():
@@ -91,7 +91,7 @@ def Test():
     else:
         __artistsearchtest = "Fail!"
         
-    response = TrackDownloadTest()
+    response = TrackDownloadTest(track_name="NCS")
     if (response != None):
         __tdtest = "OK!"
     else:
