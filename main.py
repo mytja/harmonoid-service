@@ -65,10 +65,6 @@ async def TrackDownload(track_id=None, album_id=None, track_name=None):
         raise HTTPException(422, "Both track_id and track_name is specified")
     return await harmonoidService.TrackDownload(track_id, album_id, track_name)
 
-@app.get("/test/download")
-async def TrackDownloadTest(track_id=None, album_id=None, track_name=None):
-    return await harmonoidService.TrackDownload(track_id, album_id, track_name)
-
 @app.get("/test")
 async def Test():
     import time
@@ -91,8 +87,8 @@ async def Test():
     else:
         __artistsearchtest = "Fail!"
         
-    response = await TrackDownloadTest(track_name="NCS")
-    if (response != None or response.find("500") != -1):
+    response = await TrackDownload(track_name="NCS")
+    if (response != None or response.find("500") == -1):
         __tdtest = "OK!"
     else:
         __tdtest = "Fail!"
