@@ -67,29 +67,28 @@ async def TrackDownload(track_id=None, album_id=None, track_name=None):
     return await harmonoidService.TrackDownload(track_id, album_id, track_name)
 
 @app.get("/test")
-async def Test():
+def Test():
     import time
     
-    response = await SearchYoutube("NCS", "track")
+    response = SearchYoutube("NCS", "track")
     if (response != None):
         __musicsearchtest = "OK!"
     else:
         __musicsearchtest = "Fail!"
     
-    response = await SearchYoutube("NCS", "album")
+    response = SearchYoutube("NCS", "album")
     if (response != None):
         __albumsearchtest = "OK!"
     else:
         __albumsearchtest = "Fail!"
     
-    response = await SearchYoutube("NCS", "artist")
+    response = SearchYoutube("NCS", "artist")
     if (response != None):
         __artistsearchtest = "OK!"
     else:
         __artistsearchtest = "Fail!"
        
-    async with httpx.AsyncClient() as client:
-        r = await client.get('/trackdownload?track_name=NCS')
+    r = await httpx.get('/trackdownload?track_name=NCS')
     if (r.status_code == 200):
         __tdtest = "OK!"
     else:
