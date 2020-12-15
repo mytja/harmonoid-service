@@ -88,11 +88,15 @@ def Test():
     else:
         __artistsearchtest = "Fail!"
        
-    r = httpx.get('/trackdownload?track_name=NCS')
-    if (r.status_code == 200):
-        __tdtest = "OK!"
-    else:
+    try:
+        response = harmonoidService.TrackDownload(track_id, album_id, track_name)
+        status_code = response.status_code
+    except:
+        status_code = 500
+    if status_code != 200:
         __tdtest = "Fail!"
+    else:
+        __tdtest = "OK!"
         
     if (__artistsearchtest=="Fail!" or __musicsearchtest=="Fail!" or __albumsearchtest=="Fail!" or __tdtest=="Fail!"):
         __testfail = True
