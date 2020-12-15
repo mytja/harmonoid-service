@@ -91,11 +91,11 @@ def Test():
     else:
         __artistsearchtest = "Fail!"
         
-    #response = TrackDownloadTest(track_name="NCS")
-    #if (response != None):
-    #    __tdtest = "OK!"
-    #else:
-    #    __tdtest = "Fail!"
+    response = TrackDownloadTest(track_name="NCS")
+    if (response != None or response.find("500") != -1):
+        __tdtest = "OK!"
+    else:
+        __tdtest = "Fail!"
         
     if (__artistsearchtest=="Fail!" or __musicsearchtest=="Fail!" or __albumsearchtest=="Fail!"):
         __testfail = True
@@ -111,7 +111,7 @@ def Test():
         "tracksearch": __musicsearchtest,
         "albumsearch": __albumsearchtest,
         "artistsearch": __artistsearchtest,
-        #"trackdownload": __tdtest
+        "trackdownload": __tdtest
     }
     
     return ReturnResponse(__json)
