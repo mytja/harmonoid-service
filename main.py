@@ -97,7 +97,7 @@ def Test():
     else:
         __tdtest = "Fail!"
         
-    if (__artistsearchtest=="Fail!" or __musicsearchtest=="Fail!" or __albumsearchtest=="Fail!"):
+    if (__artistsearchtest=="Fail!" or __musicsearchtest=="Fail!" or __albumsearchtest=="Fail!" or __tdtest=="Fail!"):
         __testfail = True
     else:
         __testfail = False
