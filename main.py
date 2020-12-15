@@ -1,6 +1,7 @@
 from harmonoidservice import HarmonoidService
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.responses import PlainTextResponse
+import httpx
 import json
 
 harmonoidService = HarmonoidService()
@@ -87,13 +88,13 @@ async def Test():
     else:
         __artistsearchtest = "Fail!"
         
-    #response = await TrackDownload(track_name="NCS")
-    #if (response != None or response.find("Internal Server Error") == -1):
-    #    __tdtest = "OK!"
-    #else:
-    #    __tdtest = "Fail!"
+    r = httpx.get('/trackdownload?track_name=NCS')
+    if (r.status_code == 200):
+        __tdtest = "OK!"
+    else:
+        __tdtest = "Fail!"
         
-    if (__artistsearchtest=="Fail!" or __musicsearchtest=="Fail!" or __albumsearchtest=="Fail!"):
+    if (__artistsearchtest=="Fail!" or __musicsearchtest=="Fail!" or __albumsearchtest=="Fail!" or __tdtest=="Fail!"):
         __testfail = True
     else:
         __testfail = False
@@ -107,7 +108,7 @@ async def Test():
         "tracksearch": __musicsearchtest,
         "albumsearch": __albumsearchtest,
         "artistsearch": __artistsearchtest,
-        #"trackdownload": __tdtest
+        "trackdownload": __tdtest
     }
     
     return ReturnResponse(__json)
