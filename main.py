@@ -67,7 +67,7 @@ async def TrackDownload(track_id=None, album_id=None, track_name=None):
 
 @app.get("/test/download")
 def TrackDownloadTest():
-    return harmonoidService.TrackDownload(track_name="NCS")
+    return harmonoidService.TrackDownload(track_id=None, album_id=None, track_name="NCS")
 
 @app.get("/test")
 def Test():
