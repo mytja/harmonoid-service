@@ -18,7 +18,7 @@ def ReturnResponse(response):
 
 @app.get("/")
 async def hello():
-    return PlainTextResponse("service is running")
+    return ReturnResponse("service is running")
 
 
 @app.get("/search")
@@ -65,6 +65,10 @@ async def TrackDownload(track_id=None, album_id=None, track_name=None):
         raise HTTPException(422, "Both track_id and track_name is specified")
     return await harmonoidService.TrackDownload(track_id, album_id, track_name)
 
+@app.get("/test/download")
+def TrackDownloadTest():
+    return harmonoidService.TrackDownload(track_name="NCS")
+
 @app.get("/test")
 def Test():
     import time
@@ -87,7 +91,13 @@ def Test():
     else:
         __artistsearchtest = "Fail!"
         
-    if (__artistsearchtest=="Fail!" or __musicsearchtest=="Fail!" or __albumsearchtest=="Fail!"):
+    response = TrackDownloadTest()
+    if (response != None):
+        __tdtest = "OK!"
+    else:
+        __tdtest = "Fail!"
+        
+    if (__artistsearchtest=="Fail!" or __musicsearchtest=="Fail!" or __albumsearchtest=="Fail!" or __tdtest=="Fail!"):
         __testfail = True
     else:
         __testfail = False
@@ -100,7 +110,8 @@ def Test():
         "fail": __testfail,
         "tracksearch": __musicsearchtest,
         "albumsearch": __albumsearchtest,
-        "artistsearch": __artistsearchtest
+        "artistsearch": __artistsearchtest,
+        "trackdownload": __tdtest
     }
     
     return ReturnResponse(__json)
