@@ -88,6 +88,7 @@ async def Test():
         __artistsearchtest = "Fail!"
         
     response = await TrackDownload(track_name="NCS")
+    print("[trackdownloadtest] Response: "+response)
     if (response != None or response.find("500") == -1):
         __tdtest = "OK!"
     else:
