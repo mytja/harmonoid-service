@@ -88,7 +88,7 @@ def Test():
     else:
         __artistsearchtest = "Fail!"
        
-    r = await httpx.get('/trackdownload?track_name=NCS')
+    r = httpx.get('/trackdownload?track_name=NCS')
     if (r.status_code == 200):
         __tdtest = "OK!"
     else:
