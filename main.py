@@ -67,29 +67,44 @@ async def TrackDownload(track_id=None, album_id=None, track_name=None):
     return await harmonoidService.TrackDownload(track_id, album_id, track_name)
 
 @app.get("/test")
-def Test():
+async def Test():
     import time
     
-    response = SearchYoutube("NCS", "track")
-    if (response != None):
-        __musicsearchtest = "OK!"
-    else:
+    try:
+        response = await SearchYoutube("NCS", "track")
+        response = json.dumps(response, indent=4)
+        ifin =  "track_id" in response
+        if (response != None and ifin==True):
+            __musicsearchtest = "OK!"
+        else:
+            __musicsearchtest = "Fail!"
+    except:
         __musicsearchtest = "Fail!"
     
-    response = SearchYoutube("NCS", "album")
-    if (response != None):
-        __albumsearchtest = "OK!"
-    else:
+    try:
+        response = await SearchYoutube("NCS", "album")
+        response = json.dumps(response, indent=4)
+        ifin =  "album_id" in response
+        if (response != None and ifin==True):
+            __albumsearchtest = "OK!"
+        else:
+            __albumsearchtest = "Fail!"
+    except:
         __albumsearchtest = "Fail!"
     
-    response = SearchYoutube("NCS", "artist")
-    if (response != None):
-        __artistsearchtest = "OK!"
-    else:
+    try:
+        response = await SearchYoutube("NCS", "artist")
+        response = json.dumps(response, indent=4)
+        ifin =  "artist_id" in response
+        if (response != None and ifin==True):
+            __artistsearchtest = "OK!"
+        else:
+            __artistsearchtest = "Fail!"
+    except:
         __artistsearchtest = "Fail!"
        
     try:
-        response = harmonoidService.TrackDownload(track_id, album_id, track_name)
+        response = await harmonoidService.TrackDownload(track_id, album_id, track_name)
         status_code = response.status_code
     except:
         status_code = 500
