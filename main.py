@@ -71,19 +71,22 @@ def Test():
     import time
     
     response = SearchYoutube("NCS", "track")
-    if (response != None):
+    ifin =  "track_id" in response
+    if (response != None and ifin==True):
         __musicsearchtest = "OK!"
     else:
         __musicsearchtest = "Fail!"
     
     response = SearchYoutube("NCS", "album")
-    if (response != None):
+    ifin =  "album_id" in response
+    if (response != None and ifin==True):
         __albumsearchtest = "OK!"
     else:
         __albumsearchtest = "Fail!"
     
     response = SearchYoutube("NCS", "artist")
-    if (response != None):
+    ifin =  "artist_id" in response
+    if (response != None and ifin==True):
         __artistsearchtest = "OK!"
     else:
         __artistsearchtest = "Fail!"
