@@ -67,10 +67,10 @@ async def TrackDownload(track_id=None, album_id=None, track_name=None):
     return await harmonoidService.TrackDownload(track_id, album_id, track_name)
 
 @app.get("/test")
-def Test():
+async def Test():
     import time
     
-    response = SearchYoutube("NCS", "track")
+    response = await SearchYoutube("NCS", "track")
     response = json.dumps(response, indent=4)
     ifin =  "track_id" in response
     if (response != None and ifin==True):
@@ -78,7 +78,7 @@ def Test():
     else:
         __musicsearchtest = "Fail!"
     
-    response = SearchYoutube("NCS", "album")
+    response = await SearchYoutube("NCS", "album")
     response = json.dumps(response, indent=4)
     ifin =  "album_id" in response
     if (response != None and ifin==True):
@@ -86,7 +86,7 @@ def Test():
     else:
         __albumsearchtest = "Fail!"
     
-    response = SearchYoutube("NCS", "artist")
+    response = await SearchYoutube("NCS", "artist")
     response = json.dumps(response, indent=4)
     ifin =  "artist_id" in response
     if (response != None and ifin==True):
@@ -95,7 +95,7 @@ def Test():
         __artistsearchtest = "Fail!"
        
     try:
-        response = harmonoidService.TrackDownload(track_id, album_id, track_name)
+        response = await harmonoidService.TrackDownload(track_id, album_id, track_name)
         status_code = response.status_code
     except:
         status_code = 500
