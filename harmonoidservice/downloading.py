@@ -51,6 +51,7 @@ class DownloadHandler:
             print(yt)
             print(f"[youtube] Track download successful for track ID: {trackId}.")
             return (True, None)
+        #RP
         except:
             print(f"[youtube] Track download unsuccessful for track ID: {trackId}.")
             print(f"[metadata] Skipped adding metadata to track ID: {trackId}.")
