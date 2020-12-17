@@ -92,31 +92,49 @@ async def Test():
     
     
     
+    response = await SearchYoutube("NCS", "album")
+    response = jsonable_encoder(response)
+    rcode = response["status_code"]
+    print("[test-troubleshooting] Status code: "+str(rcode))
+    response = response["body"]
+    #try:
+        #print("[test-troubleshooting] "+str(response))
+    #except:
+        #print("[test-troubleshooting] Cannot print response!")
     try:
-        response = SearchYoutube("NCS", "album")
-        response = json.dumps(response, indent=4)
         ifin =  "album_id" in response
-        if (response != None and ifin==True):
-            __albumsearchtest = "OK!"
+        if (response != None and ifin==True and int(rcode) == 200):
+            __albumsearchtest = True
         else:
-            __albumsearchtest = "Fail!"
+            __albumsearchtest = False
     except:
-        __albumsearchtest = "Fail!"
+        print("[test-troubleshooting] Type is not dict")
     
+    
+    
+    response = await SearchYoutube("NCS", "artist")
+    response = jsonable_encoder(response)
+    rcode = response["status_code"]
+    print("[test-troubleshooting] Status code: "+str(rcode))
+    response = response["body"]
+    #try:
+        #print("[test-troubleshooting] "+str(response))
+    #except:
+        #print("[test-troubleshooting] Cannot print response!")
     try:
-        response = SearchYoutube("NCS", "artist")
-        response = json.dumps(response, indent=4)
         ifin =  "artist_id" in response
-        if (response != None and ifin==True):
-            __artistsearchtest = "OK!"
+        if (response != None and ifin==True and int(rcode) == 200):
+            __artistsearchtest = True
         else:
-            __artistsearchtest = "Fail!"
+            __artistsearchtest = False
     except:
-        __artistsearchtest = "Fail!"
+        print("[test-troubleshooting] Type is not dict")
        
     try:
         response = harmonoidService.TrackDownload(track_id, album_id, track_name)
-        status_code = response.status_code
+        response = jsonable_encoder(response)
+        print(str(response))
+        #status_code = response.status_code
     except:
         status_code = 500
     if status_code != 200:
