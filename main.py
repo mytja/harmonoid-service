@@ -75,6 +75,7 @@ async def Test():
     response = await SearchYoutube("NCS", "track")
     response = jsonable_encoder(response)
     rcode = response["status_code"]
+    print("[test-troubleshooting] Status code: "+str(rcode))
     response = response["body"]
     try:
         print("[test-troubleshooting] "+str(response))
