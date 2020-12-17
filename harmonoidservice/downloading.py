@@ -55,7 +55,7 @@ class DownloadHandler:
         # Convert
         cmd = 'ffmpeg -i "'+yt_streams+'" '+trackId+".mp3"
         print("[conversion] CMD line: "+cmd)
-        subprocess.Popen(cmd, shell=True, )
+        os.system(cmd)
         
         #Success!
         print(f"[youtube] Track download successful for track ID: {trackId}.")
