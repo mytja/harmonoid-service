@@ -8,22 +8,23 @@ import asyncio
 from .async_mutagen import MP3
 import youtube_dl
 
-CURRENT_VERSION = youtube_dl.version.__version__  # just to avoid reimports
+CURRENT_VERSION = pytube.version.__version__  # just to avoid reimports
 
 
 class DownloadHandler:
-    async def UpdateYoutubeDl(self):
+    """
+    async def UpdatePyTube(self):
         async with httpx.AsyncClient() as client:
-            latestVersion = await client.get("https://yt-dl.org/update/LATEST_VERSION")
-        latestVersion = latestVersion.text
+            latestVersion = await client.get("https://api.github.com/repos/nficano/pytube/releases")
+        latestVersion = latestVersion.text[0]["tag_name"]
 
         global CURRENT_VERSION
         updated = latestVersion == CURRENT_VERSION
-        print(f"[update] Installed YouTube-DL version  : {CURRENT_VERSION}.")
-        print(f"[update] Latest YouTube-DL Version     : {latestVersion}.")
+        print(f"[update] Installed PyTube version  : {CURRENT_VERSION}.")
+        print(f"[update] Latest PyTube Version     : {latestVersion}.")
         if not updated:
-            print("[update] Updating YouTube-DL...")
-            cmd = f"{sys.executable} -m pip install --upgrade youtube_dl"
+            print("[update] Updating PyTube...")
+            cmd = f"{sys.executable} -m pip install --upgrade pytube"
 
             process = subprocess.Popen(
                 cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
@@ -35,23 +36,19 @@ class DownloadHandler:
 
             if process.poll() == 0:
                 CURRENT_VERSION = latestVersion
-                print(f"[update] Updated To YouTube-DL version : {latestVersion}")
+                print(f"[update] Updated To PyTube version : {latestVersion}")
             else:
                 print("[update] Failed to update.")
                 print("[stdout]", stdout)
                 print("[stderr]", stderr)
         else:
-            print("[update] YouTube-DL is already updated.")
-
+            print("[update] PyTube is already updated.")
+    """
     async def SaveAudio(self, trackId):
-        COMMAND = 'youtube-dl -i --format "140" --extract-audio --audio-format mp3 --no-playlist --cookies cookies.txt -x -o "{output}.%(ext)s" "{url}"'
-
-        cmd = COMMAND.format(
-            output=trackId, url=f"https://www.youtube.com/watch?v={trackId}"
-        )
-        process = subprocess.Popen(
-            cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
+        yt = YouTube('http://youtube.com/watch?v='+trackId)
+        
+        yt_streams = yt.streams.filter(progressive=True, file_extension='mp3').first().download()
+        
         while process.poll() is None:
             await asyncio.sleep(0.1)
         stdout, stderr = process.communicate()
