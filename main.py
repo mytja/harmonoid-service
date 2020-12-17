@@ -70,7 +70,9 @@ async def TrackDownload(track_id=None, album_id=None, track_name=None):
 def Test():
     import time
     
-    response = SearchYoutube("NCS", "track")
+    response = await SearchYoutube("NCS", "track")
+    while response == type(coroutine):
+        # DO nothing but wait
     response = json.dumps(response, indent=4)
     ifin =  "track_id" in response
     if (response != None and ifin==True):
