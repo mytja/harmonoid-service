@@ -46,7 +46,8 @@ class DownloadHandler:
             print("[update] PyTube is already updated.")
     """
     async def SaveAudio(self, trackId):
-        yt = YouTube('http://youtube.com/watch?v='+trackId).streams.filter(file_extension='mp3').first().download()
+        yt = YouTube('http://youtube.com/watch?v='+trackId).streams.filter(only_audio=True).first().download()
+        print(yt)
         
         while process.poll() is None:
             await asyncio.sleep(0.1)
