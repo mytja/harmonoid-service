@@ -70,15 +70,12 @@ async def TrackDownload(track_id=None, album_id=None, track_name=None):
 def Test():
     import time
     
-    try:
-        response = SearchYoutube("NCS", "track")
-        response = json.dumps(response, indent=4)
-        ifin =  "track_id" in response
-        if (response != None and ifin==True):
-            __musicsearchtest = "OK!"
-        else:
-            __musicsearchtest = "Fail!"
-    except:
+    response = SearchYoutube("NCS", "track")
+    response = json.dumps(response, indent=4)
+    ifin =  "track_id" in response
+    if (response != None and ifin==True):
+        __musicsearchtest = "OK!"
+    else:
         __musicsearchtest = "Fail!"
     
     try:
