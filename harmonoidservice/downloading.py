@@ -48,7 +48,7 @@ class DownloadHandler:
     async def SaveAudio(self, trackId):
         #try:
         yt = YouTube('https://youtube.com/watch?v='+trackId)
-        yt_streams = yt.streams
+        yt_streams = yt.streams.filter(only_audio=True)
         print("[pytube] YT streams avaiable "+yt_streams)
         yt_streams = yt_streams.first().download()
         cmd = "ffmpeg -i "+yt_streams+" "+trackId+".mp3"
