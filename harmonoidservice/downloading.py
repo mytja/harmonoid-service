@@ -50,7 +50,7 @@ class DownloadHandler:
         yt = YouTube('https://youtube.com/watch?v='+trackId)
         yt_streams = yt.streams
         print("[pytube] YT streams avaiable")
-        yt_streams = yt_streams.order_by("abr").desc().first().download()
+        yt_streams = yt_streams.get_audio_only().first().download()
         cmd = "ffmpeg -i "+yt+" "+trackId+".mp3"
         print("[conversion] CMD line: "+cmd)
         os.system(cmd)
