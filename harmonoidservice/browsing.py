@@ -197,7 +197,7 @@ class BrowsingHandler:
                         "album_type": trackStuffList[index][4],
                     }
                 ]
-            return Response(json.dumps({"tracks": tracks}, indent=4), media_type="application/json")
+            return json.dumps({"tracks": tracks}, indent=4)
 
         if mode == "artist":
             youtubeResult = await self.ytMusic._search(keyword, "artists")
