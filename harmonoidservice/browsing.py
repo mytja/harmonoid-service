@@ -1,5 +1,6 @@
 import asyncio
 import json
+from fastapi.responses import JSONResponse as Response
 
 
 class BrowsingHandler:
@@ -161,7 +162,7 @@ class BrowsingHandler:
                         else "album",
                     }
                 ]
-            return {"albums": albums}
+            return Response(json.dumps({"albums": albums}, indent=4), media_type="application/json")
 
         if mode == "track":
             youtubeResult = await self.ytMusic._search(keyword, "songs")
