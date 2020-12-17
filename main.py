@@ -74,16 +74,18 @@ async def Test():
     
     response = await SearchYoutube("NCS", "track")
     response = jsonable_encoder(response)
-    #try:
-        #print("[test-troubleshooting] "+str(response))
-    #except:
-        #print("[test-troubleshooting] Cannot print response!")
+    rcode = response["status_code"]
+    response = response["body"]
+    try:
+        print("[test-troubleshooting] "+str(response))
+    except:
+        print("[test-troubleshooting] Cannot print response!")
     if (type(response) == dict):
         ifin =  "track_id" in response
-        if (response != None and ifin==True):
-            __musicsearchtest = "OK!"
+        if (response != None and ifin==True and rcode == 200):
+            __musicsearchtest = True
         else:
-            __musicsearchtest = "Fail!"
+            __musicsearchtest = False
     else:
         print("[test-troubleshooting] Type is not dict")
     
