@@ -46,26 +46,15 @@ class DownloadHandler:
             print("[update] PyTube is already updated.")
     """
     async def SaveAudio(self, trackId):
-        yt = YouTube('http://youtube.com/watch?v='+trackId).streams.filter(only_audio=True).first().download()
-        print(yt)
-        
-        while process.poll() is None:
-            await asyncio.sleep(0.1)
-        stdout, stderr = process.communicate()
-        stdout, stderr = stdout.decode(), stderr.decode()
-
-        print("[stdout]", stdout)
-        print(
-            "[stderr]", stderr
-        )  # sometimes YT-DL returns status code 0 even with an error occurred
-
-        if process.poll() == 0 and not ("ERROR" in stderr):
+        try:
+            yt = YouTube('http://youtube.com/watch?v='+trackId).streams.filter(only_audio=True).first().download()
+            print(yt)
             print(f"[youtube] Track download successful for track ID: {trackId}.")
             return (True, None)
         else:
             print(f"[youtube] Track download unsuccessful for track ID: {trackId}.")
             print(f"[metadata] Skipped adding metadata to track ID: {trackId}.")
-            return (False, stderr)
+            return (False)
 
     async def SaveMetaData(self, trackInfoJSON):
         art = (
