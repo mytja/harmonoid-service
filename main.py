@@ -1,8 +1,10 @@
 from harmonoidservice import HarmonoidService
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.responses import PlainTextResponse
+from fastapi.encoders import jsonable_encoder
 import httpx
 import json
+import types
 
 harmonoidService = HarmonoidService()
 
@@ -70,44 +72,75 @@ async def TrackDownload(track_id=None, album_id=None, track_name=None):
 async def Test():
     import time
     
+    response = await SearchYoutube("NCS", "track")
+    response = jsonable_encoder(response)
+    rcode = response["status_code"]
+    print("[test-troubleshooting] Status code: "+str(rcode))
+    response = response["body"]
+    #try:
+        #print("[test-troubleshooting] "+str(response))
+    #except:
+        #print("[test-troubleshooting] Cannot print response!")
     try:
-        response = await SearchYoutube("NCS", "track")
-        response = json.dumps(response, indent=4)
         ifin =  "track_id" in response
-        if (response != None and ifin==True):
-            __musicsearchtest = "OK!"
+        if (response != None and ifin==True and int(rcode) == 200):
+            __musicsearchtest = True
         else:
-            __musicsearchtest = "Fail!"
+            __musicsearchtest = False
     except:
-        __musicsearchtest = "Fail!"
+        print("[test-troubleshooting] Type is not dict")
     
+    
+    
+    response = await SearchYoutube("NCS", "album")
+    response = jsonable_encoder(response)
+    rcode = response["status_code"]
+    print("[test-troubleshooting] Status code: "+str(rcode))
+    response = response["body"]
+    #try:
+        #print("[test-troubleshooting] "+str(response))
+    #except:
+        #print("[test-troubleshooting] Cannot print response!")
     try:
-        response = await SearchYoutube("NCS", "album")
-        response = json.dumps(response, indent=4)
         ifin =  "album_id" in response
-        if (response != None and ifin==True):
-            __albumsearchtest = "OK!"
+        if (response != None and ifin==True and int(rcode) == 200):
+            __albumsearchtest = True
         else:
-            __albumsearchtest = "Fail!"
+            __albumsearchtest = False
     except:
-        __albumsearchtest = "Fail!"
+        print("[test-troubleshooting] Type is not dict")
     
+    
+    
+    response = await SearchYoutube("NCS", "artist")
+    response = jsonable_encoder(response)
+    rcode = response["status_code"]
+    print("[test-troubleshooting] Status code: "+str(rcode))
+    response = response["body"]
+    #try:
+        #print("[test-troubleshooting] "+str(response))
+    #except:
+        #print("[test-troubleshooting] Cannot print response!")
     try:
-        response = await SearchYoutube("NCS", "artist")
-        response = json.dumps(response, indent=4)
         ifin =  "artist_id" in response
-        if (response != None and ifin==True):
-            __artistsearchtest = "OK!"
+        if (response != None and ifin==True and int(rcode) == 200):
+            __artistsearchtest = True
         else:
-            __artistsearchtest = "Fail!"
+            __artistsearchtest = False
     except:
-        __artistsearchtest = "Fail!"
+        print("[test-troubleshooting] Type is not dict")
        
     try:
         response = await harmonoidService.TrackDownload(track_id, album_id, track_name)
-        status_code = response.status_code
+        print("[test-troubleshooting]: "+str(response))
+        
     except:
         status_code = 500
+    try:
+        status_code = response.status_code
+        print(status_code)
+    except:
+        status_code = 200
     if status_code != 200:
         __tdtest = "Fail!"
     else:

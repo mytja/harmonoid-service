@@ -1,4 +1,6 @@
 import asyncio
+import json
+from fastapi import Response
 
 
 class BrowsingHandler:
@@ -160,7 +162,7 @@ class BrowsingHandler:
                         else "album",
                     }
                 ]
-            return {"albums": albums}
+            return json.dumps({"albums": albums}, indent=4)
 
         if mode == "track":
             youtubeResult = await self.ytMusic._search(keyword, "songs")
@@ -195,7 +197,7 @@ class BrowsingHandler:
                         "album_type": trackStuffList[index][4],
                     }
                 ]
-            return {"tracks": tracks}
+            return json.dumps({"tracks": tracks}, indent=4)
 
         if mode == "artist":
             youtubeResult = await self.ytMusic._search(keyword, "artists")
@@ -214,7 +216,7 @@ class BrowsingHandler:
                         "artist_art_64": artist_art_64,
                     }
                 ]
-            return {"artists": artists}
+            return json.dumps({"artists": artists}, indent=4)
 
     # 🎉 Other Functions For YouTube Music
     async def ArrangeVideoIds(self, track):
