@@ -47,7 +47,7 @@ class DownloadHandler:
     """
     async def SaveAudio(self, trackId):
         try:
-            yt = YouTube('http://youtube.com/watch?v='+trackId).streams.filter(only_audio=True, file_extension='mp3').first().download(output_path=str(trackId)+".mp3")
+            yt = YouTube('http://youtube.com/watch?v='+trackId).streams.filter(only_audio=True).first().download(output_path=str(trackId)+".mp3")
             print(yt)
             print(f"[youtube] Track download successful for track ID: {trackId}.")
             return (True, None)
@@ -104,13 +104,14 @@ class DownloadHandler:
                 )
             else:
                  if retry:
-                    print("\n[diagnosis] (1/1) Deleting cookies file.")
-                    await aiofiles.os.remove("cookies.txt")
-                    print(f"[diagnosis] Retrying download for track ID: {trackId}.\n")
-                    updatedResponse = await self.TrackDownload(
-                        trackId, albumId, trackName, retry=False
-                    )
-                    return updatedResponse
+                    try:
+                        print("\n[diagnosis] (1/1) Deleting cookies file.")
+                        await aiofiles.os.remove("cookies.txt")
+                        print(f"[diagnosis] Retrying download for track ID: {trackId}.\n")
+                        updatedResponse = await self.TrackDownload(
+                            trackId, albumId, trackName, retry=False
+                        )
+                        return updatedResponse
                  print(f"[server] Sending status code 500 for track ID: {trackId}.")
                  return PlainTextResponse(
                     content=f"Internal Server Error.\nYouTube-DL Failed.\n{str(error)}",
