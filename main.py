@@ -74,7 +74,10 @@ async def Test():
     
     response = await SearchYoutube("NCS", "track")
     response = jsonable_encoder(response)
-    print("[test-troubleshooting] "+response)
+    try:
+        print("[test-troubleshooting] "+str(response))
+    except:
+        print("[test-troubleshooting] Cannot print response!")
     print("[test-troubleshooting] "+type(response))
     ifin =  "track_id" in response
     if (response != None and ifin==True):
