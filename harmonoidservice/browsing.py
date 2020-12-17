@@ -90,7 +90,7 @@ class BrowsingHandler:
                     "album_type": "single" if albumLengthList[index] == 1 else "album",
                 }
             ]
-        return json.dumps({"albums": artistAlbums})
+        return {"albums": artistAlbums}
 
     async def ArtistTracks(self, artistId):
         artistJson = await self.ytMusic._get_artist(artistId)
@@ -197,7 +197,7 @@ class BrowsingHandler:
                         "album_type": trackStuffList[index][4],
                     }
                 ]
-            return {"tracks": tracks}
+            return Response(json.dumps({"tracks": tracks}, indent=4), media_type="application/json")
 
         if mode == "artist":
             youtubeResult = await self.ytMusic._search(keyword, "artists")
@@ -216,7 +216,7 @@ class BrowsingHandler:
                         "artist_art_64": artist_art_64,
                     }
                 ]
-            return {"artists": artists}
+            return Response(json.dumps({"artists": artists}, indent=4), media_type="application/json")
 
     # 🎉 Other Functions For YouTube Music
     async def ArrangeVideoIds(self, track):
