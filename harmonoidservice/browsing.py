@@ -162,7 +162,7 @@ class BrowsingHandler:
                         else "album",
                     }
                 ]
-            return Response(json.dumps({"albums": albums}, indent=4), media_type="application/json")
+            return json.dumps({"albums": albums}, indent=4)
 
         if mode == "track":
             youtubeResult = await self.ytMusic._search(keyword, "songs")
@@ -197,7 +197,7 @@ class BrowsingHandler:
                         "album_type": trackStuffList[index][4],
                     }
                 ]
-            return Response(json.dumps({"tracks": tracks}, indent=4), media_type="application/json")
+            return json.dumps({"tracks": tracks}, indent=4)
 
         if mode == "artist":
             youtubeResult = await self.ytMusic._search(keyword, "artists")
