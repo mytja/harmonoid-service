@@ -1,6 +1,7 @@
 from harmonoidservice import HarmonoidService
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.responses import PlainTextResponse
+from fastapi.encoders import jsonable_encoder
 import httpx
 import json
 import types
@@ -72,7 +73,7 @@ async def Test():
     import time
     
     response = await SearchYoutube("NCS", "track")
-    response = json.dumps(response, indent=4)
+    response = jsonable_encoder(response)
     ifin =  "track_id" in response
     if (response != None and ifin==True):
         __musicsearchtest = "OK!"
