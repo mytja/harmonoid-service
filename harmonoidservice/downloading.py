@@ -8,7 +8,7 @@ import asyncio
 from .async_mutagen import MP3
 import youtube_dl
 
-CURRENT_VERSION = pytube.version.__version__  # just to avoid reimports
+#CURRENT_VERSION = pytube.version.__version__  # just to avoid reimports
 
 
 class DownloadHandler:
