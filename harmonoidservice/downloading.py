@@ -9,7 +9,7 @@ from .async_mutagen import MP3
 import youtube_dl
 from pytube import YouTube
 
-#CURRENT_VERSION = pytube.version.__version__  # just to avoid reimports
+#CURRENT_VERSION = __version__  # just to avoid reimports
 
 
 class DownloadHandler:
@@ -47,7 +47,7 @@ class DownloadHandler:
     """
     async def SaveAudio(self, trackId):
         #try:
-        yt = YouTube('http://youtube.com/watch?v='+trackId)
+        yt = YouTube('https://youtube.com/watch?v='+trackId)
         yt_streams = yt.streams
         print("[pytube] YT streams avaiable")
         yt_streams = yt_streams.order_by("abr").desc().first().download()
