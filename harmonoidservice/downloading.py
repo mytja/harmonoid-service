@@ -105,14 +105,13 @@ class DownloadHandler:
                 )
             else:
                  if retry:
-                    try:
-                        print("\n[diagnosis] (1/1) Deleting cookies file.")
-                        await aiofiles.os.remove("cookies.txt")
-                        print(f"[diagnosis] Retrying download for track ID: {trackId}.\n")
-                        updatedResponse = await self.TrackDownload(
-                            trackId, albumId, trackName, retry=False
-                        )
-                        return updatedResponse
+                     print("\n[diagnosis] (1/1) Deleting cookies file.")
+                     await aiofiles.os.remove("cookies.txt")
+                     print(f"[diagnosis] Retrying download for track ID: {trackId}.\n")
+                     updatedResponse = await self.TrackDownload(
+                         trackId, albumId, trackName, retry=False
+                     )
+                     return updatedResponse
                  print(f"[server] Sending status code 500 for track ID: {trackId}.")
                  return PlainTextResponse(
                     content=f"Internal Server Error.\nYouTube-DL Failed.\n{str(error)}",
