@@ -48,6 +48,9 @@ class DownloadHandler:
     async def SaveAudio(self, trackId):
         try:
             yt = YouTube('http://youtube.com/watch?v='+trackId).streams.filter(only_audio=True).first().download()
+            cmd = "ffmpeg -i "+yt+" "+trackId+".mp3"
+            print("[conversion] CMD line: "+cmd
+            os.system(cmd)
             os.rename(yt, trackId+".mp3")
             print(f"[youtube] Track download successful for track ID: {trackId}.")
             return (True, None)
