@@ -71,7 +71,7 @@ def Test():
     import time
     
     response = await SearchYoutube("NCS", "track")
-    if response != type(coroutine):
+    while response != type(coroutine):
         response = json.dumps(response, indent=4)
         ifin =  "track_id" in response
     if (response != None and ifin==True):
