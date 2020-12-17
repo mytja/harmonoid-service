@@ -142,11 +142,11 @@ async def Test():
     except:
         status_code = 200
     if status_code != 200:
-        __tdtest = "Fail!"
+        __tdtest = False
     else:
-        __tdtest = "OK!"
+        __tdtest = True
         
-    if (__artistsearchtest=="Fail!" or __musicsearchtest=="Fail!" or __albumsearchtest=="Fail!" or __tdtest=="Fail!"):
+    if (__artistsearchtest==False or __musicsearchtest==False or __albumsearchtest==False or __tdtest==False):
         __testfail = True
     else:
         __testfail = False
