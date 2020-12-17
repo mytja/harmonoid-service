@@ -7,6 +7,7 @@ import sys
 import asyncio
 from .async_mutagen import MP3
 import youtube_dl
+from pytube import YouTube
 
 #CURRENT_VERSION = pytube.version.__version__  # just to avoid reimports
 
