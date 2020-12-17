@@ -67,7 +67,7 @@ async def TrackDownload(track_id=None, album_id=None, track_name=None):
     return await harmonoidService.TrackDownload(track_id, album_id, track_name)
 
 @app.get("/test")
-def Test():
+async def Test():
     import time
     
     response = await SearchYoutube("NCS", "track")
