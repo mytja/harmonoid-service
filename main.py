@@ -72,7 +72,7 @@ async def Test():
     import time
     
     response = await SearchYoutube("NCS", "track")
-    #response = json.dumps(response, indent=4)
+    response = json.dumps(response, indent=4)
     ifin =  "track_id" in response
     if (response != None and ifin==True):
         __musicsearchtest = "OK!"
