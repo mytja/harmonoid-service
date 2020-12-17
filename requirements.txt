@@ -1,5 +1,5 @@
 git+https://github.com/sigma67/ytmusicapi@master
--u git+https://github.com/nficano/pytube@master
+--upgrade git+https://github.com/nficano/pytube@master
 youtube-dl
 fastapi
 uvicorn[standard]
