@@ -79,7 +79,6 @@ async def Test():
     except:
         print("[test-troubleshooting] Cannot print response!")
     if (type(response) == dict):
-        print("[test-troubleshooting] "+type(response))
         ifin =  "track_id" in response
         if (response != None and ifin==True):
             __musicsearchtest = "OK!"
@@ -87,6 +86,8 @@ async def Test():
             __musicsearchtest = "Fail!"
     else:
         print("[test-troubleshooting] Type is not dict")
+    
+    
     
     try:
         response = SearchYoutube("NCS", "album")
