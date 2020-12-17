@@ -3,6 +3,7 @@ from fastapi import FastAPI, HTTPException, Response
 from fastapi.responses import PlainTextResponse
 import httpx
 import json
+import types
 
 harmonoidService = HarmonoidService()
 
@@ -71,7 +72,7 @@ async def Test():
     import time
     
     response = await SearchYoutube("NCS", "track")
-    while response != type(coroutine):
+    while response != types.CoroutineType):
         response = json.dumps(response, indent=4)
         ifin =  "track_id" in response
     if (response != None and ifin==True):
