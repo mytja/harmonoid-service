@@ -49,9 +49,9 @@ class DownloadHandler:
         #try:
         yt = YouTube('https://youtube.com/watch?v='+trackId)
         yt_streams = yt.streams
-        print("[pytube] YT streams avaiable")
+        print("[pytube] YT streams avaiable "+yt_streams)
         yt_streams = yt_streams.first().download()
-        cmd = "ffmpeg -i "+yt+" "+trackId+".mp3"
+        cmd = "ffmpeg -i "+yt_streams+" "+trackId+".mp3"
         print("[conversion] CMD line: "+cmd)
         os.system(cmd)
         print(f"[youtube] Track download successful for track ID: {trackId}.")
