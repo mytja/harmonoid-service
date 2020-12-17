@@ -162,7 +162,7 @@ class BrowsingHandler:
                         else "album",
                     }
                 ]
-            return Response(json.dumps({"albums": albums}, indent=4), media_type="application/json")
+            return json.dumps({"albums": albums}, indent=4)
 
         if mode == "track":
             youtubeResult = await self.ytMusic._search(keyword, "songs")
@@ -216,7 +216,7 @@ class BrowsingHandler:
                         "artist_art_64": artist_art_64,
                     }
                 ]
-            return Response(json.dumps({"artists": artists}, indent=4), media_type="application/json")
+            return json.dumps({"artists": artists}, indent=4)
 
     # 🎉 Other Functions For YouTube Music
     async def ArrangeVideoIds(self, track):
