@@ -53,7 +53,7 @@ class DownloadHandler:
         yt.streams
         
         # Convert
-        cmd = "ffmpeg -i "+yt_streams+" "+trackId+".mp3"
+        cmd = 'ffmpeg -i "'+yt_streams+'" '+trackId+".mp3"
         print("[conversion] CMD line: "+cmd)
         subprocess.Popen(cmd, shell=True, )
         
