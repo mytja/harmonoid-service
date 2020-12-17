@@ -1,4 +1,5 @@
 import asyncio
+import json
 
 
 class BrowsingHandler:
@@ -88,7 +89,7 @@ class BrowsingHandler:
                     "album_type": "single" if albumLengthList[index] == 1 else "album",
                 }
             ]
-        return {"albums": artistAlbums}
+        return json.dumps({"albums": artistAlbums})
 
     async def ArtistTracks(self, artistId):
         artistJson = await self.ytMusic._get_artist(artistId)
