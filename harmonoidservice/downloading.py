@@ -12,6 +12,7 @@ CURRENT_VERSION = pytube.version.__version__  # just to avoid reimports
 
 
 class DownloadHandler:
+    """
     async def UpdatePyTube(self):
         async with httpx.AsyncClient() as client:
             latestVersion = await client.get("https://api.github.com/repos/nficano/pytube/releases")
@@ -42,7 +43,7 @@ class DownloadHandler:
                 print("[stderr]", stderr)
         else:
             print("[update] PyTube is already updated.")
-
+    """
     async def SaveAudio(self, trackId):
         yt = YouTube('http://youtube.com/watch?v='+trackId)
         
