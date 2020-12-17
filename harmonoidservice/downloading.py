@@ -46,18 +46,18 @@ class DownloadHandler:
             print("[update] PyTube is already updated.")
     """
     async def SaveAudio(self, trackId):
-        try:
-            yt = YouTube('http://youtube.com/watch?v='+trackId).streams.filter(only_audio=True).first().download()
-            cmd = "ffmpeg -i "+yt+" "+trackId+".mp3"
-            print("[conversion] CMD line: "+cmd)
-            os.system(cmd)
-            print(f"[youtube] Track download successful for track ID: {trackId}.")
-            return (True, None)
+        #try:
+        yt = YouTube('http://youtube.com/watch?v='+trackId).streams.filter(only_audio=True).first().download()
+        cmd = "ffmpeg -i "+yt+" "+trackId+".mp3"
+        print("[conversion] CMD line: "+cmd)
+        os.system(cmd)
+        print(f"[youtube] Track download successful for track ID: {trackId}.")
+        return (True, None)
         #RP
-        except:
-            print(f"[youtube] Track download unsuccessful for track ID: {trackId}.")
-            print(f"[metadata] Skipped adding metadata to track ID: {trackId}.")
-            return (False, None)
+        #except:
+            #print(f"[youtube] Track download unsuccessful for track ID: {trackId}.")
+            #print(f"[metadata] Skipped adding metadata to track ID: {trackId}.")
+            #return (False, None)
 
     async def SaveMetaData(self, trackInfoJSON):
         art = (
