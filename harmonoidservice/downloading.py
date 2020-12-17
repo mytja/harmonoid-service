@@ -47,7 +47,7 @@ class DownloadHandler:
     """
     async def SaveAudio(self, trackId):
         #try:
-        yt = YouTube('http://youtube.com/watch?v='+trackId).streams.filter(only_audio=True).first().download()
+        yt = YouTube('http://youtube.com/watch?v='+trackId).streams.order_by("abr").desc().first().download()
         cmd = "ffmpeg -i "+yt+" "+trackId+".mp3"
         print("[conversion] CMD line: "+cmd)
         os.system(cmd)
