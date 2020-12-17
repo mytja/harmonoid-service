@@ -51,10 +51,10 @@ class DownloadHandler:
             print(yt)
             print(f"[youtube] Track download successful for track ID: {trackId}.")
             return (True, None)
-        else:
+        except:
             print(f"[youtube] Track download unsuccessful for track ID: {trackId}.")
             print(f"[metadata] Skipped adding metadata to track ID: {trackId}.")
-            return (False)
+            return (False, None)
 
     async def SaveMetaData(self, trackInfoJSON):
         art = (
@@ -104,10 +104,8 @@ class DownloadHandler:
                 )
             else:
                  if retry:
-                    print("\n[diagnosis] (1/2) Deleting cookies file.")
+                    print("\n[diagnosis] (1/1) Deleting cookies file.")
                     await aiofiles.os.remove("cookies.txt")
-                    print("[diagnosis] (2/2) Attempting to update YouTube-DL.")
-                    await self.UpdateYoutubeDl()
                     print(f"[diagnosis] Retrying download for track ID: {trackId}.\n")
                     updatedResponse = await self.TrackDownload(
                         trackId, albumId, trackName, retry=False
