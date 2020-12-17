@@ -71,10 +71,9 @@ def Test():
     import time
     
     response = await SearchYoutube("NCS", "track")
-    while response == type(coroutine):
-        # DO nothing but wait
-    response = json.dumps(response, indent=4)
-    ifin =  "track_id" in response
+    if response != type(coroutine):
+        response = json.dumps(response, indent=4)
+        ifin =  "track_id" in response
     if (response != None and ifin==True):
         __musicsearchtest = "OK!"
     else:
