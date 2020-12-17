@@ -46,14 +46,18 @@ class DownloadHandler:
             print("[update] PyTube is already updated.")
     """
     async def SaveAudio(self, trackId):
-        #try:
+        # Download
         yt = YouTube('https://youtube.com/watch?v='+trackId)
         yt_streams = yt.streams.first().download()
         print("[pytube] YT streams avaiable")
         yt.streams
+        
+        # Convert
         cmd = "ffmpeg -i "+yt_streams+" "+trackId+".mp3"
         print("[conversion] CMD line: "+cmd)
-        os.system(cmd)
+        subprocess.Popen(cmd, shell=True, )
+        
+        #Success!
         print(f"[youtube] Track download successful for track ID: {trackId}.")
         return (True, None)
         #RP
