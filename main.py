@@ -77,17 +77,17 @@ async def Test():
     rcode = response["status_code"]
     print("[test-troubleshooting] Status code: "+str(rcode))
     response = response["body"]
+    #try:
+        #print("[test-troubleshooting] "+str(response))
+    #except:
+        #print("[test-troubleshooting] Cannot print response!")
     try:
-        print("[test-troubleshooting] "+str(response))
-    except:
-        print("[test-troubleshooting] Cannot print response!")
-    if (type(response) == dict):
         ifin =  "track_id" in response
-        if (response != None and ifin==True and rcode == 200):
+        if (response != None and ifin==True and int(rcode) == 200):
             __musicsearchtest = True
         else:
             __musicsearchtest = False
-    else:
+    except:
         print("[test-troubleshooting] Type is not dict")
     
     
