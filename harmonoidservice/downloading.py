@@ -8,11 +8,46 @@ import asyncio
 from .async_mutagen import MP3
 import youtube_dl
 from pytube import YouTube
+import ytmusicapi
 
 #CURRENT_VERSION = __version__  # just to avoid reimports
+MUSICAPI_VERSION = ytmusicapi.__version__
 
 
 class DownloadHandler:
+    async def UpdateYTMusicAPI(self):
+        async with httpx.AsyncClient() as client:
+            latestVersion = await client.get("https://api.github.com/repos/sigma67/ytmusicapi/release")
+        latestVersion = latestVersion.text
+        
+        jsonLoad = json.loads(latestVersion)[0]["tag_name"]
+        
+        updated = (jsonLoad == MUSICAPI_VERSION)
+        print(f"[update] Installed ytmusicapi version  : {MUSICAPI_VERSION}.")
+        print(f"[update] Latest ytmusicapi Version     : {jsonLoad}.")
+        if not updated:
+            print("[update] Updating ytmusicapi...")
+            cmd = f"{sys.executable} -m pip install --upgrade ytmusicapi"
+
+            process = subprocess.Popen(
+                cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            )
+            while process.poll() is None:
+                await asyncio.sleep(0.1)
+            stdout, stderr = process.communicate()
+            stdout, stderr = stdout.decode(), stderr.decode()
+
+            if process.poll() == 0:
+                MUSICAPI_VERSION = jsonLoad
+                print(
+                    f"[update] Updated To ytmusicapi version : {latestVersion}"
+                )
+            else:
+                print("[update] Failed to update.")
+                print("[stdout]", stdout)
+                print("[stderr]", stderr)
+        else:
+            print("[update] ytmusicapi is already updated.")
     """
     async def UpdatePyTube(self):
         async with httpx.AsyncClient() as client:
@@ -114,13 +149,16 @@ class DownloadHandler:
                 )
             else:
                  if retry:
-                     print("\n[diagnosis] (1/1) Deleting cookies file.")
+                     print("\n[diagnosis] (1/2) Deleting cookies file.")
                      await aiofiles.os.remove("cookies.txt")
+                     print("\n[diagnosis] (2/2) Updating YTMusicAPI.")
+                     await UpdateYTMusicAPI()
                      print(f"[diagnosis] Retrying download for track ID: {trackId}.\n")
                      updatedResponse = await self.TrackDownload(
                          trackId, albumId, trackName, retry=False
                      )
                      return updatedResponse
+                 print("\n[diagnosis] Diagnosis finished without success!")
                  print(f"[server] Sending status code 500 for track ID: {trackId}.")
                  return PlainTextResponse(
                     content=f"Internal Server Error.\nYouTube-DL Failed.\n{str(error)}",
