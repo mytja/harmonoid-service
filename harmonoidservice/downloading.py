@@ -47,7 +47,7 @@ class DownloadHandler:
     """
     async def SaveAudio(self, trackId):
         try:
-            yt = YouTube('http://youtube.com/watch?v='+trackId).streams.filter(only_audio=True).first().download()
+            yt = YouTube('http://youtube.com/watch?v='+trackId).streams.filter(only_audio=True, file_extension='mp3').first().download(output_path=str(trackId)+".mp3")
             print(yt)
             print(f"[youtube] Track download successful for track ID: {trackId}.")
             return (True, None)
