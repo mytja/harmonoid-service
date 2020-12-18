@@ -62,7 +62,7 @@ class DownloadHandler:
             "[stderr]", stderr
         )  # sometimes YT-DL returns status code 0 even with an error occurred
 
-        if process.poll() == 0 and not ("ERROR" in stderr):
+        if process.poll() == 0 and "ERROR" not in stderr:
             print(f"[youtube] Track download successful for track ID: {trackId}.")
             return (True, None)
         else:
@@ -117,7 +117,7 @@ class DownloadHandler:
                     headers={"Accept-Ranges": "bytes"},
                 )
             else:
-                if retry:
+                 if retry:
                     print("\n[diagnosis] (1/2) Deleting cookies file.")
                     await aiofiles.os.remove("cookies.txt")
                     print("[diagnosis] (2/2) Attempting to update YouTube-DL.")
@@ -127,11 +127,10 @@ class DownloadHandler:
                         trackId, albumId, trackName, retry=False
                     )
                     return updatedResponse
-                else:
-                    print(f"[server] Sending status code 500 for track ID: {trackId}.")
-                    return PlainTextResponse(
-                        content=f"Internal Server Error.\nYouTube-DL Failed.\n{str(error)}",
-                        status_code=500,
+                 print(f"[server] Sending status code 500 for track ID: {trackId}.")
+                 return PlainTextResponse(
+                    content=f"Internal Server Error.\nYouTube-DL Failed.\n{str(error)}",
+                    status_code=500,
                     )
         else:
             print(f"[youtube] Could not retrieve metadata of track ID: {trackId}.")
