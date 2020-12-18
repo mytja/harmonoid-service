@@ -132,7 +132,7 @@ async def Test():
        
     try:
         response = await harmonoidService.TrackDownload(track_id, album_id, track_name)
-        print("[test-troubleshooting]: "+str(response))
+        #print("[test-troubleshooting]: "+str(response)) File can't convert to string!
         
     except:
         status_code = 500
