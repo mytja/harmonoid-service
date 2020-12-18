@@ -71,7 +71,7 @@ git push heroku master
     "tracksearch": true,
     "albumsearch": true,
     "artistsearch": true,
-    "trackdownload": "Fail!"
+    "trackdownload": false
 }
 ```
 If ```fail``` is true, then a component failed to do its job correctly, in this case ```trackdownload``` 
