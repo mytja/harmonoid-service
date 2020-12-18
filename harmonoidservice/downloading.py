@@ -62,7 +62,7 @@ class DownloadHandler:
             "[stderr]", stderr
         )  # sometimes YT-DL returns status code 0 even with an error occurred
 
-        if process.poll() == 0 and not ("ERROR" in stderr):
+        if process.poll() == 0 and "ERROR" not in stderr:
             print(f"[youtube] Track download successful for track ID: {trackId}.")
             return (True, None)
         else:
