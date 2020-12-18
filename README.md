@@ -6,7 +6,7 @@
 
 ##### This is used in the 🎵 [Harmonoid](https://github.com/alexmercerind/harmonoid) music app.
 
-This repository has everything ready to be deployed on [Heroku](https://heroku.com).
+This repository has everything ready to be deployed on [Heroku](https://heroku.com) or on a Linux VM.
 
 ## ❔ What does this app do?
 
@@ -23,6 +23,8 @@ You can use this in your music app if you want.
 ![A track downloaded](/downloaded_track.PNG)
 
 ## 🔧 Setting Up
+
+### Heroku
 
 **1) Create a new personal app at Heroku**
 
@@ -60,7 +62,35 @@ git push heroku master
 
 **6) Verify that you did everything correct**
 
-Now, if you visit your app at https://yourapp.herokuapp.com/ in a browser, you will see 'service is running' on your screen, with a status code of 200.
+- Now, if you visit your app at https://yourapp.herokuapp.com/ in a browser, you will see 'service is running' on your screen, with a status code of 200.
+- Visit test suite at https://yourapp.herokuapp.com/test in a browser! If you see something like this:
+```
+{
+    "endtime": "Fri Dec 18 07:31:29 2020",
+    "fail": true,
+    "tracksearch": true,
+    "albumsearch": true,
+    "artistsearch": true,
+    "trackdownload": false
+}
+```
+If ```fail``` is true, then a component failed to do its job correctly, in this case ```trackdownload``` 
+
+### On Linux VM / Cloud Service
+
+**1) Clone this repository**
+
+In terminal / bash in your home directory (```cd ~```), type in ```git clone https://github.com/raitonoberu/harmonoid-service```
+
+**2) Open folder**
+
+Open your newly created foler with ```cd harmonoid-service```
+
+**3) Run a script included with this repository**
+
+Run ```sudo source setupvm``` on Ubuntu, on Debian ```sudo ./setupvm```
+
+You can also try command without ```sudo```
 
 ## 📐 Usage
 
