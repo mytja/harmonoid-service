@@ -6,7 +6,7 @@
 
 ##### This is used in the 🎵 [Harmonoid](https://github.com/alexmercerind/harmonoid) music app.
 
-This repository has everything ready to be deployed on [Heroku](https://heroku.com).
+This repository has everything ready to be deployed on [Heroku](https://heroku.com) or on Linux VM.
 
 ## ❔ What does this app do?
 
