@@ -51,7 +51,7 @@ class BrowsingHandler:
         tracks = response["tracks"]
 
         videoIdList = await self.AsyncAlbumSearch(tracks)
-
+        
         result = []
         for index, track in enumerate(tracks):
             result += [
@@ -63,6 +63,7 @@ class BrowsingHandler:
                     "track_duration": int(track["lengthMs"]),
                 }
             ]
+            
         return {"tracks": result}
 
     async def ArtistAlbums(self, artistId):
