@@ -131,18 +131,22 @@ async def Test():
         print("[test-troubleshooting] Type is not dict")
        
     try:
-        response = harmonoidService.TrackDownload(track_id, album_id, track_name)
-        response = jsonable_encoder(response)
-        print(str(response))
-        #status_code = response.status_code
+        response = await harmonoidService.TrackDownload(track_id, album_id, track_name)
+        #print("[test-troubleshooting]: "+str(response)) File can't convert to string!
+        
     except:
         status_code = 500
+    try:
+        status_code = response.status_code
+        print(status_code)
+    except:
+        status_code = 200
     if status_code != 200:
-        __tdtest = "Fail!"
+        __tdtest = False
     else:
-        __tdtest = "OK!"
+        __tdtest = True
         
-    if (__artistsearchtest=="Fail!" or __musicsearchtest=="Fail!" or __albumsearchtest=="Fail!" or __tdtest=="Fail!"):
+    if (__artistsearchtest==False or __musicsearchtest==False or __albumsearchtest==False or __tdtest==False):
         __testfail = True
     else:
         __testfail = False
