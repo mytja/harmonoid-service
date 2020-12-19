@@ -7,4 +7,3 @@ gunicorn
 mutagen
 aiofiles
 httpx
-pytube
