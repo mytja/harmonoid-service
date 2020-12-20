@@ -83,7 +83,7 @@ class DownloadHandler:
     async def SaveAudio(self, trackId):
         # Download
         yt = YouTube('https://youtube.com/watch?v='+trackId)
-        yt_streams = yt.streams.first().download()
+        yt_streams = yt.streams.filter(only_audio=True).order_by("abr").desc().first().download()
         print("[pytube] YT streams avaiable")
         yt.streams
         
