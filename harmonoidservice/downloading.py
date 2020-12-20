@@ -89,8 +89,9 @@ class DownloadHandler:
         yt_streams = yt_streams.first().download()
         
         yt_end = yt_streams.split(".")
+        print(yt_end)
         yt_list_len = len(yt_end)
-        if (yt_end[yt_list_len-1] != "mp3":
+        if (yt_end[yt_list_len-1] != "mp3"):
             print("[conversion] Stream isn't mp3. Converting")
             # Convert
             cmd = 'ffmpeg -i "'+yt_streams+'" '+trackId+".mp3"
