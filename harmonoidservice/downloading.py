@@ -83,14 +83,24 @@ class DownloadHandler:
     async def SaveAudio(self, trackId):
         # Download
         yt = YouTube('https://youtube.com/watch?v='+trackId)
-        yt_streams = yt.streams.first().download()
+        yt_streams = yt.streams.filter(only_audio=True).order_by("abr").desc()
         print("[pytube] YT streams avaiable")
-        yt.streams
+        print(yt_streams)
+        yt_streams = yt_streams.first().download()
         
-        # Convert
-        cmd = 'ffmpeg -i "'+yt_streams+'" '+trackId+".mp3"
-        print("[conversion] CMD line: "+cmd)
-        os.system(cmd)
+        yt_end = yt_streams.split(".")
+        print(yt_end)
+        yt_list_len = len(yt_end)
+        if (yt_end[yt_list_len-1] != "mp3"):
+            print("[conversion] Stream isn't mp3. Converting")
+            # Convert
+            cmd = 'ffmpeg -i "'+yt_streams+'" '+trackId+".mp3"
+            print("[conversion] CMD line: "+cmd)
+            os.system(cmd)
+        else:
+            print("[system] Moving MP3 file to output folder")
+            cmd = 'mv "'+yt_streams+'" '+trackId+".mp3"
+            os.system(cmd)
         
         #Success!
         print(f"[youtube] Track download successful for track ID: {trackId}.")
