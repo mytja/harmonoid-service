@@ -87,7 +87,7 @@ class DownloadHandler:
         print("[pytube] YT streams avaiable")
         print(yt_streams)
         yt_streams = yt_streams.first().download()
-        
+
         yt_end = yt_streams.split(".")
         print(yt_end)
         yt_list_len = len(yt_end)
@@ -96,12 +96,10 @@ class DownloadHandler:
             # Convert
             cmd = 'ffmpeg -i "'+yt_streams+'" '+trackId+".mp3"
             print("[conversion] CMD line: "+cmd)
-            os.system(cmd)
         else:
             print("[system] Moving MP3 file to output folder")
             cmd = 'mv "'+yt_streams+'" '+trackId+".mp3"
-            os.system(cmd)
-        
+        os.system(cmd)
         #Success!
         print(f"[youtube] Track download successful for track ID: {trackId}.")
         return (True, None)
