@@ -72,7 +72,7 @@ async def Test():
     import time
     
     __start_time = time.time()
-    __start_lt = time.ctime(__timesec)
+    __start_lt = time.ctime(__start_time)
     
     response = await SearchYoutube("NCS", "track")
     response = jsonable_encoder(response)
