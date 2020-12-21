@@ -1,7 +1,7 @@
 ytmusicapi
 youtube-dl
 fastapi
-uvicorn
+uvicorn[standard]
 gunicorn
 mutagen
 aiofiles

@@ -10,6 +10,14 @@ harmonoidservice/__pycache__/*
 
 .vscode
 
+#pycharm
+
+.idea
+
 #uvicorn
 
 __pycache__
+
+#cookies
+
+cookies.txt
