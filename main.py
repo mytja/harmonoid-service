@@ -2,7 +2,6 @@ from harmonoidservice import HarmonoidService
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.responses import PlainTextResponse
 from fastapi.encoders import jsonable_encoder
-import httpx
 import json
 import types
 
@@ -72,15 +71,15 @@ async def TrackDownload(track_id=None, album_id=None, track_name=None):
 async def Test():
     import time
     
+    __start_time = time.time()
+    __start_lt = time.ctime(__timesec)
+    
     response = await SearchYoutube("NCS", "track")
     response = jsonable_encoder(response)
     rcode = response["status_code"]
     print("[test-troubleshooting] Status code: "+str(rcode))
     response = response["body"]
-    #try:
-        #print("[test-troubleshooting] "+str(response))
-    #except:
-        #print("[test-troubleshooting] Cannot print response!")
+    
     try:
         ifin =  "track_id" in response
         if (response != None and ifin==True and int(rcode) == 200):
@@ -90,17 +89,12 @@ async def Test():
     except:
         print("[test-troubleshooting] Type is not dict")
     
-    
-    
     response = await SearchYoutube("NCS", "album")
     response = jsonable_encoder(response)
     rcode = response["status_code"]
     print("[test-troubleshooting] Status code: "+str(rcode))
     response = response["body"]
-    #try:
-        #print("[test-troubleshooting] "+str(response))
-    #except:
-        #print("[test-troubleshooting] Cannot print response!")
+    
     try:
         ifin =  "album_id" in response
         if (response != None and ifin==True and int(rcode) == 200):
@@ -110,17 +104,12 @@ async def Test():
     except:
         print("[test-troubleshooting] Type is not dict")
     
-    
-    
     response = await SearchYoutube("NCS", "artist")
     response = jsonable_encoder(response)
     rcode = response["status_code"]
     print("[test-troubleshooting] Status code: "+str(rcode))
     response = response["body"]
-    #try:
-        #print("[test-troubleshooting] "+str(response))
-    #except:
-        #print("[test-troubleshooting] Cannot print response!")
+    
     try:
         ifin =  "artist_id" in response
         if (response != None and ifin==True and int(rcode) == 200):
@@ -154,8 +143,12 @@ async def Test():
     __timesec = time.time()
     __lt = time.ctime(__timesec)
     
+    __time = __timesec - __start_time
+    
     __json = {
         "endtime": __lt,
+        "starttime": __start_lt,
+        "time": __time,
         "fail": __testfail,
         "tracksearch": __musicsearchtest,
         "albumsearch": __albumsearchtest,
