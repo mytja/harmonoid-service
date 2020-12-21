@@ -48,23 +48,19 @@ class BrowsingHandler:
 
         tracks = response["tracks"]
 
-        videoIdList = ["" for index in range(0, len(tracks))]
+        videoIdList = ["" for index in range(len(tracks))]
         searchQueriesList = [
             track["title"] + " " + track["artists"] for track in tracks
         ]
         await self.AsyncAlbumSearch(searchQueriesList, videoIdList)
 
-        result = []
-        for index, track in enumerate(tracks):
-            result += [
-                {
+        result = [{
                     "track_id": videoIdList[index],
                     "track_name": track["title"],
                     "track_artists": [track["artists"]],
                     "track_number": int(track["index"]),
                     "track_duration": int(track["lengthMs"]),
-                }
-            ]
+                } for index, track in enumerate(tracks)]
         return {"tracks": result}
 
     async def ArtistAlbums(self, artistId):
@@ -255,8 +251,9 @@ class BrowsingHandler:
     async def AsyncAlbumSearch(self, searchQueriesList, videoIdList):
         args = [
             (searchQueriesList, videoIdList, index)
-            for index in range(0, len(videoIdList))
+            for index in range(len(videoIdList))
         ]
+
         asyncSearchTasks = itertools.starmap(self.ArrangeVideoIds, args)
         await asyncio.gather(*asyncSearchTasks)
 
@@ -269,8 +266,9 @@ class BrowsingHandler:
     async def AsyncAlbumLength(self, albumIdList, albumLengthList):
         args = [
             (albumIdList, albumLengthList, index)
-            for index in range(0, len(albumIdList))
+            for index in range(len(albumIdList))
         ]
+
         asyncSearchTasks = itertools.starmap(self.ArrangeAlbumLength, args)
         await asyncio.gather(*asyncSearchTasks)
 
@@ -285,8 +283,9 @@ class BrowsingHandler:
     async def AsyncTrackDuration(self, trackIdList, trackDurationList):
         args = [
             (trackIdList, trackDurationList, index)
-            for index in range(0, len(trackIdList))
+            for index in range(len(trackIdList))
         ]
+
         asyncSearchTasks = itertools.starmap(self.ArrangeTrackDuration, args)
         await asyncio.gather(*asyncSearchTasks)
 
@@ -320,8 +319,7 @@ class BrowsingHandler:
         albumLengthList,
         albumTypeList,
     ):
-        args = [
-            (
+        args = [(
                 trackTitleList,
                 albumIdList,
                 trackNumberList,
@@ -329,9 +327,7 @@ class BrowsingHandler:
                 albumLengthList,
                 albumTypeList,
                 index,
-            )
-            for index in range(0, len(albumIdList))
-        ]
+            ) for index in range(len(albumIdList))]
         asyncSearchTasks = itertools.starmap(self.ArrangeTrackStuff, args)
         await asyncio.gather(*asyncSearchTasks)
 
