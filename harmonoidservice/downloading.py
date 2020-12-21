@@ -126,6 +126,9 @@ class DownloadHandler:
         print(f"[metadata] Successfully added metadata to track ID: {trackId}.")
 
     async def TrackDownload(self, trackId, albumId, trackName, retry=True):
+        import time
+        start_time = time.time()
+        
         if trackId:
             print(f"[server] Download request in ID format.")
         if trackName:
@@ -137,6 +140,7 @@ class DownloadHandler:
             print(
                 f"[youtube] Track already downloaded for track ID: {trackId}.\n[server] Sending audio binary for track ID: {trackId}."
             )
+            print("[speed] Returning already downloaded file took %s seconds" % (time.time() - start_time))
             return FileResponse(
                 f"{trackId}.mp3",
                 media_type="audio/mpeg",
@@ -152,6 +156,7 @@ class DownloadHandler:
                 await self.SaveMetaData(trackInfo)
 
                 print(f"[server] Sending audio binary for track ID: {trackId}")
+                print("[speed] Downloading, adding metadata and returning took %s seconds" % (time.time() - start_time))
                 return FileResponse(
                     f"{trackId}.mp3",
                     media_type="audio/mpeg",
@@ -170,6 +175,7 @@ class DownloadHandler:
                      return updatedResponse
                  print("\n[diagnosis] Diagnosis finished without success!")
                  print(f"[server] Sending status code 500 for track ID: {trackId}.")
+                print("[speed] Fail with diagnosis took %s seconds" % (time.time() - start_time))
                  return PlainTextResponse(
                     content=f"Internal Server Error.\nYouTube-DL Failed.\n{str(error)}",
                     status_code=500,
@@ -177,6 +183,7 @@ class DownloadHandler:
         else:
             print(f"[youtube] Could not retrieve metadata of track ID: {trackId}.")
             print(f"[server] Sending status code 500 for track ID: {trackId}.")
+            print("[speed] Fail took %s seconds" % (time.time() - start_time))
             return PlainTextResponse(
                 content=trackInfo,
                 status_code=500,
