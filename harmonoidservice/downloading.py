@@ -6,9 +6,9 @@ import os
 import sys
 import asyncio
 from .async_mutagen import MP3
-import youtube_dl
 from pytube import *
 import ytmusicapi
+import time
 
 #CURRENT_VERSION = __version__  # just to avoid reimports
 MUSICAPI_VERSION = ytmusicapi.__version__
@@ -48,38 +48,6 @@ class DownloadHandler:
                 print("[stderr]", stderr)
         else:
             print("[update] ytmusicapi is already updated.")
-    """
-    async def UpdatePyTube(self):
-        async with httpx.AsyncClient() as client:
-            latestVersion = await client.get("https://api.github.com/repos/nficano/pytube/releases")
-        latestVersion = latestVersion.text[0]["tag_name"]
-
-        global CURRENT_VERSION
-        updated = latestVersion == CURRENT_VERSION
-        print(f"[update] Installed PyTube version  : {CURRENT_VERSION}.")
-        print(f"[update] Latest PyTube Version     : {latestVersion}.")
-        if not updated:
-            print("[update] Updating PyTube...")
-            cmd = f"{sys.executable} -m pip install --upgrade pytube"
-
-            process = subprocess.Popen(
-                cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-            )
-            while process.poll() is None:
-                await asyncio.sleep(0.1)
-            stdout, stderr = process.communicate()
-            stdout, stderr = stdout.decode(), stderr.decode()
-
-            if process.poll() == 0:
-                CURRENT_VERSION = latestVersion
-                print(f"[update] Updated To PyTube version : {latestVersion}")
-            else:
-                print("[update] Failed to update.")
-                print("[stdout]", stdout)
-                print("[stderr]", stderr)
-        else:
-            print("[update] PyTube is already updated.")
-    """
     async def SaveAudio(self, trackId):
         # Download
         yt = YouTube('https://youtube.com/watch?v='+trackId)
@@ -126,7 +94,6 @@ class DownloadHandler:
         print(f"[metadata] Successfully added metadata to track ID: {trackId}.")
 
     async def TrackDownload(self, trackId, albumId, trackName, retry=True):
-        import time
         start_time = time.time()
         
         if trackId:
@@ -175,7 +142,7 @@ class DownloadHandler:
                      return updatedResponse
                  print("\n[diagnosis] Diagnosis finished without success!")
                  print(f"[server] Sending status code 500 for track ID: {trackId}.")
-                print("[speed] Fail with diagnosis took %s seconds" % (time.time() - start_time))
+                 print("[speed] Fail with diagnosis took %s seconds" % (time.time() - start_time))
                  return PlainTextResponse(
                     content=f"Internal Server Error.\nYouTube-DL Failed.\n{str(error)}",
                     status_code=500,
