@@ -1,10 +1,10 @@
 import asyncio
-from mutagen.mp3 import MP3
+from mutagen.mp4 import MP4
 from mutagen.id3 import TIT2, TALB, TPE1, COMM, TDRC, TRCK, APIC, TPE2
 import httpx
 
 
-class MP3(MP3):
+class MP4(MP4):
     def __init__(self, filename, trackInfoJSON, art):
         self.filename = filename
         self.trackInfoJSON = trackInfoJSON
