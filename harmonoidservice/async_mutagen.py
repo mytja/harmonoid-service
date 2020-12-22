@@ -14,21 +14,6 @@ class MP4(MP4):
         loop = asyncio.get_running_loop()
         await loop.run_in_executor(None, super().__init__, self.filename)
 
-        if self.art:
-            print("[metadata] Getting album art: " + self.art)
-            async with httpx.AsyncClient() as client:
-                response = await client.get(self.art)
-            albumArtBinary = response.content
-            print("[metadata] Album art retrieved.")
-            self["APIC"] = APIC(
-                mime="image/jpeg",
-                type=3,
-                desc="Cover",
-                data=albumArtBinary,
-            )
-        else:
-            print("[metadata] Album art is not found.")
-
         self["TIT2"] = TIT2(encoding=3, text=self.trackInfoJSON["track_name"])
         self["TALB"] = TALB(encoding=3, text=self.trackInfoJSON["album_name"])
         self["COMM"] = COMM(
