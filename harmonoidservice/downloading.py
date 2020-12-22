@@ -5,7 +5,7 @@ import aiofiles.os
 import os
 import sys
 import asyncio
-from .async_mutagen import MP3
+from .async_mutagen import MP4
 from pytube import *
 import ytmusicapi
 import time
@@ -82,7 +82,7 @@ class DownloadHandler:
 
         trackId = trackInfoJSON["track_id"]
 
-        audioFile = MP3(f"{trackId}.mp3", trackInfoJSON, art)
+        audioFile = MP4(f"{trackId}.mp4", trackInfoJSON, art)
         await audioFile.init()
 
         print(f"[metadata] Successfully added metadata to track ID: {trackId}.")
@@ -97,13 +97,13 @@ class DownloadHandler:
             trackId = await self.ytMusic._search(trackName, "songs")
             trackId = trackId[0]["videoId"]
 
-        if os.path.isfile(f"{trackId}.mp3"):
+        if os.path.isfile(f"{trackId}.mp4"):
             print(
                 f"[youtube] Track already downloaded for track ID: {trackId}.\n[server] Sending audio binary for track ID: {trackId}."
             )
             print("[speed] Returning already downloaded file took %s seconds" % (time.time() - start_time))
             return FileResponse(
-                f"{trackId}.mp3",
+                f"{trackId}.mp4",
                 media_type="audio/mpeg",
                 headers={"Accept-Ranges": "bytes"},
             )
@@ -119,7 +119,7 @@ class DownloadHandler:
                 print(f"[server] Sending audio binary for track ID: {trackId}")
                 print("[speed] Downloading, adding metadata and returning took %s seconds" % (time.time() - start_time))
                 return FileResponse(
-                    f"{trackId}.mp3",
+                    f"{trackId}.mp4",
                     media_type="audio/mpeg",
                     headers={"Accept-Ranges": "bytes"},
                 )
