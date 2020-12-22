@@ -70,59 +70,59 @@ async def TrackDownload(track_id=None, album_id=None, track_name=None):
 @app.get("/test")
 async def Test():
     import time
-    
+
     __start_time = time.time()
     __start_lt = time.ctime(__start_time)
-    
+
     response = await SearchYoutube("NCS", "track")
     response = jsonable_encoder(response)
     rcode = response["status_code"]
     print("[test-troubleshooting] Status code: "+str(rcode))
     response = response["body"]
-    
+
     try:
         ifin =  "track_id" in response
-        if (response != None and ifin==True and int(rcode) == 200):
+        if response != None and ifin and int(rcode) == 200:
             __musicsearchtest = True
         else:
             __musicsearchtest = False
     except:
         print("[test-troubleshooting] Type is not dict")
-    
+
     response = await SearchYoutube("NCS", "album")
     response = jsonable_encoder(response)
     rcode = response["status_code"]
     print("[test-troubleshooting] Status code: "+str(rcode))
     response = response["body"]
-    
+
     try:
         ifin =  "album_id" in response
-        if (response != None and ifin==True and int(rcode) == 200):
+        if response != None and ifin and int(rcode) == 200:
             __albumsearchtest = True
         else:
             __albumsearchtest = False
     except:
         print("[test-troubleshooting] Type is not dict")
-    
+
     response = await SearchYoutube("NCS", "artist")
     response = jsonable_encoder(response)
     rcode = response["status_code"]
     print("[test-troubleshooting] Status code: "+str(rcode))
     response = response["body"]
-    
+
     try:
         ifin =  "artist_id" in response
-        if (response != None and ifin==True and int(rcode) == 200):
+        if response != None and ifin and int(rcode) == 200:
             __artistsearchtest = True
         else:
             __artistsearchtest = False
     except:
         print("[test-troubleshooting] Type is not dict")
-       
+
     try:
         response = await harmonoidService.TrackDownload(track_id, album_id, track_name)
         #print("[test-troubleshooting]: "+str(response)) File can't convert to string!
-        
+
     except:
         status_code = 500
     try:
@@ -130,21 +130,22 @@ async def Test():
         print(status_code)
     except:
         status_code = 200
-    if status_code != 200:
-        __tdtest = False
-    else:
-        __tdtest = True
-        
-    if (__artistsearchtest==False or __musicsearchtest==False or __albumsearchtest==False or __tdtest==False):
+    __tdtest = status_code == 200
+    if (
+        not __artistsearchtest
+        or not __musicsearchtest
+        or not __albumsearchtest
+        or not __tdtest
+    ):
         __testfail = True
     else:
         __testfail = False
-    
+
     __timesec = time.time()
     __lt = time.ctime(__timesec)
-    
+
     __time = __timesec - __start_time
-    
+
     __json = {
         "endtime": __lt,
         "starttime": __start_lt,
@@ -155,7 +156,7 @@ async def Test():
         "artistsearch": __artistsearchtest,
         "trackdownload": __tdtest
     }
-    
+
     return ReturnResponse(__json)
     
 
