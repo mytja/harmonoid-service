@@ -51,7 +51,7 @@ class DownloadHandler:
     async def SaveAudio(self, trackId):
         # Download
         yt = YouTube('https://youtube.com/watch?v='+trackId)
-        yt_streams = yt.streams.get_by_itag(22)
+        yt_streams = yt.streams.get_by_itag(140)
         print("[pytube] YT streams avaiable")
         print(yt_streams)
         yt_streams = yt_streams.download()
