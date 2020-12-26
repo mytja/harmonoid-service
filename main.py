@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException, Response
 from fastapi.responses import PlainTextResponse
 from fastapi.encoders import jsonable_encoder
 import json
-import types
+import time
 
 harmonoidService = HarmonoidService()
 
@@ -67,84 +67,86 @@ async def TrackDownload(track_id=None, album_id=None, track_name=None):
         raise HTTPException(422, "Both track_id and track_name is specified")
     return await harmonoidService.TrackDownload(track_id, album_id, track_name)
 
+
 @app.get("/test")
 async def Test():
-    import time
-    
     __start_time = time.time()
     __start_lt = time.ctime(__start_time)
-    
-    response = await SearchYoutube("NCS", "track")
-    response = jsonable_encoder(response)
-    rcode = response["status_code"]
-    print("[test-troubleshooting] Status code: "+str(rcode))
-    response = response["body"]
-    
+
+    print("[test-troubleshooting] Testing searching (track)")
     try:
-        ifin =  "track_id" in response
-        if (response != None and ifin==True and int(rcode) == 200):
+        response = await SearchYoutube("NCS", "track")
+        response = jsonable_encoder(response)
+        rcode = response["status_code"]
+        print("[test-troubleshooting] Status code: " + str(rcode))
+
+        tracks = json.loads(response["body"])["tracks"]
+        if len(tracks) != 0 and tracks[0]["album_id"]:
             __musicsearchtest = True
         else:
             __musicsearchtest = False
-    except:
-        print("[test-troubleshooting] Type is not dict")
-    
-    response = await SearchYoutube("NCS", "album")
-    response = jsonable_encoder(response)
-    rcode = response["status_code"]
-    print("[test-troubleshooting] Status code: "+str(rcode))
-    response = response["body"]
-    
+    except Exception as e:
+        __musicsearchtest = False
+        print("[test-troubleshooting] Exception: " + str(e))
+
+    print("[test-troubleshooting] Testing searching (album)")
     try:
-        ifin =  "album_id" in response
-        if (response != None and ifin==True and int(rcode) == 200):
+        response = await SearchYoutube("NCS", "album")
+        response = jsonable_encoder(response)
+        rcode = response["status_code"]
+        print("[test-troubleshooting] Status code: " + str(rcode))
+
+        albums = json.loads(response["body"])["albums"]
+        if len(albums) != 0 and albums[0]["album_id"]:
             __albumsearchtest = True
         else:
             __albumsearchtest = False
-    except:
-        print("[test-troubleshooting] Type is not dict")
-    
-    response = await SearchYoutube("NCS", "artist")
-    response = jsonable_encoder(response)
-    rcode = response["status_code"]
-    print("[test-troubleshooting] Status code: "+str(rcode))
-    response = response["body"]
-    
+    except Exception as e:
+        __albumsearchtest = False
+        print("[test-troubleshooting] Exception: " + str(e))
+
+    print("[test-troubleshooting] Testing searching (artist)")
     try:
-        ifin =  "artist_id" in response
-        if (response != None and ifin==True and int(rcode) == 200):
+        response = await SearchYoutube("NCS", "artist")
+        response = jsonable_encoder(response)
+        rcode = response["status_code"]
+        print("[test-troubleshooting] Status code: " + str(rcode))
+
+        artists = json.loads(response["body"])["artists"]
+        if len(artists) != 0 and artists[0]["artist_id"]:
             __artistsearchtest = True
         else:
             __artistsearchtest = False
-    except:
-        print("[test-troubleshooting] Type is not dict")
-       
+    except Exception as e:
+        __artistsearchtest = False
+        print("[test-troubleshooting] Exception: " + str(e))
+
+    print("[test-troubleshooting] Testing downloading")
     try:
-        response = await harmonoidService.TrackDownload(track_id, album_id, track_name)
-        #print("[test-troubleshooting]: "+str(response)) File can't convert to string!
-        
-    except:
-        status_code = 500
-    try:
+        response = await harmonoidService.TrackDownload(
+            "JTjmZZ1W2ew", None, None
+        )  # NCS
         status_code = response.status_code
-        print(status_code)
-    except:
-        status_code = 200
+    except Exception as e:
+        status_code = 500
+        print("[test-troubleshooting] Exception: " + str(e))
+
+    print("[test-troubleshooting] Status code: " + str(status_code))
     if status_code != 200:
         __tdtest = False
     else:
         __tdtest = True
-        
-    if (__artistsearchtest==False or __musicsearchtest==False or __albumsearchtest==False or __tdtest==False):
-        __testfail = True
-    else:
+
+    if all([__artistsearchtest, __musicsearchtest, __albumsearchtest, __tdtest]):
         __testfail = False
-    
+    else:
+        __testfail = True
+
     __timesec = time.time()
     __lt = time.ctime(__timesec)
-    
+
     __time = __timesec - __start_time
-    
+
     __json = {
         "endtime": __lt,
         "starttime": __start_lt,
@@ -153,11 +155,10 @@ async def Test():
         "tracksearch": __musicsearchtest,
         "albumsearch": __albumsearchtest,
         "artistsearch": __artistsearchtest,
-        "trackdownload": __tdtest
+        "trackdownload": __tdtest,
     }
-    
+
     return ReturnResponse(__json)
-    
 
 
 if __name__ == "__main__":
