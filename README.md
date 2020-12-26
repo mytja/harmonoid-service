@@ -10,7 +10,7 @@ This repository has everything ready to be deployed on [Heroku](https://heroku.c
 
 ## ❔ What does this app do?
 
-This app is a simple backend that can be used to browse & download music from [YouTube Music](https://music.youtube.com) using [youtube-dl](https://github.com/ytdl-org/youtube-dl) & [ytmusicapi](https://github.com/sigma67/ytmusicapi). The tracks you get in download, are MP3 in format with exact metadata.
+This app is a simple backend that can be used to browse & download music from [YouTube Music](https://music.youtube.com) using [PyTube](https://github.com/nficano/pytube) & [ytmusicapi](https://github.com/sigma67/ytmusicapi). The tracks you get in download, are MP3 in format with exact metadata.
 
 This uses [mutagen](https://github.com/quodlibet/mutagen) for adding metadata & album art to the tracks.
 
@@ -192,7 +192,7 @@ else:
     print('Download Failed!')
 ```
 
-**NOTE**: If something goes wrong during the runtime of the app, like [youtube-dl](https://github.com/ytdl-org/youtube-dl) stops working or your server's IP gets blocked with 429 status codes from Google, you'll recieve status code 500 from this app.
+**NOTE**: If something goes wrong during the runtime of the app, like [PyTube](https://github.com/nficano/pytube) stops working or your server's IP gets blocked with 429 status codes from Google, you'll recieve status code 500 from this app.
 In that case you can simply re-push the code to the Heroku by making an empty commit. It will automatically update the dependencies at heroku and everything should be fixed.
 
 ## 💌 Big Thanks To These People And Organizations
@@ -203,7 +203,7 @@ In that case you can simply re-push the code to the Heroku by making an empty co
 
 - [sigmatics](https://github.com/sigma67) for [ytmusicapi](https://github.com/sigma67/ytmusicapi)
 - [Sebastián Ramírez](https://github.com/tiangolo) for [fastapi](https://github.com/tiangolo/fastapi)
-- [youtube-dl](https://github.com/ytdl-org) for [youtube-dl](https://github.com/ytdl-org/youtube-dl)
+- [Nick Ficano](https://github.com/nficano) for [PyTube](https://github.com/nficano/pytube)
 - [Quod Libet](https://github.com/quodlibet) for [mutagen](https://github.com/quodlibet/mutagen)
 - [Encode](https://github.com/encode) for [httpx](https://github.com/encode/httpx)
 - [Tin Tvrtković](https://github.com/Tinche) for [aiofiles](https://github.com/Tinche/aiofiles)
