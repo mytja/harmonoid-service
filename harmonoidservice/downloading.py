@@ -56,19 +56,8 @@ class DownloadHandler:
         print(yt_streams)
         yt_streams = yt_streams.first().download()
         
-        yt_end = yt_streams.split(".")
-        print(yt_end)
-        yt_list_len = len(yt_end)
-        if (yt_end[yt_list_len-1] != "mp3"):
-            print("[conversion] Stream isn't mp3. Converting")
-            # Convert
-            cmd = 'ffmpeg -i "'+yt_streams+'" '+trackId+".mp3"
-            print("[conversion] CMD line: "+cmd)
-            os.system(cmd)
-        else:
-            print("[system] Moving MP3 file to output folder")
-            cmd = 'mv "'+yt_streams+'" '+trackId+".mp3"
-            os.system(cmd)
+        cmd = "mv "+yt_streams+" "+trackId+".webm"
+        os.system(cmd)
         
         #Success!
         print(f"[youtube] Track download successful for track ID: {trackId}.")
@@ -88,7 +77,7 @@ class DownloadHandler:
 
         trackId = trackInfoJSON["track_id"]
 
-        audioFile = MP3(f"{trackId}.mp3", trackInfoJSON, art)
+        audioFile = MP3(f"{trackId}.webm", trackInfoJSON, art)
         await audioFile.init()
 
         print(f"[metadata] Successfully added metadata to track ID: {trackId}.")
@@ -103,14 +92,14 @@ class DownloadHandler:
             trackId = await self.ytMusic._search(trackName, "songs")
             trackId = trackId[0]["videoId"]
 
-        if os.path.isfile(f"{trackId}.mp3"):
+        if os.path.isfile(f"{trackId}.webm"):
             print(
                 f"[youtube] Track already downloaded for track ID: {trackId}.\n[server] Sending audio binary for track ID: {trackId}."
             )
             print("[speed] Returning already downloaded file took %s seconds" % (time.time() - start_time))
             return FileResponse(
-                f"{trackId}.mp3",
-                media_type="audio/mpeg",
+                f"{trackId}.webm",
+                media_type="audio/opus",
                 headers={"Accept-Ranges": "bytes"},
             )
 
@@ -120,13 +109,13 @@ class DownloadHandler:
 
             status, error = await self.SaveAudio(trackId)
             if status:
-                await self.SaveMetaData(trackInfo)
+                #await self.SaveMetaData(trackInfo)
 
                 print(f"[server] Sending audio binary for track ID: {trackId}")
                 print("[speed] Downloading, adding metadata and returning took %s seconds" % (time.time() - start_time))
                 return FileResponse(
-                    f"{trackId}.mp3",
-                    media_type="audio/mpeg",
+                    f"{trackId}.webm",
+                    media_type="audio/opus",
                     headers={"Accept-Ranges": "bytes"},
                 )
             else:
