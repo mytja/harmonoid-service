@@ -56,7 +56,8 @@ class DownloadHandler:
         print(yt_streams)
         yt_streams = yt_streams.first().download()
         
-        cmd = "mv "+yt_streams+" "+trackId+".webm"
+        cmd = "mv app/"+yt_streams+" "+trackId+".webm"
+        print("[cmd] Command: "+cmd)
         os.system(cmd)
         
         #Success!
