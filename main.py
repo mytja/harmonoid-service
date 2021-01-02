@@ -76,13 +76,13 @@ async def getLyrics(trackId, trackName = None):
     return result
 
 
-@app.get("/trackdownload")
+@app.get("/trackDownload")
 async def trackDownload(trackId=None, albumId=None, trackName=None):
     if not any((trackId, trackName)):
         raise HTTPException(422, "Neither trackId nor trackName is specified")
     if trackId and trackName:
         raise HTTPException(422, "Both trackId and trackName is specified")
-    return await harmonoidService.TrackDownload(trackId, albumId, trackName)
+    return await harmonoidService.trackDownload(trackId, albumId, trackName)
 
 
 @app.get("/test")
