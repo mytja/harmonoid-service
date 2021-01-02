@@ -9,159 +9,172 @@ harmonoidService = HarmonoidService()
 
 app = FastAPI()
 
+@app.on_event("startup")
+async def startupEvent():
+    """
+    Prefetching player JavaScript
+    """
+    await harmonoidService.ytMusic.youtube.getJS()
 
-def ReturnResponse(response):
-    if type(response) == dict:
+
+def returnResponse(response):
+    if type(response) is dict:
         return Response(json.dumps(response, indent=4), media_type="application/json")
-    if type(response) == str:
+    if type(response) is str:
         return PlainTextResponse(response)
     return response
 
 
 @app.get("/")
 async def hello():
-    return ReturnResponse("service is running")
+    return returnResponse("harmonoid")
 
 
 @app.get("/search")
-async def SearchYoutube(keyword, mode="album"):
-    result = await harmonoidService.SearchYoutube(keyword, mode)
-    return ReturnResponse(result)
+async def searchYoutube(keyword, mode="album"):
+    result = await harmonoidService.searchYoutube(keyword, mode)
+    return returnResponse(result)
 
 
-@app.get("/albuminfo")
-async def AlbumInfo(album_id):
-    result = await harmonoidService.AlbumInfo(album_id)
-    return ReturnResponse(result)
+@app.get("/albumInfo")
+async def albumInfo(albumId):
+    result = await harmonoidService.albumInfo(albumId)
+    return returnResponse(result)
 
 
-@app.get("/trackinfo")
-async def TrackInfo(track_id, album_id=None):
-    result = await harmonoidService.TrackInfo(track_id, album_id)
-    return ReturnResponse(result)
+@app.get("/trackInfo")
+async def trackInfo(trackId, albumId = None):
+    result = await harmonoidService.trackInfo(trackId, albumId)
+    return returnResponse(result)
 
 
-@app.get("/artistalbums")
-async def ArtistAlbums(artist_id):
-    result = await harmonoidService.ArtistAlbums(artist_id)
-    return ReturnResponse(result)
+@app.get("/artistInfo")
+async def artistInfo(artistId):
+    result = await harmonoidService.artistInfo(artistId)
+    return returnResponse(result)
 
 
-@app.get("/artisttracks")
-async def ArtistTracks(artist_id):
-    result = await harmonoidService.ArtistTracks(artist_id)
-    return ReturnResponse(result)
+@app.get("/artistTracks")
+async def artistTracks(artistId):
+    result = await harmonoidService.artistTracks(artistId)
+    return returnResponse(result)
 
 
 @app.get("/artistinfo")
-async def ArtistAlbums(artist_id):
-    result = await harmonoidService.ArtistInfo(artist_id)
-    return ReturnResponse(result)
+async def artistInfo(artistId):
+    result = await harmonoidService.artistInfo(artistId)
+    return returnResponse(result)
+
+
+@app.get("/lyrics")
+async def getLyrics(trackId, trackName = None):
+    if not any((trackId, trackName)):
+        raise HTTPException(422, "Neither trackId nor trackName is specified")
+    if trackId and trackName:
+        raise HTTPException(422, "Both trackId and trackName is specified")
+    result = await harmonoidService.getLyrics(trackId, trackName)
+    return result
 
 
 @app.get("/trackdownload")
-async def TrackDownload(track_id=None, album_id=None, track_name=None):
-    if not any((track_id, track_name)):
-        raise HTTPException(422, "Neither track_id nor track_name is specified")
-    if track_id and track_name:
-        raise HTTPException(422, "Both track_id and track_name is specified")
-    return await harmonoidService.TrackDownload(track_id, album_id, track_name)
+async def trackDownload(trackId=None, albumId=None, trackName=None):
+    if not any((trackId, trackName)):
+        raise HTTPException(422, "Neither trackId nor trackName is specified")
+    if trackId and trackName:
+        raise HTTPException(422, "Both trackId and trackName is specified")
+    return await harmonoidService.TrackDownload(trackId, albumId, trackName)
 
 
 @app.get("/test")
-async def Test():
-    __start_time = time.time()
-    __start_lt = time.ctime(__start_time)
-
-    print("[test-troubleshooting] Testing searching (track)")
+async def test():
+    startTime = time.time()
+    startLt = time.ctime(startTime)
+    print("[test] Testing /search&mode=track")
     try:
-        response = await SearchYoutube("NCS", "track")
+        response = await searchYoutube("NoCopyrightSounds", "track")
         response = jsonable_encoder(response)
-        rcode = response["status_code"]
-        print("[test-troubleshooting] Status code: " + str(rcode))
-
+        responseCode = response["status_code"]
+        print(f"[test] Status code: {responseCode}")
         tracks = json.loads(response["body"])["tracks"]
-        if len(tracks) != 0 and tracks[0]["album_id"]:
-            __musicsearchtest = True
+        if len(tracks) != 0 and tracks[0]["albumId"]:
+            trackSearchTest = True
         else:
-            __musicsearchtest = False
+            trackSearchTest = False
     except Exception as e:
-        __musicsearchtest = False
-        print("[test-troubleshooting] Exception: " + str(e))
+        trackSearchTest = False
+        print(f"[test] Exception: {e}")
 
-    print("[test-troubleshooting] Testing searching (album)")
+    print("[test] Testing /search&mode=album")
     try:
-        response = await SearchYoutube("NCS", "album")
+        response = await searchYoutube("NoCopyrightSounds", "album")
         response = jsonable_encoder(response)
-        rcode = response["status_code"]
-        print("[test-troubleshooting] Status code: " + str(rcode))
-
+        responseCode = response["status_code"]
+        print(f"[test] Status code: {responseCode}")
         albums = json.loads(response["body"])["albums"]
-        if len(albums) != 0 and albums[0]["album_id"]:
-            __albumsearchtest = True
+        if len(albums) != 0 and albums[0]["albumId"]:
+            albumSearchTest = True
         else:
-            __albumsearchtest = False
+            albumSearchTest = False
     except Exception as e:
-        __albumsearchtest = False
-        print("[test-troubleshooting] Exception: " + str(e))
-
-    print("[test-troubleshooting] Testing searching (artist)")
+        albumSearchTest = False
+        print(f"[test] Exception: {e}")
+    print("[test] Testing /search&mode=artist")
     try:
-        response = await SearchYoutube("NCS", "artist")
+        response = await searchYoutube("NoCopyrightSounds", "artist")
         response = jsonable_encoder(response)
-        rcode = response["status_code"]
-        print("[test-troubleshooting] Status code: " + str(rcode))
-
+        responseCode = response["status_code"]
+        print(f"[test] Status code: {responseCode}")
         artists = json.loads(response["body"])["artists"]
         if len(artists) != 0 and artists[0]["artist_id"]:
-            __artistsearchtest = True
+            artistSearchTest = True
         else:
-            __artistsearchtest = False
+            artistSearchTest = False
     except Exception as e:
-        __artistsearchtest = False
-        print("[test-troubleshooting] Exception: " + str(e))
-
-    print("[test-troubleshooting] Testing downloading")
+        artistSearchTest = False
+        print(f"[test] Exception: {e}")
+    print("[test] Testing /trackDownload")
     try:
         response = await harmonoidService.TrackDownload(
             "JTjmZZ1W2ew", None, None
-        )  # NCS
-        status_code = response.status_code
+        )
+        statusCode = response.status_code
     except Exception as e:
-        status_code = 500
-        print("[test-troubleshooting] Exception: " + str(e))
-
-    print("[test-troubleshooting] Status code: " + str(status_code))
-    if status_code != 200:
-        __tdtest = False
+        statusCode = 500
+        print(f"[test] Exception: {e}")
+    print(f"[test] Status code: {statusCode}")
+    if statusCode != 200:
+        trackDownloadTest = False
     else:
-        __tdtest = True
-
-    if all([__artistsearchtest, __musicsearchtest, __albumsearchtest, __tdtest]):
-        __testfail = False
+        trackDownloadTest = True
+    if all([trackSearchTest, albumSearchTest, artistSearchTest, trackDownloadTest]):
+        testFail = False
     else:
-        __testfail = True
-
-    __timesec = time.time()
-    __lt = time.ctime(__timesec)
-
-    __time = __timesec - __start_time
-
-    __json = {
-        "endtime": __lt,
-        "starttime": __start_lt,
-        "time": __time,
-        "fail": __testfail,
-        "tracksearch": __musicsearchtest,
-        "albumsearch": __albumsearchtest,
-        "artistsearch": __artistsearchtest,
-        "trackdownload": __tdtest,
+        testFail = True
+    endTime = time.time()
+    endLt = time.ctime(endTime)
+    totalTime = endTime - startTime
+    response = {
+        "endTime": endLt,
+        "startTime": startLt,
+        "time": totalTime,
+        "fail": testFail,
+        "trackSearch": trackSearchTest,
+        "albumSearch": albumSearchTest,
+        "artistSearch": artistSearchTest,
+        "trackDownload": trackDownloadTest,
     }
-
-    return ReturnResponse(__json)
+    return returnResponse(response)
 
 
 if __name__ == "__main__":
     import uvicorn
+    uvicorn.run("main:app")
 
-    uvicorn.run("main:app", reload=True)
+"""
+- Class methods names are lower camel case.
+- Class names are upper camel case.
+- Constants are upper snake case.
+- Class attributes are lower camel case.
+- Other identifiers & object names are lower camel case.
+- Only private methods have two underscores in their name.
+"""
