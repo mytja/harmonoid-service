@@ -134,7 +134,7 @@ async def test():
         print(f"[test] Exception: {e}")
     print("[test] Testing /trackDownload")
     try:
-        response = await harmonoidService.TrackDownload(
+        response = await harmonoidService.trackDownload(
             "JTjmZZ1W2ew", None, None
         )
         statusCode = response.status_code
