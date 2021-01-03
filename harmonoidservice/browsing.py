@@ -98,7 +98,7 @@ class BrowsingHandler(BrowsingHandlerInternal):
             "albumId": albumId,
             "albumName": album["title"],
             "year": track["release"].split("-")[0] if "release" in track else "",
-            "albumArtistName": albumArtistName,
+            "albumArtistName": albumArtistName[0],
             "albumLength": int(album["trackCount"]),
             "albumType": "single" if len(album["tracks"]) == 1 else "album",
             "url": track["url"],

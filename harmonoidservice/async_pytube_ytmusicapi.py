@@ -44,19 +44,12 @@ class YouTube(YouTube):
             """
             Removed v parameter from the query. (No idea about why PyTube bothered with that)
             """
-            response = await client.get("https://youtube.com/watch", timeout = None)
+            response = await client.get("https://www.youtube.com/", timeout=None)
             watch_html = response.text
-        age_restricted = extract.is_age_restricted(watch_html)
-        if age_restricted:
-            async with httpx.AsyncClient() as client:
-                response = await client.get("https://www.youtube.com/embed", timeout = None)
-                embed_html = response.text
-            self.js_url = extract.js_url(embed_html)
-        else:
-            self.js_url = extract.js_url(watch_html)
+        self.js_url = extract.js_url(watch_html)
         if pytube.__js_url__ != self.js_url:
             async with httpx.AsyncClient() as client:
-                response = await client.get(self.js_url, timeout = None)
+                response = await client.get(self.js_url, timeout=None)
                 self.js = response.text
             pytube.__js__ = self.js
             pytube.__js_url__ = self.js_url
@@ -107,7 +100,9 @@ class YTMusic(YTMusic):
         endpoint = "https://www.youtube.com/get_video_info"
         params = {"video_id": videoId, "hl": self.language, "el": "detailpage"}
         async with httpx.AsyncClient() as client:
-            response = await client.get(endpoint, params=params, headers=self.headers, timeout = None)
+            response = await client.get(
+                endpoint, params=params, headers=self.headers, timeout=None
+            )
         text = parse_qs(response.text)
         if "player_response" not in text:
             return text
