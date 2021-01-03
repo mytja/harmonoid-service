@@ -31,9 +31,8 @@ class DownloadHandler:
 
         trackInfo = await self.trackInfo(trackId, albumId)
         if type(trackInfo) is dict:
-            print(f"[pytube] Successfully retrieved metadata of track ID: {trackId}.")
+            print(f"[ytmusicapi] Successfully retrieved metadata of track ID: {trackId}.")
             await self.saveAudio(trackId, trackInfo["url"])
-            await self.saveMetadata(trackInfo)
             print(f"[server] Sending audio binary for track ID: {trackId}")
             return FileResponse(
                 f"{trackId}.webm",
@@ -47,28 +46,25 @@ class DownloadHandler:
                 content=trackInfo,
                 status_code=500,
             )
-    
+
     async def saveAudio(self, trackId, trackUrl):
         filename = f"{trackId}.webm"
-
         print(f"[download] Downloading track ID: {trackId}.")
-        """
-        Intellectual thing from raitonoberu.
-        """
         async with httpx.AsyncClient() as client:
-            async with client.stream("GET", trackUrl) as response:
-                async with aiofiles.open(filename, "wb") as file:
-                    async for chunk in response.aiter_bytes():
-                        await file.write(chunk)
+            response = await client.get(trackUrl, timeout = None)
+            trackBinary = response.content
+        async with aiofiles.open(filename, "wb") as file:
+            await file.write(trackBinary)
         print(f"[pytube] Track download successful for track ID: {trackId}.")
 
     """
     Yet to implement...
     """
+
     async def updateYTMusicAPI(self):
         async with httpx.AsyncClient() as client:
             latestVersion = await client.get(
-                "https://api.github.com/repos/sigma67/ytmusicapi/release"
+                "https://api.github.com/repos/sigma67/ytmusicapi/release", timeout = None
             )
         latestVersion = latestVersion.json()[0]["tag_name"]
 
