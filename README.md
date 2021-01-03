@@ -66,12 +66,12 @@ git push heroku master
 - Visit test suite at https://yourapp.herokuapp.com/test in a browser! If you see something like this:
 ```
 {
-    "endtime": "Fri Dec 18 07:31:29 2020",
-    "fail": true,
-    "tracksearch": true,
-    "albumsearch": true,
-    "artistsearch": true,
-    "trackdownload": false
+    "endTime": "Fri Dec 18 07:31:29 2020",
+    "fail": false,
+    "trackSearch": true,
+    "albumSearch": true,
+    "artistSearch": true,
+    "trackDownload": true
 }
 ```
 If ```fail``` is true, then a component failed to do its job correctly, in this case ```trackdownload``` 
@@ -107,8 +107,6 @@ response = requests.get(
     'https://yourapp.herokuapp.com/search', {
         'keyword': 'Tobu Sunburst',                    #Keyword for searching
         'mode': 'album',                               #Your mode for searching. Valid modes are 'album', 'track', & 'artist'
-        'offset': '0',                                 #Search offset
-        'limit': '50',                                 #Limiting the amount of results
     }
 )
 
@@ -121,8 +119,8 @@ print(response.json())
 import requests
 
 response = requests.get(
-    'https://yourapp.herokuapp.com/albuminfo', {
-        'album_id': 'MPREb_PvefrisSxRq',                #Album ID of the track
+    'https://yourapp.herokuapp.com/albumInfo', {
+        'albumId': 'MPREb_PvefrisSxRq',                #Album ID of the track
     }
 )
 
@@ -135,9 +133,9 @@ print(response.json())
 import requests
 
 response = requests.get(
-    'https://yourapp.herokuapp.com/trackinfo', {
-        'track_id': '9j81j90jkKU',                      #Track ID of the track
-        'album_id': 'MPREb_PvefrisSxRq',                #Album ID of the track
+    'https://yourapp.herokuapp.com/trackInfo', {
+        'trackId': '9j81j90jkKU',                      #Track ID of the track
+        'albumId': 'MPREb_PvefrisSxRq',                #Album ID of the track
     }
 )
 
@@ -150,8 +148,8 @@ print(response.json())
 import requests
 
 response = requests.get(
-    'https://yourapp.herokuapp.com/artistalbums', {
-        'artist_id': 'UCh6GMTlXgeHnwDHaIQ_ThAA',        #Artist ID of the artist
+    'https://yourapp.herokuapp.com/artistAlbums', {
+        'artistId': 'UCh6GMTlXgeHnwDHaIQ_ThAA',        #Artist ID of the artist
     }
 )
 
@@ -164,8 +162,8 @@ print(response.json())
 import requests
 
 response = requests.get(
-    'https://yourapp.herokuapp.com/artisttracks', {
-        'artist_id': 'UCh6GMTlXgeHnwDHaIQ_ThAA',        #Artist ID of the artist
+    'https://yourapp.herokuapp.com/artistTracks', {
+        'artistId': 'UCh6GMTlXgeHnwDHaIQ_ThAA',        #Artist ID of the artist
     }
 )
 
@@ -178,18 +176,31 @@ print(response.json())
 import requests
 
 audioResponse = requests.get(
-    'https://yourapp.herokuapp.com/trackdownload', {
-        'track_id': '9j81j90jkKU',                     #Track ID of the track
+    'https://yourapp.herokuapp.com/trackDownload', {
+        'trackId': '9j81j90jkKU',                     #Track ID of the track
     }
 )
 if (audioResponse.status_code == 200):
     audioTrackBinary = audioResponse.content
-    audioTrackFile = open('download.m4a', 'wb')
+    audioTrackFile = open('download.ogg', 'wb')
     audioTrackFile.write(audioTrackBinary)
     audioTrackFile.close()
     print('Download Successful!')
 else:
     print('Download Failed!')
+```
+
+##### Get lyrics of a track
+
+```python
+import requests
+
+response = requests.get(
+    'https://yourapp.herokuapp.com/lyrics', {
+        'trackId': '9j81j90jkKU',                     #Track ID of the track
+    }
+)
+print(response.json())
 ```
 
 **NOTE**: If something goes wrong during the runtime of the app, like [PyTube](https://github.com/nficano/pytube) stops working or your server's IP gets blocked with 429 status codes from Google, you'll recieve status code 500 from this app.
