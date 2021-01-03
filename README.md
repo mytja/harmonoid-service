@@ -14,9 +14,9 @@ This app is a simple backend that can be used to browse & download music from [Y
 
 This uses [mutagen](https://github.com/quodlibet/mutagen) for adding metadata & album art to the tracks.
 
-You can use this in your music app if you want.
+You may use this in your music app if you want.
 
-**This project is strictly intended for personal & non-commercial usage only. The project does not support piracy. Buy artists' music to support them.**
+**This project is strictly intended for personal & non-commercial usage only. Buy artists' music to support them.**
 
 ###### 🎶 A track downloaded using this app
 
@@ -74,7 +74,7 @@ git push heroku master
     "trackDownload": true
 }
 ```
-If ```fail``` is true, then a component failed to do its job correctly, in this case ```trackdownload``` 
+If ```fail``` is true, then a route failed to do its job correctly.
 
 ### On Linux VM / Cloud Service
 

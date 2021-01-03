@@ -71,10 +71,10 @@ class Metadata(OggOpus):
 
 """
 Kept old MP3 derived class.
-"""
+
 
 from mutagen.mp3 import MP3
-from mutagen.id3 import TIT2, TALB, TPE1, COMM, TDRC, TRCK, APIC, TPE
+from mutagen.id3 import TIT2, TALB, TPE1, COMM, TDRC, TRCK, APIC, TPE1
 
 class MP3(MP3):
     def __init__(self, filename, trackInfoJSON, art):
@@ -119,3 +119,4 @@ class MP3(MP3):
 
         loop = asyncio.get_running_loop()
         await loop.run_in_executor(None, self.save)
+"""
