@@ -64,9 +64,6 @@ class BrowsingHandlerInternal:
 class BrowsingHandler(BrowsingHandlerInternal):
     async def trackInfo(self, trackId, albumId):
         track = await self.ytMusic.getSong(trackId)
-        """
-        Following ****ing statement messes randomly.
-        """ 
         trackArtistNames = [a for a in track["artists"]]
         """
         Searching for track & fetching albumId if it is None.
@@ -101,12 +98,12 @@ class BrowsingHandler(BrowsingHandlerInternal):
             "albumId": albumId,
             "albumName": album["title"],
             "year": track["release"].split("-")[0] if "release" in track else "",
-            "albumArtistName": albumArtistName,
+            "albumArtistName": albumArtistName[0],
             "albumLength": int(album["trackCount"]),
             "albumType": "single" if len(album["tracks"]) == 1 else "album",
-            "url": track["url"]
+            "url": track["url"],
         }
-    
+
     async def albumInfo(self, albumId):
         response = await self.ytMusic.getAlbum(albumId)
 
@@ -279,10 +276,10 @@ class BrowsingHandler(BrowsingHandlerInternal):
                     }
                 ]
             return {"artists": artists}
-    
+
     async def getLyrics(self, trackId, trackName):
         if not trackId:
-            trackId = await self.searchYoutube(trackName, "songs")[0]['videoId']
+            trackId = await self.searchYoutube(trackName, "songs")[0]["videoId"]
         watchPlaylist = await self.ytMusic.getWatchPlaylist(trackId)
-        watchPlaylistId = watchPlaylist['lyrics']
+        watchPlaylistId = watchPlaylist["lyrics"]
         return await self.ytMusic.getLyrics(watchPlaylistId)

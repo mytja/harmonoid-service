@@ -1,5 +1,6 @@
 import httpx
 from fastapi.responses import FileResponse, PlainTextResponse
+from fastapi.exceptions import HTTPException
 import subprocess
 import aiofiles
 import aiofiles.os
@@ -7,8 +8,10 @@ import os
 import sys
 import asyncio
 import ytmusicapi
+from .async_mutagen import Metadata
 
 MUSICAPI_VERSION = ytmusicapi.__version__
+FFMPEG_COMMAND = "ffmpeg -i {trackId}.webm -vn -c:a copy {trackId}.ogg"
 
 
 class DownloadHandler:
@@ -19,56 +22,80 @@ class DownloadHandler:
             print(f"[server] Download request in name format.")
             trackId = await self.ytMusic.searchYoutube(trackName, "songs")
             trackId = trackId[0]["videoId"]
-        if os.path.isfile(f"{trackId}.webm"):
+        if os.path.isfile(f"{trackId}.ogg"):
             print(
                 f"[pytube] Track already downloaded for track ID: {trackId}.\n[server] Sending audio binary for track ID: {trackId}."
             )
             return FileResponse(
-                f"{trackId}.webm",
-                media_type="audio/webm",
+                f"{trackId}.ogg",
+                media_type="audio/ogg",
                 headers={"Accept-Ranges": "bytes"},
             )
 
         trackInfo = await self.trackInfo(trackId, albumId)
         if type(trackInfo) is dict:
-            print(f"[pytube] Successfully retrieved metadata of track ID: {trackId}.")
-            await self.saveAudio(trackId, trackInfo["url"])
-            await self.saveMetadata(trackInfo)
+            print(
+                f"[ytmusicapi] Successfully retrieved metadata of track ID: {trackId}."
+            )
+            await self.saveAudio(trackInfo)
             print(f"[server] Sending audio binary for track ID: {trackId}")
             return FileResponse(
-                f"{trackId}.webm",
-                media_type="audio/webm",
+                f"{trackId}.ogg",
+                media_type="audio/ogg",
                 headers={"Accept-Ranges": "bytes"},
             )
         else:
-            print(f"[pytube] Could not retrieve metadata of track ID: {trackId}.")
+            print(f"[ytmusicapi] Could not retrieve metadata of track ID: {trackId}.")
             print(f"[server] Sending status code 500 for track ID: {trackId}.")
             return PlainTextResponse(
                 content=trackInfo,
                 status_code=500,
             )
-    
-    async def saveAudio(self, trackId, trackUrl):
-        filename = f"{trackId}.webm"
 
-        print(f"[download] Downloading track ID: {trackId}.")
-        """
-        Intellectual thing from raitonoberu.
-        """
+    async def saveAudio(self, trackInfo):
+        filename = f"{trackInfo['trackId']}.webm"
+        print(f"[httpx] Downloading track ID: {trackInfo['trackId']}.")
         async with httpx.AsyncClient() as client:
-            async with client.stream("GET", trackUrl) as response:
-                async with aiofiles.open(filename, "wb") as file:
-                    async for chunk in response.aiter_bytes():
-                        await file.write(chunk)
-        print(f"[pytube] Track download successful for track ID: {trackId}.")
+            response = await client.get(trackInfo["url"], timeout=None)
+        if response.status_code == 200:
+            async with aiofiles.open(filename, "wb") as file:
+                await file.write(response.content)
+            """
+            WEBM container preferred for video files, but who thought YouTube would store only audio in it. (Similar case is with the 140 stream).
+            So, we have no choice but to use another container for OPUS which supports adding audio tags.
+            Changing WEBM Matroska container to OGG without re-encoding (to add vorbis comments on OGG container).
+            """
+            subprocess.call(
+                FFMPEG_COMMAND.format(trackId=trackInfo["trackId"]),
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.STDOUT,
+            )
+            await aiofiles.os.remove(f"{trackInfo['trackId']}.webm")
+            """
+            Adding metadata.
+            """
+            await Metadata(trackInfo).add()
+            print(
+                f"[pytube] Track download successful for track ID: {trackInfo['trackId']}."
+            )
+        else:
+            print(f"[pytube] Could not download track ID: {trackInfo['trackId']}.")
+            print(
+                f"[server] Sending status code 500 for track ID: {trackInfo['trackId']}."
+            )
+            raise HTTPException(
+                status_code=500,
+                detail=f"[pytube] Could not download track ID: {trackInfo['trackId']}.",
+            )
 
     """
     Yet to implement...
     """
+
     async def updateYTMusicAPI(self):
         async with httpx.AsyncClient() as client:
             latestVersion = await client.get(
-                "https://api.github.com/repos/sigma67/ytmusicapi/release"
+                "https://api.github.com/repos/sigma67/ytmusicapi/release", timeout=None
             )
         latestVersion = latestVersion.json()[0]["tag_name"]
 
