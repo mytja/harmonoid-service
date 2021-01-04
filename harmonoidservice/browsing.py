@@ -75,7 +75,6 @@ class BrowsingHandler(BrowsingHandlerInternal):
             albumId = albumId[0]["album"]["id"]
         album = await self.ytMusic.getAlbum(albumId)
         trackNumber = 1
-
         albumArtLow, albumArtMedium, albumArtHigh = self.sortThumbnails(
             album["thumbnails"]
         )
@@ -97,7 +96,7 @@ class BrowsingHandler(BrowsingHandlerInternal):
             "albumArtLow": albumArtLow,
             "albumId": albumId,
             "albumName": album["title"],
-            "year": track["release"].split("-")[0] if "release" in track else "",
+            "year": album["releaseDate"]["year"],
             "albumArtistName": albumArtistName[0],
             "albumLength": int(album["trackCount"]),
             "albumType": "single" if len(album["tracks"]) == 1 else "album",
@@ -211,7 +210,7 @@ class BrowsingHandler(BrowsingHandlerInternal):
                     {
                         "albumId": album["browseId"],
                         "albumName": album["title"],
-                        "year": album["year"],
+                        "year": int(album["year"]) if album["year"].isnumeric() else "",
                         "albumArtistName": album["artist"],
                         "albumArtHigh": albumArtHigh,
                         "albumArtMedium": albumArtMedium,

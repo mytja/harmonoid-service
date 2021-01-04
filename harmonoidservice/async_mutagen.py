@@ -58,7 +58,7 @@ class Metadata(OggOpus):
         This needs a fix. Vorbis comment keeps date instead of year & MediaMetadataRetriever is unable to read this.
         Fix if you get to know something...
         """
-        self["date"] = [self.trackInfo["year"]]
+        self["date"] = [str(self.trackInfo["year"])]
         self["tracknumber"] = [str(self.trackInfo["trackNumber"])]
         """
         Again, no official reference of this one at http://age.hobba.nl/audio/mirroredpages/ogg-tagging.html. Thus, unable to read.
