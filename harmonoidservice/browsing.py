@@ -32,17 +32,17 @@ class BrowsingHandlerInternal:
         return await asyncio.gather(*tasks)
 
     async def arrangeTrackStuff(self, track):
-        youtubeResult = await self.ytMusic.getAlbum(track["album"]["id"])
-        for result_track in youtubeResult["tracks"]:
-            if result_track["title"] == track["title"]:
-                number = int(result_track["index"])
-                break
-        year = youtubeResult["releaseDate"]["year"]
-        artists = [a["name"] for a in youtubeResult["artist"]]
-        length = int(youtubeResult["trackCount"])
-        type = "single" if len(youtubeResult["tracks"]) == 1 else "album"
-
-        return (number, year, artists, length, type)
+        if track["album"] != None:
+            youtubeResult = await self.ytMusic.getAlbum(track["album"]["id"])
+            for result_track in youtubeResult["tracks"]:
+                if result_track["title"] == track["title"]:
+                    number = int(result_track["index"])
+                    break
+            year = youtubeResult["releaseDate"]["year"]
+            artists = [a["name"] for a in youtubeResult["artist"]]
+            length = int(youtubeResult["trackCount"])
+            type = "single" if len(youtubeResult["tracks"]) == 1 else "album"
+            return (number, year, artists, length, type)
 
     async def asyncTrackStuff(self, tracks):
         tasks = [self.arrangeTrackStuff(track) for track in tracks]
@@ -230,31 +230,32 @@ class BrowsingHandler(BrowsingHandlerInternal):
 
             tracks = []
             for index, track in enumerate(youtubeResult):
-                albumArtLow, albumArtMedium, albumArtHigh = self.sortThumbnails(
-                    track["thumbnails"]
-                )
-                trackArtistNames = [a["name"] for a in track["artists"]]
-                tracks += [
-                    {
-                        "trackId": track["videoId"],
-                        "trackName": track["title"],
-                        "trackArtistNames": trackArtistNames,
-                        "trackNumber": trackStuffList[index][0],
-                        "trackDuration": (
-                            int(track["duration"].split(":")[0]) * 60
-                            + int(track["duration"].split(":")[1])
-                        ),
-                        "albumId": track["album"]["id"],
-                        "albumName": track["album"]["name"],
-                        "year": trackStuffList[index][1],
-                        "albumArtistName": trackStuffList[index][2][0],
-                        "albumArtHigh": albumArtHigh,
-                        "albumArtMedium": albumArtMedium,
-                        "albumArtLow": albumArtLow,
-                        "albumLength": trackStuffList[index][3],
-                        "albumType": trackStuffList[index][4],
-                    }
-                ]
+                if track["album"] != None:
+                    albumArtLow, albumArtMedium, albumArtHigh = self.sortThumbnails(
+                        track["thumbnails"]
+                    )
+                    trackArtistNames = [a["name"] for a in track["artists"]]
+                    tracks += [
+                        {
+                            "trackId": track["videoId"],
+                            "trackName": track["title"],
+                            "trackArtistNames": trackArtistNames,
+                            "trackNumber": trackStuffList[index][0],
+                            "trackDuration": (
+                                int(track["duration"].split(":")[0]) * 60
+                                + int(track["duration"].split(":")[1])
+                            ),
+                            "albumId": track["album"]["id"],
+                            "albumName": track["album"]["name"],
+                            "year": trackStuffList[index][1],
+                            "albumArtistName": trackStuffList[index][2][0],
+                            "albumArtHigh": albumArtHigh,
+                            "albumArtMedium": albumArtMedium,
+                            "albumArtLow": albumArtLow,
+                            "albumLength": trackStuffList[index][3],
+                            "albumType": trackStuffList[index][4],
+                        }
+                    ] 
             return {"tracks": tracks}
 
         if mode == "artist":
