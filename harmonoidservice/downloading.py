@@ -56,7 +56,9 @@ class DownloadHandler:
         filename = f"{trackInfo['trackId']}.webm"
         print(f"[httpx] Downloading track ID: {trackInfo['trackId']}.")
         async with httpx.AsyncClient() as client:
-            response = await client.get(trackInfo["url"], timeout=None)
+            response = await client.get(
+                trackInfo["url"], timeout=None, headers={"Range": "bytes=0-"}
+            )
         if response.status_code == 200:
             async with aiofiles.open(filename, "wb") as file:
                 await file.write(response.content)
@@ -65,12 +67,22 @@ class DownloadHandler:
             So, we have no choice but to use another container for OPUS which supports adding audio tags.
             Changing WEBM Matroska container to OGG without re-encoding (to add vorbis comments on OGG container).
             """
-            subprocess.call(
+            process = subprocess.Popen(
                 FFMPEG_COMMAND.format(trackId=trackInfo["trackId"]),
+                shell=True,
                 stdout=subprocess.DEVNULL,
-                stderr=subprocess.STDOUT,
+                stderr=subprocess.PIPE,
             )
-            await aiofiles.os.remove(f"{trackInfo['trackId']}.webm")
+            while process.poll() is None:
+                await asyncio.sleep(0.1)
+            _, stderr = process.communicate()
+            stderr = stderr.decode()
+
+            if process.poll() != 0:
+                print("[stderr]", stderr)
+
+            # it's not important, so we can do it in background
+            asyncio.ensure_future(aiofiles.os.remove(f"{trackInfo['trackId']}.webm"))
             """
             Adding metadata.
             """
