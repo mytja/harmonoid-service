@@ -59,7 +59,6 @@ class DownloadHandler:
             response = await client.get(
                 trackInfo["url"], timeout=None, headers={"Range": "bytes=0-"}
             )
-            print(response.status_code)
         if response.status_code in [200, 206]:
             async with aiofiles.open(filename, "wb") as file:
                 await file.write(response.content)
@@ -82,7 +81,9 @@ class DownloadHandler:
             if process.poll() != 0:
                 print("[stderr]", stderr)
 
-            # it's not important, so we can do it in background
+            """
+            It's not important, so we can do it in background.
+            """
             asyncio.ensure_future(aiofiles.os.remove(f"{trackInfo['trackId']}.webm"))
             """
             Adding metadata.
