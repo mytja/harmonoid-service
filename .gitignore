@@ -6,6 +6,7 @@
 
 *.m4a
 *.mp3
+*.webm
 
 #vscode
 
@@ -14,7 +15,3 @@
 #pycharm
 
 .idea
-
-#cookies
-
-cookies.txt

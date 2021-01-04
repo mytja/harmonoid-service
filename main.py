@@ -2,172 +2,179 @@ from harmonoidservice import HarmonoidService
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.responses import PlainTextResponse
 from fastapi.encoders import jsonable_encoder
-import httpx
 import json
-import types
+import time
 
 harmonoidService = HarmonoidService()
 
 app = FastAPI()
 
 
-def ReturnResponse(response):
-    if type(response) == dict:
+@app.on_event("startup")
+async def startupEvent():
+    """
+    Prefetching player JavaScript
+    """
+    await harmonoidService.ytMusic.youtube.getJS()
+
+
+def returnResponse(response):
+    if type(response) is dict:
         return Response(json.dumps(response, indent=4), media_type="application/json")
-    if type(response) == str:
+    if type(response) is str:
         return PlainTextResponse(response)
     return response
 
 
 @app.get("/")
 async def hello():
-    return ReturnResponse("service is running")
+    return returnResponse("harmonoid")
 
 
 @app.get("/search")
-async def SearchYoutube(keyword, mode="album"):
-    result = await harmonoidService.SearchYoutube(keyword, mode)
-    return ReturnResponse(result)
+async def searchYoutube(keyword, mode="album"):
+    result = await harmonoidService.searchYoutube(keyword, mode)
+    return returnResponse(result)
 
 
-@app.get("/albuminfo")
-async def AlbumInfo(album_id):
-    result = await harmonoidService.AlbumInfo(album_id)
-    return ReturnResponse(result)
+@app.get("/albumInfo")
+async def albumInfo(albumId):
+    result = await harmonoidService.albumInfo(albumId)
+    return returnResponse(result)
 
 
-@app.get("/trackinfo")
-async def TrackInfo(track_id, album_id=None):
-    result = await harmonoidService.TrackInfo(track_id, album_id)
-    return ReturnResponse(result)
+@app.get("/trackInfo")
+async def trackInfo(trackId, albumId=None):
+    result = await harmonoidService.trackInfo(trackId, albumId)
+    return returnResponse(result)
 
 
-@app.get("/artistalbums")
-async def ArtistAlbums(artist_id):
-    result = await harmonoidService.ArtistAlbums(artist_id)
-    return ReturnResponse(result)
+@app.get("/artistInfo")
+async def artistInfo(artistId):
+    result = await harmonoidService.artistInfo(artistId)
+    return returnResponse(result)
 
 
-@app.get("/artisttracks")
-async def ArtistTracks(artist_id):
-    result = await harmonoidService.ArtistTracks(artist_id)
-    return ReturnResponse(result)
+@app.get("/artistTracks")
+async def artistTracks(artistId):
+    result = await harmonoidService.artistTracks(artistId)
+    return returnResponse(result)
 
 
 @app.get("/artistinfo")
-async def ArtistAlbums(artist_id):
-    result = await harmonoidService.ArtistInfo(artist_id)
-    return ReturnResponse(result)
+async def artistInfo(artistId):
+    result = await harmonoidService.artistInfo(artistId)
+    return returnResponse(result)
 
 
-@app.get("/trackdownload")
-async def TrackDownload(track_id=None, album_id=None, track_name=None):
-    if not any((track_id, track_name)):
-        raise HTTPException(422, "Neither track_id nor track_name is specified")
-    if track_id and track_name:
-        raise HTTPException(422, "Both track_id and track_name is specified")
-    return await harmonoidService.TrackDownload(track_id, album_id, track_name)
+@app.get("/lyrics")
+async def getLyrics(trackId, trackName=None):
+    if not any((trackId, trackName)):
+        raise HTTPException(422, "Neither trackId nor trackName is specified")
+    if trackId and trackName:
+        raise HTTPException(422, "Both trackId and trackName is specified")
+    result = await harmonoidService.getLyrics(trackId, trackName)
+    return result
+
+
+@app.get("/trackDownload")
+async def trackDownload(trackId=None, albumId=None, trackName=None):
+    if not any((trackId, trackName)):
+        raise HTTPException(422, "Neither trackId nor trackName is specified")
+    if trackId and trackName:
+        raise HTTPException(422, "Both trackId and trackName is specified")
+    return await harmonoidService.trackDownload(trackId, albumId, trackName)
+
 
 @app.get("/test")
-async def Test():
-    import time
-    
-    response = await SearchYoutube("NCS", "track")
-    response = jsonable_encoder(response)
-    rcode = response["status_code"]
-    print("[test-troubleshooting] Status code: "+str(rcode))
-    response = response["body"]
-    #try:
-        #print("[test-troubleshooting] "+str(response))
-    #except:
-        #print("[test-troubleshooting] Cannot print response!")
+async def test():
+    startTime = time.time()
+    startLt = time.ctime(startTime)
+    print("[test] Testing /search&mode=track")
     try:
-        ifin =  "track_id" in response
-        if (response != None and ifin==True and int(rcode) == 200):
-            __musicsearchtest = True
+        response = await searchYoutube("NoCopyrightSounds", "track")
+        response = jsonable_encoder(response)
+        responseCode = response["status_code"]
+        print(f"[test] Status code: {responseCode}")
+        tracks = json.loads(response["body"])["tracks"]
+        if len(tracks) != 0 and tracks[0]["albumId"]:
+            trackSearchTest = True
         else:
-            __musicsearchtest = False
-    except:
-        print("[test-troubleshooting] Type is not dict")
-    
-    
-    
-    response = await SearchYoutube("NCS", "album")
-    response = jsonable_encoder(response)
-    rcode = response["status_code"]
-    print("[test-troubleshooting] Status code: "+str(rcode))
-    response = response["body"]
-    #try:
-        #print("[test-troubleshooting] "+str(response))
-    #except:
-        #print("[test-troubleshooting] Cannot print response!")
+            trackSearchTest = False
+    except Exception as e:
+        trackSearchTest = False
+        print(f"[test] Exception: {e}")
+
+    print("[test] Testing /search&mode=album")
     try:
-        ifin =  "album_id" in response
-        if (response != None and ifin==True and int(rcode) == 200):
-            __albumsearchtest = True
+        response = await searchYoutube("NoCopyrightSounds", "album")
+        response = jsonable_encoder(response)
+        responseCode = response["status_code"]
+        print(f"[test] Status code: {responseCode}")
+        albums = json.loads(response["body"])["albums"]
+        if len(albums) != 0 and albums[0]["albumId"]:
+            albumSearchTest = True
         else:
-            __albumsearchtest = False
-    except:
-        print("[test-troubleshooting] Type is not dict")
-    
-    
-    
-    response = await SearchYoutube("NCS", "artist")
-    response = jsonable_encoder(response)
-    rcode = response["status_code"]
-    print("[test-troubleshooting] Status code: "+str(rcode))
-    response = response["body"]
-    #try:
-        #print("[test-troubleshooting] "+str(response))
-    #except:
-        #print("[test-troubleshooting] Cannot print response!")
+            albumSearchTest = False
+    except Exception as e:
+        albumSearchTest = False
+        print(f"[test] Exception: {e}")
+    print("[test] Testing /search&mode=artist")
     try:
-        ifin =  "artist_id" in response
-        if (response != None and ifin==True and int(rcode) == 200):
-            __artistsearchtest = True
+        response = await searchYoutube("NoCopyrightSounds", "artist")
+        response = jsonable_encoder(response)
+        responseCode = response["status_code"]
+        print(f"[test] Status code: {responseCode}")
+        artists = json.loads(response["body"])["artists"]
+        if len(artists) != 0 and artists[0]["artist_id"]:
+            artistSearchTest = True
         else:
-            __artistsearchtest = False
-    except:
-        print("[test-troubleshooting] Type is not dict")
-       
+            artistSearchTest = False
+    except Exception as e:
+        artistSearchTest = False
+        print(f"[test] Exception: {e}")
+    print("[test] Testing /trackDownload")
     try:
-        response = await harmonoidService.TrackDownload(track_id, album_id, track_name)
-        #print("[test-troubleshooting]: "+str(response)) File can't convert to string!
-        
-    except:
-        status_code = 500
-    try:
-        status_code = response.status_code
-        print(status_code)
-    except:
-        status_code = 200
-    if status_code != 200:
-        __tdtest = False
+        response = await harmonoidService.trackDownload("JTjmZZ1W2ew", None, None)
+        statusCode = response.status_code
+    except Exception as e:
+        statusCode = 500
+        print(f"[test] Exception: {e}")
+    print(f"[test] Status code: {statusCode}")
+    if statusCode != 200:
+        trackDownloadTest = False
     else:
-        __tdtest = True
-        
-    if (__artistsearchtest==False or __musicsearchtest==False or __albumsearchtest==False or __tdtest==False):
-        __testfail = True
+        trackDownloadTest = True
+    if all([trackSearchTest, albumSearchTest, artistSearchTest, trackDownloadTest]):
+        testFail = False
     else:
-        __testfail = False
-    
-    __timesec = time.time()
-    __lt = time.ctime(__timesec)
-    
-    __json = {
-        "endtime": __lt,
-        "fail": __testfail,
-        "tracksearch": __musicsearchtest,
-        "albumsearch": __albumsearchtest,
-        "artistsearch": __artistsearchtest,
-        "trackdownload": __tdtest
+        testFail = True
+    endTime = time.time()
+    endLt = time.ctime(endTime)
+    totalTime = endTime - startTime
+    response = {
+        "endTime": endLt,
+        "startTime": startLt,
+        "time": totalTime,
+        "fail": testFail,
+        "trackSearch": trackSearchTest,
+        "albumSearch": albumSearchTest,
+        "artistSearch": artistSearchTest,
+        "trackDownload": trackDownloadTest,
     }
-    
-    return ReturnResponse(__json)
-    
+    return returnResponse(response)
 
 
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("main:app", reload=True)
+    uvicorn.run("main:app")
+
+"""
+- Class methods names are lower camel case.
+- Class names are upper camel case.
+- Constants are upper snake case.
+- Class attributes are lower camel case.
+- Other identifiers & object names are lower camel case.
+- Only private methods have two underscores in their name.
+"""
