@@ -44,10 +44,12 @@ class Metadata(OggOpus):
         self["title"] = [self.trackInfo["trackName"]]
         self["album"] = [self.trackInfo["albumName"]]
         """
-        This is where we can simply provide simply a list of artists, as written above (for having mutiple value for the same key).        
+        This is where we can simply provide simply a list of artists, as written above (for having mutiple value for the same key).
+
+        REVERTED FOLLOWING:      
         But, by that MediaMetadataRetriever is just shows first artist :-(. So, I'm just joining all the artists in a single string as follows (Though, this is incorrect according to official reference).
         """
-        self["artist"] = [", ".join(self.trackInfo["trackArtistNames"])]
+        self["artist"] = self.trackInfo["trackArtistNames"]
         """
         No reference of this comment at http://age.hobba.nl/audio/mirroredpages/ogg-tagging.html, still using because a mutagen example uses it. Thus, unable to read.
         """

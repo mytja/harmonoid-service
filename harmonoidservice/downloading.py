@@ -59,7 +59,8 @@ class DownloadHandler:
             response = await client.get(
                 trackInfo["url"], timeout=None, headers={"Range": "bytes=0-"}
             )
-        if response.status_code == 200:
+            print(response.status_code)
+        if response.status_code in [200, 206]:
             async with aiofiles.open(filename, "wb") as file:
                 await file.write(response.content)
             """
