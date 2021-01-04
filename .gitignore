@@ -1,10 +1,12 @@
 #python
 
-harmonoidservice/__pycache__/*
+*.pyc
 
 #audio
 
 *.m4a
+*.mp3
+*.webm
 
 #vscode
 
@@ -13,11 +15,3 @@ harmonoidservice/__pycache__/*
 #pycharm
 
 .idea
-
-#uvicorn
-
-__pycache__
-
-#cookies
-
-cookies.txt

@@ -9,6 +9,7 @@ harmonoidService = HarmonoidService()
 
 app = FastAPI()
 
+
 @app.on_event("startup")
 async def startupEvent():
     """
@@ -43,7 +44,7 @@ async def albumInfo(albumId):
 
 
 @app.get("/trackInfo")
-async def trackInfo(trackId, albumId = None):
+async def trackInfo(trackId, albumId=None):
     result = await harmonoidService.trackInfo(trackId, albumId)
     return returnResponse(result)
 
@@ -67,7 +68,7 @@ async def artistInfo(artistId):
 
 
 @app.get("/lyrics")
-async def getLyrics(trackId, trackName = None):
+async def getLyrics(trackId, trackName=None):
     if not any((trackId, trackName)):
         raise HTTPException(422, "Neither trackId nor trackName is specified")
     if trackId and trackName:
@@ -134,9 +135,7 @@ async def test():
         print(f"[test] Exception: {e}")
     print("[test] Testing /trackDownload")
     try:
-        response = await harmonoidService.trackDownload(
-            "JTjmZZ1W2ew", None, None
-        )
+        response = await harmonoidService.trackDownload("JTjmZZ1W2ew", None, None)
         statusCode = response.status_code
     except Exception as e:
         statusCode = 500
@@ -168,6 +167,7 @@ async def test():
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run("main:app")
 
 """
