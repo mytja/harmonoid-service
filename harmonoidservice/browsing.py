@@ -67,17 +67,21 @@ class BrowsingHandlerInternal:
 
 class BrowsingHandler(BrowsingHandlerInternal):
     async def trackInfo(self, trackId, albumId):
-        track = await self.ytMusic.getSong(trackId)
-        trackArtistNames = [a for a in track["artists"]]
-        """
-        Searching for track & fetching albumId if it is None.
-        """
-        if not albumId:
+        if trackId and albumId:
+            """
+            Making simultaneous request if both albumId & trackId are present.
+            """
+            track, album = await asyncio.gather(self.ytMusic.getSong(trackId), self.ytMusic.getAlbum(albumId))
+        else:
+            track = await self.ytMusic.getSong(trackId)
+            """
+            Searching for track & fetching albumId if it is None.
+            """
             albumId = await self.ytMusic.searchYoutube(
-                " ".join(trackArtistNames) + " " + track["title"], "songs"
+                " ".join([artist for artist in track["artists"]]) + " " + track["title"], "songs"
             )
             albumId = albumId[0]["album"]["id"]
-        album = await self.ytMusic.getAlbum(albumId)
+            album = await self.ytMusic.getAlbum(albumId)
         trackNumber = 1
         albumArtLow, albumArtMedium, albumArtHigh = self.sortThumbnails(
             album["thumbnails"]
@@ -86,12 +90,11 @@ class BrowsingHandler(BrowsingHandlerInternal):
             if albumTrack["title"] == track["title"]:
                 trackNumber = int(albumTrack["index"])
                 break
-
         albumArtistName = [a["name"] for a in album["artist"]]
         return {
             "trackId": track["videoId"],
             "trackName": track["title"],
-            "trackArtistNames": trackArtistNames,
+            "trackArtistNames": [artist for artist in track["artists"]],
             "trackNumber": trackNumber,
             "trackDuration": int(track["lengthSeconds"]),
             "albumArtHigh": albumArtHigh,
