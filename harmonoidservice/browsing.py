@@ -1,5 +1,4 @@
 import asyncio
-import json
 
 
 class BrowsingHandlerInternal:
@@ -14,7 +13,23 @@ class BrowsingHandlerInternal:
     async def asyncAlbumSearch(self, tracks):
         tasks = [self.arrangeVideoIds(track) for track in tracks]
         return await asyncio.gather(*tasks)
+    
+    def sortThumbnails(self, thumbnails):
+        thumbs = {}
+        for thumbnail in thumbnails:
+            wh = thumbnail["width"] * thumbnail["height"]
+            thumbs[wh] = thumbnail["url"]
+        resolutions = sorted(list(thumbs.keys()))
+        max = resolutions[-1]
+        mid = resolutions[-2] if len(resolutions) > 2 else max
+        min = resolutions[0]
 
+        return (thumbs[min], thumbs[mid], thumbs[max])
+    
+    """
+    Commented out code, which was used for fetching missing keys in <=0.0.2+2 version of app.
+    """
+    """
     async def arrangeAlbumLength(self, album):
         youtubeResult = await self.ytMusic.getAlbum(album["browseId"])
         return int(youtubeResult["trackCount"])
@@ -30,7 +45,7 @@ class BrowsingHandlerInternal:
     async def asyncTrackDuration(self, tracks):
         tasks = [self.arrangeTrackDuration(track) for track in tracks]
         return await asyncio.gather(*tasks)
-
+    
     async def arrangeTrackStuff(self, track):
         if track["album"] != None:
             youtubeResult = await self.ytMusic.getAlbum(track["album"]["id"])
@@ -47,18 +62,7 @@ class BrowsingHandlerInternal:
     async def asyncTrackStuff(self, tracks):
         tasks = [self.arrangeTrackStuff(track) for track in tracks]
         return await asyncio.gather(*tasks)
-
-    def sortThumbnails(self, thumbnails):
-        thumbs = {}
-        for thumbnail in thumbnails:
-            wh = thumbnail["width"] * thumbnail["height"]
-            thumbs[wh] = thumbnail["url"]
-        resolutions = sorted(list(thumbs.keys()))
-        max = resolutions[-1]
-        mid = resolutions[-2] if len(resolutions) > 2 else max
-        min = resolutions[0]
-
-        return (thumbs[min], thumbs[mid], thumbs[max])
+    """
 
 
 class BrowsingHandler(BrowsingHandlerInternal):
@@ -78,7 +82,6 @@ class BrowsingHandler(BrowsingHandlerInternal):
         albumArtLow, albumArtMedium, albumArtHigh = self.sortThumbnails(
             album["thumbnails"]
         )
-
         for albumTrack in album["tracks"]:
             if albumTrack["title"] == track["title"]:
                 trackNumber = int(albumTrack["index"])
@@ -105,11 +108,11 @@ class BrowsingHandler(BrowsingHandlerInternal):
 
     async def albumInfo(self, albumId):
         response = await self.ytMusic.getAlbum(albumId)
-
         tracks = response["tracks"]
-
+        """
+        For replacing video IDs of music videos with video IDs of tracks.
+        """
         videoIdList = await self.asyncAlbumSearch(tracks)
-
         result = []
         for index, track in enumerate(tracks):
             result += [
@@ -121,18 +124,13 @@ class BrowsingHandler(BrowsingHandlerInternal):
                     "trackDuration": int(track["lengthMs"]),
                 }
             ]
-
         return {"tracks": result}
 
     async def artistAlbums(self, artistId):
         artistJson = await self.ytMusic.getArtist(artistId)
-
         albums = artistJson["albums"]["results"] + artistJson["singles"]["results"]
-
-        albumLengthList = await self.asyncAlbumLength(albums)
-
         artistAlbums = []
-        for index, album in enumerate(albums):
+        for album in albums:
             albumArtLow, albumArtMedium, albumArtHigh = self.sortThumbnails(
                 album["thumbnails"]
             )
@@ -145,24 +143,15 @@ class BrowsingHandler(BrowsingHandlerInternal):
                     "albumArtHigh": albumArtHigh,
                     "albumArtMedium": albumArtMedium,
                     "albumArtLow": albumArtLow,
-                    "albumLength": albumLengthList[index],
-                    "albumType": "single" if albumLengthList[index] == 1 else "album",
                 }
             ]
         return {"albums": artistAlbums}
 
     async def artistTracks(self, artistId):
         artistJson = await self.ytMusic.getArtist(artistId)
-
         tracks = artistJson["songs"]["results"]
-
-        trackStuffList, trackDurationList = await asyncio.gather(
-            self.asyncTrackStuff(tracks),
-            self.asyncTrackDuration(tracks),
-        )
-
         artistTracks = []
-        for index, track in enumerate(tracks):
+        for track in tracks:
             trackArtistNames = [a["name"] for a in track["artists"]]
             albumArtLow, albumArtMedium, albumArtHigh = self.sortThumbnails(
                 track["thumbnails"]
@@ -172,17 +161,11 @@ class BrowsingHandler(BrowsingHandlerInternal):
                     "trackId": track["videoId"],
                     "trackName": track["title"],
                     "trackArtistNames": trackArtistNames,
-                    "trackNumber": trackStuffList[index][0],
-                    "trackDuration": trackDurationList[index],
                     "albumArtHigh": albumArtHigh,
                     "albumArtMedium": albumArtMedium,
                     "albumArtLow": albumArtLow,
                     "albumId": track["album"]["id"],
                     "albumName": track["album"]["name"],
-                    "year": trackStuffList[index][1],
-                    "albumArtistName": trackStuffList[index][2][0],
-                    "albumLength": trackStuffList[index][3],
-                    "albumType": trackStuffList[index][4],
                 }
             ]
         return {"tracks": artistTracks}
@@ -198,11 +181,8 @@ class BrowsingHandler(BrowsingHandlerInternal):
     async def searchYoutube(self, keyword, mode):
         if mode == "album":
             youtubeResult = await self.ytMusic.searchYoutube(keyword, "albums")
-
-            albumLengthList = await self.asyncAlbumLength(youtubeResult)
-
             albums = []
-            for index, album in enumerate(youtubeResult):
+            for album in youtubeResult:
                 albumArtLow, albumArtMedium, albumArtHigh = self.sortThumbnails(
                     album["thumbnails"]
                 )
@@ -215,21 +195,14 @@ class BrowsingHandler(BrowsingHandlerInternal):
                         "albumArtHigh": albumArtHigh,
                         "albumArtMedium": albumArtMedium,
                         "albumArtLow": albumArtLow,
-                        "albumLength": albumLengthList[index],
-                        "albumType": "single"
-                        if albumLengthList[index] == 1
-                        else "album",
                     }
                 ]
             return {"albums": albums}
 
         if mode == "track":
             youtubeResult = await self.ytMusic.searchYoutube(keyword, "songs")
-
-            trackStuffList = await self.asyncTrackStuff(youtubeResult)
-
             tracks = []
-            for index, track in enumerate(youtubeResult):
+            for track in youtubeResult:
                 if track["album"] != None:
                     albumArtLow, albumArtMedium, albumArtHigh = self.sortThumbnails(
                         track["thumbnails"]
@@ -240,20 +213,15 @@ class BrowsingHandler(BrowsingHandlerInternal):
                             "trackId": track["videoId"],
                             "trackName": track["title"],
                             "trackArtistNames": trackArtistNames,
-                            "trackNumber": trackStuffList[index][0],
                             "trackDuration": (
                                 int(track["duration"].split(":")[0]) * 60
                                 + int(track["duration"].split(":")[1])
                             ),
                             "albumId": track["album"]["id"],
                             "albumName": track["album"]["name"],
-                            "year": trackStuffList[index][1],
-                            "albumArtistName": trackStuffList[index][2][0],
                             "albumArtHigh": albumArtHigh,
                             "albumArtMedium": albumArtMedium,
                             "albumArtLow": albumArtLow,
-                            "albumLength": trackStuffList[index][3],
-                            "albumType": trackStuffList[index][4],
                         }
                     ] 
             return {"tracks": tracks}
