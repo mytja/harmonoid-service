@@ -1,0 +1,27 @@
+# Setup python 3.7
+sudo apt update
+sudo apt install software-properties-common
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt update
+sudo apt install python3.7
+sudo update-alternatives  --set python /usr/bin/python3.7
+
+#If 3.7, then OK!
+python3 --version
+
+# Gunicorn & Python & Nohup setup
+sudo apt-get install python3-venv
+sudo apt-get install python3-pip
+sudo apt-get install gunicorn3
+sudo apt-get install nohup
+
+# Setup venv
+python3 -m venv venv
+source venv/bin/activate
+
+# Python PIP setup
+python3 --version
+python3 -m pip install -r requirements.txt
+
+# Run gunicorn script in background
+nohup build
