@@ -105,7 +105,6 @@ class DownloadHandler:
     """
     Yet to implement...
     """
-
     async def updateYTMusicAPI(self):
         async with httpx.AsyncClient() as client:
             latestVersion = await client.get(
@@ -128,7 +127,6 @@ class DownloadHandler:
                 await asyncio.sleep(0.1)
             stdout, stderr = process.communicate()
             stdout, stderr = stdout.decode(), stderr.decode()
-
             if process.poll() == 0:
                 MUSICAPI_VERSION = latestVersion
                 print(f"[update] Updated To ytmusicapi version : {latestVersion}")

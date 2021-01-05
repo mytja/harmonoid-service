@@ -226,7 +226,7 @@ class BrowsingHandler(BrowsingHandlerInternal):
                             "albumArtMedium": albumArtMedium,
                             "albumArtLow": albumArtLow,
                         }
-                    ] 
+                    ]
             return {"tracks": tracks}
 
         if mode == "artist":

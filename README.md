@@ -10,7 +10,9 @@ This repository has everything ready to be deployed on [Heroku](https://heroku.c
 
 ## ❔ What does this app do?
 
-This app is a simple backend that can be used to browse & download music from [YouTube Music](https://music.youtube.com) using [PyTube](https://github.com/nficano/pytube) & [ytmusicapi](https://github.com/sigma67/ytmusicapi). The tracks you get in download, are MP3 in format with exact metadata.
+This app is a simple backend that can be used to browse & download music from [YouTube Music](https://music.youtube.com) using [PyTube](https://github.com/nficano/pytube) & [ytmusicapi](https://github.com/sigma67/ytmusicapi).
+
+**The tracks you get in download are in high quality OGG(OPUS) in format with exact metadata.**
 
 This uses [mutagen](https://github.com/quodlibet/mutagen) for adding metadata & album art to the tracks.
 
@@ -185,9 +187,9 @@ if (audioResponse.status_code == 200):
     audioTrackFile = open('download.ogg', 'wb')
     audioTrackFile.write(audioTrackBinary)
     audioTrackFile.close()
-    print('Download Successful!')
+    print('Download Successful.')
 else:
-    print('Download Failed!')
+    print('Download Failed.')
 ```
 
 ##### Get lyrics of a track

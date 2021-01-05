@@ -170,6 +170,7 @@ if __name__ == "__main__":
 
     uvicorn.run("main:app")
 
+    
 """
 - Class methods names are lower camel case.
 - Class names are upper camel case.
