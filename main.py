@@ -146,9 +146,9 @@ async def test():
     else:
         trackDownloadTest = True
     if all([trackSearchTest, albumSearchTest, artistSearchTest, trackDownloadTest]):
-        testFail = True
+        testSuccess = True
     else:
-        testFail = False
+        testSuccess = False
     endTime = time.time()
     endLt = time.ctime(endTime)
     totalTime = endTime - startTime
@@ -156,7 +156,7 @@ async def test():
         "endTime": endLt,
         "startTime": startLt,
         "time": totalTime,
-        "success": testFail,
+        "success": testSuccess,
         "trackSearch": trackSearchTest,
         "albumSearch": albumSearchTest,
         "artistSearch": artistSearchTest,
