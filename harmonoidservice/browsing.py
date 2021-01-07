@@ -96,7 +96,7 @@ class BrowsingHandler(BrowsingHandlerInternal):
             "trackName": track["title"],
             "trackArtistNames": [artist for artist in track["artists"]],
             "trackNumber": trackNumber,
-            "trackDuration": int(track["lengthSeconds"]),
+            "trackDuration": int(track["lengthSeconds"]) if track["lengthSeconds"] else 0,
             "albumArtHigh": albumArtHigh,
             "albumArtMedium": albumArtMedium,
             "albumArtLow": albumArtLow,
@@ -124,7 +124,7 @@ class BrowsingHandler(BrowsingHandlerInternal):
                     "trackName": track["title"],
                     "trackArtistNames": [track["artists"]],
                     "trackNumber": int(track["index"]),
-                    "trackDuration": int(track["lengthMs"]),
+                    "trackDuration": int(track["lengthMs"]) // 1000 if track["lengthMs"] else 0,
                 }
             ]
         return {"tracks": result}
@@ -193,7 +193,7 @@ class BrowsingHandler(BrowsingHandlerInternal):
                     {
                         "albumId": album["browseId"],
                         "albumName": album["title"],
-                        "year": int(album["year"]) if album["year"].isnumeric() else "",
+                        "year": int(album["year"]) if album["year"].isnumeric() else 0,
                         "albumArtistName": album["artist"],
                         "albumArtHigh": albumArtHigh,
                         "albumArtMedium": albumArtMedium,
@@ -218,7 +218,7 @@ class BrowsingHandler(BrowsingHandlerInternal):
                             "trackArtistNames": trackArtistNames,
                             "trackDuration": (
                                 int(track["duration"].split(":")[0]) * 60
-                                + int(track["duration"].split(":")[1])
+                                + int(track["duration"].split(":")[-1])
                             ),
                             "albumId": track["album"]["id"],
                             "albumName": track["album"]["name"],

@@ -6,4 +6,3 @@ gunicorn
 mutagen
 aiofiles
 httpx
-youtube_dl
