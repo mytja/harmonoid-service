@@ -64,19 +64,25 @@ git push heroku master
 
 **6) Verify that you did everything correct**
 
-- Now, if you visit your app at https://yourapp.herokuapp.com/ in a browser, you will see 'service is running' on your screen, with a status code of 200.
+- Now, if you visit your app at https://yourapp.herokuapp.com/ in a browser, you will see 'harmonoid' on your screen, with a status code of 200.
 - Visit test suite at https://yourapp.herokuapp.com/test in a browser! If you see something like this:
 ```
 {
-    "endTime": "Fri Dec 18 07:31:29 2020",
-    "fail": false,
+    "endTime": "Thu Jan  7 08:10:32 2021",
+    "startTime": "Thu Jan  7 08:10:26 2021",
+    "time": 6.463334321975708,
+    "success": true,
     "trackSearch": true,
+    "trackInfo": true,
     "albumSearch": true,
+    "alubmInfo": true,
     "artistSearch": true,
+    "artistInfo": true,
+    "lyricsSearch": true,
     "trackDownload": true
 }
 ```
-If ```fail``` is true, then a route failed to do its job correctly.
+If ```success``` is false, then a route failed to do its job correctly. Then seek for a route, which has false in its field.
 
 ### On Linux VM / Cloud Service
 
