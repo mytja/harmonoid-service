@@ -177,8 +177,12 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
     try:
         response = await getLyrics(lyricsTrackId, None)
         response = jsonable_encoder(response)
-        responseCode = response["status_code"]
-        print(f"[test] Status code: {responseCode}")
+        try:
+            responseCode = response["status_code"]
+            print(f"[test] Status code: {responseCode}")
+        except Exception as e:
+            print("[test] Exception: No status code!")
+            print(f"[test] Exception: Details: {e}")
         lyrics = json.loads(response["body"])
         if len(lyrics) != 0 and lyrics["lyrics"]:
             lyricsSearchTest = True
