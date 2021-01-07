@@ -66,7 +66,7 @@ git push heroku master
 
 - Now, if you visit your app at https://yourapp.herokuapp.com/ in a browser, you will see 'harmonoid' on your screen, with a status code of 200.
 - Visit test suite at https://yourapp.herokuapp.com/test in a browser! If you see something like this:
-```
+```json
 {
     "endTime": "Thu Jan  7 08:10:32 2021",
     "startTime": "Thu Jan  7 08:10:26 2021",
