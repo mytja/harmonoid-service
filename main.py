@@ -205,7 +205,7 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
     else:
         trackDownloadTest = True
     
-    if all([trackSearchTest, trackInfoTest, albumSearchTest, albumInfoTest, artistSearchTest, artistInfoTest, trackDownloadTest]):
+    if all([trackSearchTest, trackInfoTest, albumSearchTest, albumInfoTest, artistSearchTest, artistInfoTest, lyricsSearchTest, trackDownloadTest]):
         testSuccess = True
     else:
         testSuccess = False
