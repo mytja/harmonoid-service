@@ -80,7 +80,7 @@ async def trackDownload(trackId=None, albumId=None, trackName=None):
 
 
 @app.get("/test")
-async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds", artistName="NoCopyrightedSounds", trackDownloadName="NoCopyrightedSounds"):
+async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds", artistName="NoCopyrightedSounds", trackDownloadName="NoCopyrightedSounds", lyricsTrackId="Kx7B-XvmFtE"):
     startTime = time.time()
     startLt = time.ctime(startTime)
     print("[test] Testing /search&mode=track")
@@ -172,6 +172,21 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
     except Exception as e:
         trackInfoTest = False
         print(f"[test] Exception: {e}")
+        
+    print("[test] Testing /lyrics")
+    try:
+        response = await getLyrics(lyricsTrackId, None)
+        response = jsonable_encoder(response)
+        responseCode = response["status_code"]
+        print(f"[test] Status code: {responseCode}")
+        lyrics = json.loads(response["body"])
+        if len(lyrics) != 0 and lyrics["lyrics"]:
+            lyricsSearchTest = True
+        else:
+            lyricsSearchTest = False
+    except Exception as e:
+        lyricsSearchTest = False
+        print(f"[test] Exception: {e}")
     
     print("[test] Testing /trackDownload")
     try:
@@ -205,6 +220,7 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
         "alubmInfo": albumInfoTest,
         "artistSearch": artistSearchTest,
         "artistInfo": artistInfoTest,
+        "lyricsSearch": lyricsSearchTest,
         "trackDownload": trackDownloadTest,
     }
     return returnResponse(response)
