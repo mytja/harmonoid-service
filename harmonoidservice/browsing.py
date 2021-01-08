@@ -92,20 +92,20 @@ class BrowsingHandler(BrowsingHandlerInternal):
                 break
         albumArtistName = [a["name"] for a in album["artist"]]
         return {
-            "trackId": track["videoId"],
-            "trackName": track["title"],
-            "trackArtistNames": [artist for artist in track["artists"]],
-            "trackNumber": trackNumber,
-            "trackDuration": int(track["lengthSeconds"]) if track["lengthSeconds"] else 0,
-            "albumArtHigh": albumArtHigh,
-            "albumArtMedium": albumArtMedium,
-            "albumArtLow": albumArtLow,
-            "albumId": albumId,
-            "albumName": album["title"],
+            "track_id": track["videoId"],
+            "track_name": track["title"],
+            "track_artists": [artist for artist in track["artists"]],
+            "track_number": trackNumber,
+            "track_duration": int(track["lengthSeconds"]) if track["lengthSeconds"] else 0,
+            "album_art_640": albumArtHigh,
+            "album_art_300": albumArtMedium,
+            "album_art_64": albumArtLow,
+            "album_id": albumId,
+            "album_name": album["title"],
             "year": album["releaseDate"]["year"],
-            "albumArtistName": albumArtistName[0],
-            "albumLength": int(album["trackCount"]),
-            "albumType": "single" if len(album["tracks"]) == 1 else "album",
+            "album_artists": albumArtistName[0],
+            "album_length": int(album["trackCount"]),
+            "album_type": "single" if len(album["tracks"]) == 1 else "album",
             "url": track["url"],
         }
 
@@ -120,11 +120,11 @@ class BrowsingHandler(BrowsingHandlerInternal):
         for index, track in enumerate(tracks):
             result += [
                 {
-                    "trackId": videoIdList[index],
-                    "trackName": track["title"],
-                    "trackArtistNames": [track["artists"]],
-                    "trackNumber": int(track["index"]),
-                    "trackDuration": int(track["lengthMs"]) // 1000 if track["lengthMs"] else 0,
+                    "track_id": videoIdList[index],
+                    "track_name": track["title"],
+                    "track_artists": [track["artists"]],
+                    "track_number": int(track["index"]),
+                    "track_duration": int(track["lengthMs"]) // 1000 if track["lengthMs"] else 0,
                 }
             ]
         return {"tracks": result}
@@ -139,13 +139,13 @@ class BrowsingHandler(BrowsingHandlerInternal):
             )
             artistAlbums += [
                 {
-                    "albumId": album["browseId"],
-                    "albumName": album["title"],
+                    "album_id": album["browseId"],
+                    "album_name": album["title"],
                     "year": album["year"],
-                    "albumArtistName": [artistJson["name"]][0],
-                    "albumArtHigh": albumArtHigh,
-                    "albumArtMedium": albumArtMedium,
-                    "albumArtLow": albumArtLow,
+                    "album_artists": [artistJson["name"]][0],
+                    "album_art_640": albumArtHigh,
+                    "album_art_300": albumArtMedium,
+                    "album_art_64": albumArtLow,
                 }
             ]
         return {"albums": artistAlbums}
@@ -161,14 +161,14 @@ class BrowsingHandler(BrowsingHandlerInternal):
             )
             artistTracks += [
                 {
-                    "trackId": track["videoId"],
-                    "trackName": track["title"],
-                    "trackArtistNames": trackArtistNames,
-                    "albumArtHigh": albumArtHigh,
-                    "albumArtMedium": albumArtMedium,
-                    "albumArtLow": albumArtLow,
-                    "albumId": track["album"]["id"],
-                    "albumName": track["album"]["name"],
+                    "track_id": track["videoId"],
+                    "track_name": track["title"],
+                    "track_artists": trackArtistNames,
+                    "album_art_640": albumArtHigh,
+                    "album_art_300": albumArtMedium,
+                    "album_art_64": albumArtLow,
+                    "album_id": track["album"]["id"],
+                    "album_name": track["album"]["name"],
                 }
             ]
         return {"tracks": artistTracks}
@@ -191,13 +191,13 @@ class BrowsingHandler(BrowsingHandlerInternal):
                 )
                 albums += [
                     {
-                        "albumId": album["browseId"],
-                        "albumName": album["title"],
+                        "album_id": album["browseId"],
+                        "album_name": album["title"],
                         "year": int(album["year"]) if album["year"].isnumeric() else 0,
-                        "albumArtistName": album["artist"],
-                        "albumArtHigh": albumArtHigh,
-                        "albumArtMedium": albumArtMedium,
-                        "albumArtLow": albumArtLow,
+                        "album_artists": album["artist"],
+                        "album_art_640": albumArtHigh,
+                        "album_art_300": albumArtMedium,
+                        "album_art_64": albumArtLow,
                     }
                 ]
             return {"albums": albums}
@@ -213,18 +213,18 @@ class BrowsingHandler(BrowsingHandlerInternal):
                     trackArtistNames = [a["name"] for a in track["artists"]]
                     tracks += [
                         {
-                            "trackId": track["videoId"],
-                            "trackName": track["title"],
-                            "trackArtistNames": trackArtistNames,
-                            "trackDuration": (
+                            "track_id": track["videoId"],
+                            "track_name": track["title"],
+                            "track_artists": trackArtistNames,
+                            "track_duration": (
                                 int(track["duration"].split(":")[0]) * 60
                                 + int(track["duration"].split(":")[-1])
                             ),
-                            "albumId": track["album"]["id"],
-                            "albumName": track["album"]["name"],
-                            "albumArtHigh": albumArtHigh,
-                            "albumArtMedium": albumArtMedium,
-                            "albumArtLow": albumArtLow,
+                            "album_id": track["album"]["id"],
+                            "album_name": track["album"]["name"],
+                            "album_art_640": albumArtHigh,
+                            "album_art_300": albumArtMedium,
+                            "album_art_64": albumArtLow,
                         }
                     ]
             return {"tracks": tracks}
@@ -241,9 +241,9 @@ class BrowsingHandler(BrowsingHandlerInternal):
                     {
                         "artist_id": artist["browseId"],
                         "artist_name": artist["artist"],
-                        "albumArtHigh": albumArtHigh,
-                        "albumArtMedium": albumArtMedium,
-                        "albumArtLow": albumArtLow,
+                        "album_art_640": albumArtHigh,
+                        "album_art_300": albumArtMedium,
+                        "album_art_64": albumArtLow,
                     }
                 ]
             return {"artists": artists}
