@@ -1,7 +1,7 @@
 import asyncio
 
 
-class BrowsingHandlerInternal:
+class BrowsingHandler:
     async def arrangeVideoIds(self, track):
         title = track["artists"] + " " + track["title"]
         youtubeResult = await self.ytMusic.searchYoutube(title, "songs")
@@ -58,9 +58,7 @@ class BrowsingHandlerInternal:
     async def asyncTrackStuff(self, tracks):
         tasks = [self.arrangeTrackStuff(track) for track in tracks]
         return await asyncio.gather(*tasks)
-
-
-class BrowsingHandler(BrowsingHandlerInternal):
+    
     async def trackInfo(self, trackId, albumId):
         if trackId and albumId:
             """
@@ -272,3 +270,4 @@ class BrowsingHandler(BrowsingHandlerInternal):
         watchPlaylist = await self.ytMusic.getWatchPlaylist(trackId)
         watchPlaylistId = watchPlaylist["lyrics"]
         return await self.ytMusic.getLyrics(watchPlaylistId)
+    
