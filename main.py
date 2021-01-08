@@ -67,7 +67,7 @@ async def getLyrics(track_id, track_name=None):
     if track_id and track_name:
         raise HTTPException(422, "Both trackId and trackName is specified")
     result = await harmonoidService.getLyrics(track_id, track_name)
-    return returnResponse(result)
+    return result
 
 
 @app.get("/trackdownload")
@@ -176,14 +176,13 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
     print("[test] Testing /lyrics")
     try:
         response = await getLyrics(lyricsTrackId, None)
-        response = jsonable_encoder(response)
         try:
-            responseCode = response["status_code"]
+            responseCode = response.status_code
             print(f"[test] Status code: {responseCode}")
         except Exception as e:
             print("[test] Exception: No status code!")
             print(f"[test] Exception: Details: {e}")
-        lyrics = json.loads(response["body"])
+        lyrics = json.loads(response)
         if len(lyrics) != 0 and lyrics["lyrics"]:
             lyricsSearchTest = True
         else:
