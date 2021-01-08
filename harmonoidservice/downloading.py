@@ -32,7 +32,7 @@ class DownloadHandler:
                 headers={"Accept-Ranges": "bytes"},
             )
 
-        trackInfo = await self.trackInfo(trackId, albumId)
+        trackInfo = await self.TrackInfo(trackId, albumId)
         if type(trackInfo) is dict:
             print(
                 f"[ytmusicapi] Successfully retrieved metadata of track ID: {trackId}."
