@@ -166,7 +166,7 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
     
     print("[test] Testing /trackDownload")
     try:
-        response = await harmonoidService.trackDownload(None, None, trackDownloadName)
+        response = await harmonoidService.TrackDownload(None, None, trackDownloadName)
         statusCode = response.status_code
     except Exception as e:
         statusCode = 500
