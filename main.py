@@ -76,7 +76,7 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
     startLt = time.ctime(startTime)
     print("[test] Testing /search&mode=track")
     try:
-        response = await SearchYoutube(trackName, "track")
+        response = await searchYoutube(trackName, "track")
         response = jsonable_encoder(response)
         responseCode = response["status_code"]
         print(f"[test] Status code: {responseCode}")
@@ -91,7 +91,7 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
 
     print("[test] Testing /trackInfo")
     try:
-        response = await TrackInfo(tracks[0]["track_id"])
+        response = await trackInfo(tracks[0]["track_id"])
         response = jsonable_encoder(response)
         responseCode = response["status_code"]
         print(f"[test] Status code: {responseCode}")
@@ -106,7 +106,7 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
 
     print("[test] Testing /search&mode=album")
     try:
-        response = await SearchYoutube(albumName, "album")
+        response = await searchYoutube(albumName, "album")
         response = jsonable_encoder(response)
         responseCode = response["status_code"]
         print(f"[test] Status code: {responseCode}")
@@ -121,7 +121,7 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
 
     print("[test] Testing /albumInfo")
     try:
-        response = await AlbumInfo(albums[0]["album_id"])
+        response = await albumInfo(albums[0]["album_id"])
         response = jsonable_encoder(response)
         responseCode = response["status_code"]
         print(f"[test] Status code: {responseCode}")
@@ -136,7 +136,7 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
     
     print("[test] Testing /search&mode=artist")
     try:
-        response = await SearchYoutube(artistName, "artist")
+        response = await searchYoutube(artistName, "artist")
         response = jsonable_encoder(response)
         responseCode = response["status_code"]
         print(f"[test] Status code: {responseCode}")
@@ -151,7 +151,7 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
 
     print("[test] Testing /artistInfo")
     try:
-        response = await ArtistInfo(artists[0]["artist_id"])
+        response = await artistInfo(artists[0]["artist_id"])
         response = jsonable_encoder(response)
         responseCode = response["status_code"]
         print(f"[test] Status code: {responseCode}")
@@ -166,7 +166,7 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
     
     print("[test] Testing /trackDownload")
     try:
-        response = await harmonoidService.TrackDownload(None, None, trackDownloadName)
+        response = await harmonoidService.trackDownload(None, None, trackDownloadName)
         statusCode = response.status_code
     except Exception as e:
         statusCode = 500
