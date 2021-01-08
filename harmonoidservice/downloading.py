@@ -84,22 +84,22 @@ class DownloadHandler:
             """
             It's not important, so we can do it in background.
             """
-            asyncio.ensure_future(aiofiles.os.remove(f"{trackInfo['trackId']}.webm"))
+            asyncio.ensure_future(aiofiles.os.remove(f"{trackInfo['track_id']}.webm"))
             """
             Adding metadata.
             """
             await Metadata(trackInfo).add()
             print(
-                f"[pytube] Track download successful for track ID: {trackInfo['trackId']}."
+                f"[pytube] Track download successful for track ID: {trackInfo['track_id']}."
             )
         else:
-            print(f"[pytube] Could not download track ID: {trackInfo['trackId']}.")
+            print(f"[pytube] Could not download track ID: {trackInfo['track_id']}.")
             print(
-                f"[server] Sending status code 500 for track ID: {trackInfo['trackId']}."
+                f"[server] Sending status code 500 for track ID: {trackInfo['track_id']}."
             )
             raise HTTPException(
                 status_code=500,
-                detail=f"[pytube] Could not download track ID: {trackInfo['trackId']}.",
+                detail=f"[pytube] Could not download track ID: {trackInfo['track_id']}.",
             )
 
     """
