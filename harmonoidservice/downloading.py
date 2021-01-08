@@ -53,8 +53,8 @@ class DownloadHandler:
             )
 
     async def saveAudio(self, trackInfo):
-        filename = f"{trackInfo['trackId']}.webm"
-        print(f"[httpx] Downloading track ID: {trackInfo['trackId']}.")
+        filename = f"{trackInfo['track_id']}.webm"
+        print(f"[httpx] Downloading track ID: {trackInfo['track_id']}.")
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 trackInfo["url"], timeout=None, headers={"Range": "bytes=0-"}
