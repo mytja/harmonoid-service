@@ -33,40 +33,31 @@ async def hello():
 
 @app.get("/search")
 async def searchYoutube(keyword, mode="album"):
-    result = await harmonoidService.searchYoutube(keyword, mode)
+    result = await harmonoidService.SearchYoutube(keyword, mode)
     return returnResponse(result)
 
 
 @app.get("/albuminfo")
 async def albumInfo(album_id):
-    result = await harmonoidService.albumInfo(album_id)
+    result = await harmonoidService.AlbumInfo(album_id)
     return returnResponse(result)
 
 
 @app.get("/trackinfo")
 async def trackInfo(track_id, album_id=None):
-    result = await harmonoidService.trackInfo(track_id, album_id)
+    result = await harmonoidService.TrackInfo(track_id, album_id)
     return returnResponse(result)
 
 
 @app.get("/artistinfo")
 async def artistInfo(artist_id):
-    result = await harmonoidService.artistInfo(artist_id)
+    result = await harmonoidService.ArtistInfo(artist_id)
     return returnResponse(result)
 
 
 @app.get("/artisttracks")
 async def artistTracks(artist_id):
-    result = await harmonoidService.artistTracks(artist_id)
-    return returnResponse(result)
-
-@app.get("/lyrics")
-async def getLyrics(track_id, track_name=None):
-    if not any((track_id, track_name)):
-        raise HTTPException(422, "Neither trackId nor trackName is specified")
-    if track_id and track_name:
-        raise HTTPException(422, "Both trackId and trackName is specified")
-    result = await harmonoidService.getLyrics(track_id, track_name)
+    result = await harmonoidService.ArtistTracks(artist_id)
     return returnResponse(result)
 
 
@@ -90,7 +81,7 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
         responseCode = response["status_code"]
         print(f"[test] Status code: {responseCode}")
         tracks = json.loads(response["body"])["tracks"]
-        if len(tracks) != 0 and tracks[0]["trackId"]:
+        if len(tracks) != 0 and tracks[0]["track_id"]:
             trackSearchTest = True
         else:
             trackSearchTest = False
@@ -100,12 +91,12 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
 
     print("[test] Testing /trackInfo")
     try:
-        response = await trackInfo(tracks[0]["trackId"])
+        response = await trackInfo(tracks[0]["track_id"])
         response = jsonable_encoder(response)
         responseCode = response["status_code"]
         print(f"[test] Status code: {responseCode}")
         tracks = json.loads(response["body"])
-        if len(tracks) != 0 and tracks["trackId"]:
+        if len(tracks) != 0 and tracks["track_id"]:
             trackInfoTest = True
         else:
             trackInfoTest = False
@@ -120,7 +111,7 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
         responseCode = response["status_code"]
         print(f"[test] Status code: {responseCode}")
         albums = json.loads(response["body"])["albums"]
-        if len(albums) != 0 and albums[0]["albumId"]:
+        if len(albums) != 0 and albums[0]["album_id"]:
             albumSearchTest = True
         else:
             albumSearchTest = False
@@ -130,17 +121,17 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
 
     print("[test] Testing /albumInfo")
     try:
-        response = await albumInfo(albums[0]["albumId"])
+        response = await albumInfo(albums[0]["album_id"])
         response = jsonable_encoder(response)
         responseCode = response["status_code"]
         print(f"[test] Status code: {responseCode}")
         albums = json.loads(response["body"])
-        if len(albums) != 0 and (albums["tracks"][0]["trackId"]):
+        if len(albums) != 0 and (albums["tracks"][0]["track_id"]):
             albumInfoTest = True
         else:
             albumInfoTest = False
     except Exception as e:
-        trackInfoTest = False
+        albumInfoTest = False
         print(f"[test] Exception: {e}")
     
     print("[test] Testing /search&mode=artist")
@@ -172,25 +163,6 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
     except Exception as e:
         trackInfoTest = False
         print(f"[test] Exception: {e}")
-        
-    print("[test] Testing /lyrics")
-    try:
-        response = await getLyrics(lyricsTrackId, None)
-        response = jsonable_encoder(response)
-        try:
-            responseCode = response["status_code"]
-            print(f"[test] Status code: {responseCode}")
-        except Exception as e:
-            print("[test] Exception: No status code!")
-            print(f"[test] Exception: Details: {e}")
-        lyrics = json.loads(response["body"])
-        if len(lyrics) != 0 and lyrics["lyrics"]:
-            lyricsSearchTest = True
-        else:
-            lyricsSearchTest = False
-    except Exception as e:
-        lyricsSearchTest = False
-        print(f"[test] Exception: {e}")
     
     print("[test] Testing /trackDownload")
     try:
@@ -205,7 +177,7 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
     else:
         trackDownloadTest = True
     
-    if all([trackSearchTest, trackInfoTest, albumSearchTest, albumInfoTest, artistSearchTest, artistInfoTest, lyricsSearchTest, trackDownloadTest]):
+    if all([trackSearchTest, trackInfoTest, albumSearchTest, albumInfoTest, artistSearchTest, artistInfoTest, trackDownloadTest]):
         testSuccess = True
     else:
         testSuccess = False
@@ -224,7 +196,6 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
         "alubmInfo": albumInfoTest,
         "artistSearch": artistSearchTest,
         "artistInfo": artistInfoTest,
-        "lyricsSearch": lyricsSearchTest,
         "trackDownload": trackDownloadTest,
     }
     return returnResponse(response)

@@ -11,7 +11,7 @@ import ytmusicapi
 from .async_mutagen import Metadata
 
 MUSICAPI_VERSION = ytmusicapi.__version__
-FFMPEG_COMMAND = "ffmpeg -i {trackId}.webm -vn -c:a copy {trackId}.ogg"
+FFMPEG_COMMAND = "ffmpeg -i {track_id}.webm -vn -c:a copy {track_id}.ogg"
 
 
 class DownloadHandler:
@@ -32,7 +32,7 @@ class DownloadHandler:
                 headers={"Accept-Ranges": "bytes"},
             )
 
-        trackInfo = await self.trackInfo(trackId, albumId)
+        trackInfo = await self.TrackInfo(trackId, albumId)
         if type(trackInfo) is dict:
             print(
                 f"[ytmusicapi] Successfully retrieved metadata of track ID: {trackId}."
@@ -53,8 +53,8 @@ class DownloadHandler:
             )
 
     async def saveAudio(self, trackInfo):
-        filename = f"{trackInfo['trackId']}.webm"
-        print(f"[httpx] Downloading track ID: {trackInfo['trackId']}.")
+        filename = f"{trackInfo['track_id']}.webm"
+        print(f"[httpx] Downloading track ID: {trackInfo['track_id']}.")
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 trackInfo["url"], timeout=None, headers={"Range": "bytes=0-"}
@@ -68,7 +68,7 @@ class DownloadHandler:
             Changing WEBM Matroska container to OGG without re-encoding (to add vorbis comments on OGG container).
             """
             process = subprocess.Popen(
-                FFMPEG_COMMAND.format(trackId=trackInfo["trackId"]),
+                FFMPEG_COMMAND.format(track_id=trackInfo["track_id"]),
                 shell=True,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.PIPE,
@@ -84,22 +84,22 @@ class DownloadHandler:
             """
             It's not important, so we can do it in background.
             """
-            asyncio.ensure_future(aiofiles.os.remove(f"{trackInfo['trackId']}.webm"))
+            asyncio.ensure_future(aiofiles.os.remove(f"{trackInfo['track_id']}.webm"))
             """
             Adding metadata.
             """
             await Metadata(trackInfo).add()
             print(
-                f"[pytube] Track download successful for track ID: {trackInfo['trackId']}."
+                f"[pytube] Track download successful for track ID: {trackInfo['track_id']}."
             )
         else:
-            print(f"[pytube] Could not download track ID: {trackInfo['trackId']}.")
+            print(f"[pytube] Could not download track ID: {trackInfo['track_id']}.")
             print(
-                f"[server] Sending status code 500 for track ID: {trackInfo['trackId']}."
+                f"[server] Sending status code 500 for track ID: {trackInfo['track_id']}."
             )
             raise HTTPException(
                 status_code=500,
-                detail=f"[pytube] Could not download track ID: {trackInfo['trackId']}.",
+                detail=f"[pytube] Could not download track ID: {trackInfo['track_id']}.",
             )
 
     """
