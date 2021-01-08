@@ -8,11 +8,11 @@ class BrowsingHandler:
             track = await self.ytMusic._get_song(trackId)
             track_artists = [a for a in track["artists"]]
             if not albumId:
-                albumId = await self.ytMusic._search(
+                albumId = await self.ytMusic.searchYoutube(
                     " ".join(track_artists) + " " + track["title"], "songs"
                 )
                 albumId = albumId[0]["album"]["id"]
-            album = await self.ytMusic._get_album(albumId)
+            album = await self.ytMusic.getAlbum(albumId)
             trackNumber = 1
 
             album_art_64, album_art_300, album_art_640 = SortThumbnails(
@@ -50,7 +50,7 @@ class BrowsingHandler:
             return "Internal Server Error.\nytmusicapi Failed.\nERROR: This error has no explaination at the moment & restarting dynos is a possible fix."
 
     async def AlbumInfo(self, albumId):
-        response = await self.ytMusic._get_album(albumId)
+        response = await self.ytMusic.getAlbum(albumId)
 
         tracks = response["tracks"]
 
@@ -76,7 +76,7 @@ class BrowsingHandler:
         return {"tracks": result}
 
     async def ArtistAlbums(self, artistId):
-        artistJson = await self.ytMusic._get_artist(artistId)
+        artistJson = await self.ytMusic.getArtist(artistId)
 
         albums = artistJson["albums"]["results"] + artistJson["singles"]["results"]
 
@@ -103,7 +103,7 @@ class BrowsingHandler:
         return {"albums": artistAlbums}
 
     async def ArtistTracks(self, artistId):
-        artistJson = await self.ytMusic._get_artist(artistId)
+        artistJson = await self.ytMusic.getArtist(artistId)
 
         tracks = artistJson["songs"]["results"]
 
@@ -139,7 +139,7 @@ class BrowsingHandler:
         return {"tracks": artistTracks}
 
     async def ArtistInfo(self, artistId):
-        artistJson = await self.ytMusic._get_artist(artistId)
+        artistJson = await self.ytMusic.getArtist(artistId)
         return {
             "description": artistJson["description"],
             "subscribers": artistJson["subscribers"],
@@ -148,7 +148,7 @@ class BrowsingHandler:
 
     async def SearchYoutube(self, keyword, mode):
         if mode == "album":
-            youtubeResult = await self.ytMusic._search(keyword, "albums")
+            youtubeResult = await self.ytMusic.searchYoutube(keyword, "albums")
 
             albumLengthList = await self.AsyncAlbumLength(youtubeResult)
 
@@ -175,7 +175,7 @@ class BrowsingHandler:
             return json.dumps({"albums": albums}, indent=4)
 
         if mode == "track":
-            youtubeResult = await self.ytMusic._search(keyword, "songs")
+            youtubeResult = await self.ytMusic.searchYoutube(keyword, "songs")
 
             trackStuffList = await self.AsyncTrackStuff(youtubeResult)
 
@@ -210,7 +210,7 @@ class BrowsingHandler:
             return json.dumps({"tracks": tracks}, indent=4)
 
         if mode == "artist":
-            youtubeResult = await self.ytMusic._search(keyword, "artists")
+            youtubeResult = await self.ytMusic.searchYoutube(keyword, "artists")
 
             artists = []
             for artist in youtubeResult:
@@ -231,7 +231,7 @@ class BrowsingHandler:
     # 🎉 Other Functions For YouTube Music
     async def ArrangeVideoIds(self, track):
         title = track["artists"] + " " + track["title"]
-        youtubeResult = await self.ytMusic._search(title, "songs")
+        youtubeResult = await self.ytMusic.searchYoutube(title, "songs")
         if track["title"] in youtubeResult[0]["title"]:
             return youtubeResult[0]["videoId"]
         else:
@@ -242,7 +242,7 @@ class BrowsingHandler:
         return await asyncio.gather(*tasks)
 
     async def ArrangeAlbumLength(self, album):
-        youtubeResult = await self.ytMusic._get_album(album["browseId"])
+        youtubeResult = await self.ytMusic.getAlbum(album["browseId"])
         return int(youtubeResult["trackCount"])
 
     async def AsyncAlbumLength(self, albums):
@@ -250,7 +250,7 @@ class BrowsingHandler:
         return await asyncio.gather(*tasks)
 
     async def ArrangeTrackDuration(self, track):
-        trackInfo = await self.ytMusic._get_song(track["videoId"])
+        trackInfo = await self.ytMusic.getSong(track["videoId"])
         return int(trackInfo["lengthSeconds"]) * 1000
 
     async def AsyncTrackDuration(self, tracks):
@@ -258,7 +258,7 @@ class BrowsingHandler:
         return await asyncio.gather(*tasks)
 
     async def ArrangeTrackStuff(self, track):
-        youtubeResult = await self.ytMusic._get_album(track["album"]["id"])
+        youtubeResult = await self.ytMusic.getAlbum(track["album"]["id"])
         for result_track in youtubeResult["tracks"]:
             if result_track["title"] == track["title"]:
                 number = int(result_track["index"])
