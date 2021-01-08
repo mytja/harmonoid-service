@@ -51,7 +51,7 @@ class Metadata(OggOpus):
         """
         No reference of this comment at http://age.hobba.nl/audio/mirroredpages/ogg-tagging.html, still using because a mutagen example uses it. Thus, unable to read.
         """
-        self["albumartist"] = [self.trackInfo["album_artists"]]
+        self["albumartist"] = " &".join(self.trackInfo["album_artists"])
         """
         This needs a fix. Vorbis comment keeps date instead of year & MediaMetadataRetriever is unable to read this.
         Fix if you get to know something...
