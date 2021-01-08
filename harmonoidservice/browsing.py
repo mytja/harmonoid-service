@@ -45,6 +45,7 @@ class BrowsingHandler:
                 "album_artists": album_artists,
                 "album_length": int(album["trackCount"]),
                 "album_type": "single" if len(album["tracks"]) == 1 else "album",
+                "url": track["url"],
             }
         except:
             return "Internal Server Error.\nytmusicapi Failed.\nERROR: This error has no explaination at the moment & restarting dynos is a possible fix."
