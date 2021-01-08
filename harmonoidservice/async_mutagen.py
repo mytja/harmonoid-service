@@ -12,10 +12,10 @@ class Metadata(OggOpus):
     async def add(self):
         loop = asyncio.get_running_loop()
         await loop.run_in_executor(
-            None, super().__init__, f"{self.trackInfo['trackId']}.ogg"
+            None, super().__init__, f"{self.trackInfo['track_id']}.ogg"
         )
         async with httpx.AsyncClient() as client:
-            albumArtResponse = await client.get(self.trackInfo["albumArtHigh"])
+            albumArtResponse = await client.get(self.trackInfo["album_art_640"])
         picture = Picture()
         picture.data = albumArtResponse.content
         """
@@ -41,27 +41,27 @@ class Metadata(OggOpus):
         In mutagen implementation, that's why we give values in a list.
         Reference: https://gitlab.gnome.org/GNOME/rhythmbox/-/issues/16
         """
-        self["title"] = [self.trackInfo["trackName"]]
-        self["album"] = [self.trackInfo["albumName"]]
+        self["title"] = [self.trackInfo["track_name"]]
+        self["album"] = [self.trackInfo["album_name"]]
         """
         This is where we can simply provide simply a list of artists, as written above (for having mutiple value for the same key).     
         But, by that MediaMetadataRetriever is just shows first artist :-(. So, I'm just joining all artists with "/" separator. (Though, this is incorrect according to official reference).
         """
-        self["artist"] = ["/".join(self.trackInfo["trackArtistNames"])]
+        self["artist"] = ["/".join(self.trackInfo["track_artists"])]
         """
         No reference of this comment at http://age.hobba.nl/audio/mirroredpages/ogg-tagging.html, still using because a mutagen example uses it. Thus, unable to read.
         """
-        self["albumartist"] = [self.trackInfo["albumArtistName"]]
+        self["albumartist"] = [self.trackInfo["album_artists"]]
         """
         This needs a fix. Vorbis comment keeps date instead of year & MediaMetadataRetriever is unable to read this.
         Fix if you get to know something...
         """
         self["date"] = [str(self.trackInfo["year"])]
-        self["tracknumber"] = [f"{self.trackInfo['trackNumber']}/{self.trackInfo['albumLength']}"]
+        self["tracknumber"] = [f"{self.trackInfo['track_number']}/{self.trackInfo['album_length']}"]
         """
         Again, no official reference of this one at http://age.hobba.nl/audio/mirroredpages/ogg-tagging.html. Thus, unable to read.
         """
-        self["tracktotal"] = [str(self.trackInfo["albumLength"])]
+        self["tracktotal"] = [str(self.trackInfo["album_length"])]
         loop = asyncio.get_running_loop()
         await loop.run_in_executor(None, self.save)
 
