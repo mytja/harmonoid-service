@@ -1,6 +1,6 @@
-from browsing import BrowsingHandler
-from downloading import DownloadHandler
-from async_pytube_ytmusicapi import YTMusic
+from .browsing import BrowsingHandler
+from .downloading import DownloadHandler
+from .async_pytube_ytmusicapi import YTMusic
 
 
 
