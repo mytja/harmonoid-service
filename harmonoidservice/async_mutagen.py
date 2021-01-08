@@ -47,7 +47,7 @@ class Metadata(OggOpus):
         This is where we can simply provide simply a list of artists, as written above (for having mutiple value for the same key).     
         But, by that MediaMetadataRetriever is just shows first artist :-(. So, I'm just joining all artists with "/" separator. (Though, this is incorrect according to official reference).
         """
-        self["artist"] = ["/".join(self.trackInfo["track_artists"])]
+        self["artist"] = " &".join(self.trackInfo["track_artists"])
         """
         No reference of this comment at http://age.hobba.nl/audio/mirroredpages/ogg-tagging.html, still using because a mutagen example uses it. Thus, unable to read.
         """
