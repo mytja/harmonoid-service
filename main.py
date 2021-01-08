@@ -90,7 +90,7 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
         responseCode = response["status_code"]
         print(f"[test] Status code: {responseCode}")
         tracks = json.loads(response["body"])["tracks"]
-        if len(tracks) != 0 and tracks[0]["trackId"]:
+        if len(tracks) != 0 and tracks[0]["track_id"]:
             trackSearchTest = True
         else:
             trackSearchTest = False
@@ -100,12 +100,12 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
 
     print("[test] Testing /trackInfo")
     try:
-        response = await trackInfo(tracks[0]["trackId"])
+        response = await trackInfo(tracks[0]["track_id"])
         response = jsonable_encoder(response)
         responseCode = response["status_code"]
         print(f"[test] Status code: {responseCode}")
         tracks = json.loads(response["body"])
-        if len(tracks) != 0 and tracks["trackId"]:
+        if len(tracks) != 0 and tracks["track_id"]:
             trackInfoTest = True
         else:
             trackInfoTest = False
@@ -120,7 +120,7 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
         responseCode = response["status_code"]
         print(f"[test] Status code: {responseCode}")
         albums = json.loads(response["body"])["albums"]
-        if len(albums) != 0 and albums[0]["albumId"]:
+        if len(albums) != 0 and albums[0]["album_id"]:
             albumSearchTest = True
         else:
             albumSearchTest = False
@@ -130,17 +130,17 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
 
     print("[test] Testing /albumInfo")
     try:
-        response = await albumInfo(albums[0]["albumId"])
+        response = await albumInfo(albums[0]["album_id"])
         response = jsonable_encoder(response)
         responseCode = response["status_code"]
         print(f"[test] Status code: {responseCode}")
         albums = json.loads(response["body"])
-        if len(albums) != 0 and (albums["tracks"][0]["trackId"]):
+        if len(albums) != 0 and (albums["tracks"][0]["track_id"]):
             albumInfoTest = True
         else:
             albumInfoTest = False
     except Exception as e:
-        trackInfoTest = False
+        albumInfoTest = False
         print(f"[test] Exception: {e}")
     
     print("[test] Testing /search&mode=artist")
