@@ -5,7 +5,7 @@ import json
 class BrowsingHandler:
     async def TrackInfo(self, trackId, albumId):
         try:  # TODO: improve try/except
-            track = await self.ytMusic._get_song(trackId)
+            track = await self.ytMusic.getSong(trackId)
             track_artists = [a for a in track["artists"]]
             if not albumId:
                 albumId = await self.ytMusic.searchYoutube(
