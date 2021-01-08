@@ -61,7 +61,6 @@ class BrowsingHandler:
             lengthSeconds = int(track["lengthMs"])
         except:
             lengthSeconds = 0
-
         result = []
         for index, track in enumerate(tracks):
             result += [
@@ -90,15 +89,13 @@ class BrowsingHandler:
             )
             artistAlbums += [
                 {
-                    "album_id": album["browseId"],
-                    "album_name": album["title"],
+                    "albumId": album["browseId"],
+                    "albumName": album["title"],
                     "year": album["year"],
-                    "album_artists": [artistJson["name"]],
-                    "album_art_640": album_art_640,
-                    "album_art_300": album_art_300,
-                    "album_art_64": album_art_64,
-                    "album_length": albumLengthList[index],
-                    "album_type": "single" if albumLengthList[index] == 1 else "album",
+                    "albumArtistName": [artistJson["name"]][0],
+                    "albumArtHigh": albumArtHigh,
+                    "albumArtMedium": albumArtMedium,
+                    "albumArtLow": albumArtLow,
                 }
             ]
         return {"albums": artistAlbums}
@@ -153,6 +150,9 @@ class BrowsingHandler:
 
             albumLengthList = await self.AsyncAlbumLength(youtubeResult)
 
+    async def searchYoutube(self, keyword, mode):
+        if mode == "album":
+            youtubeResult = await self.ytMusic.searchYoutube(keyword, "albums")
             albums = []
             for index, album in enumerate(youtubeResult):
                 album_art_64, album_art_300, album_art_640 = SortThumbnails(
@@ -160,17 +160,13 @@ class BrowsingHandler:
                 )
                 albums += [
                     {
-                        "album_id": album["browseId"],
-                        "album_name": album["title"],
-                        "year": album["year"],
-                        "album_artists": [album["artist"]],
-                        "album_art_640": album_art_640,
-                        "album_art_300": album_art_300,
-                        "album_art_64": album_art_64,
-                        "album_length": albumLengthList[index],
-                        "album_type": "single"
-                        if albumLengthList[index] == 1
-                        else "album",
+                        "albumId": album["browseId"],
+                        "albumName": album["title"],
+                        "year": int(album["year"]) if album["year"].isnumeric() else 0,
+                        "albumArtistName": album["artist"],
+                        "albumArtHigh": albumArtHigh,
+                        "albumArtMedium": albumArtMedium,
+                        "albumArtLow": albumArtLow,
                     }
                 ]
             return json.dumps({"albums": albums}, indent=4)
@@ -222,9 +218,9 @@ class BrowsingHandler:
                     {
                         "artist_id": artist["browseId"],
                         "artist_name": artist["artist"],
-                        "artist_art_640": artist_art_640,
-                        "artist_art_300": artist_art_300,
-                        "artist_art_64": artist_art_64,
+                        "albumArtHigh": albumArtHigh,
+                        "albumArtMedium": albumArtMedium,
+                        "albumArtLow": albumArtLow,
                     }
                 ]
             return json.dumps({"artists": artists}, indent=4)
