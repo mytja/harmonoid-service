@@ -11,7 +11,7 @@ import ytmusicapi
 from .async_mutagen import Metadata
 
 MUSICAPI_VERSION = ytmusicapi.__version__
-FFMPEG_COMMAND = "ffmpeg -i {track_id}.webm -vn -c:a copy {trackId}.ogg"
+FFMPEG_COMMAND = "ffmpeg -i {track_id}.webm -vn -c:a copy {track_id}.ogg"
 
 
 class DownloadHandler:
