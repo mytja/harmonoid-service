@@ -11,7 +11,7 @@ import ytmusicapi
 from .async_mutagen import Metadata
 
 MUSICAPI_VERSION = ytmusicapi.__version__
-FFMPEG_COMMAND = "ffmpeg -i {trackId}.webm -vn -c:a copy {trackId}.ogg"
+FFMPEG_COMMAND = "ffmpeg -i {track_id}.webm -vn -c:a copy {trackId}.ogg"
 
 
 class DownloadHandler:
@@ -68,7 +68,7 @@ class DownloadHandler:
             Changing WEBM Matroska container to OGG without re-encoding (to add vorbis comments on OGG container).
             """
             process = subprocess.Popen(
-                FFMPEG_COMMAND.format(trackId=trackInfo["trackId"]),
+                FFMPEG_COMMAND.format(track_id=trackInfo["track_id"]),
                 shell=True,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.PIPE,
