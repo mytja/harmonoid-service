@@ -57,7 +57,7 @@ class Metadata(OggOpus):
         Fix if you get to know something...
         """
         self["date"] = [str(self.trackInfo["year"])]
-        self["tracknumber"] = [str(self.trackInfo["trackNumber"])]
+        self["tracknumber"] = [f"{self.trackInfo['trackNumber']}/{self.trackInfo['albumLength']}"]
         """
         Again, no official reference of this one at http://age.hobba.nl/audio/mirroredpages/ogg-tagging.html. Thus, unable to read.
         """

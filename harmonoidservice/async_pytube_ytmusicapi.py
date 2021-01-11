@@ -76,7 +76,7 @@ class YouTube(YouTube):
             """
             Fetch updated player JavaScript to get new cipher algorithm.
             """
-            self.decipher(retry=True)
+            await self.decipher(retry=True)
 
 
 class YTMusic(YTMusic):
