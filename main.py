@@ -4,6 +4,7 @@ from fastapi.responses import PlainTextResponse
 from fastapi.encoders import jsonable_encoder
 import json
 import time
+import os
 
 harmonoidService = HarmonoidService()
 
@@ -226,9 +227,9 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
 
 
 if __name__ == "__main__":
-    import uvicorn
+    import bjoern
 
-    uvicorn.run("main:app")
+    bjoern.run(app, "0.0.0.0", os.environ["PORT"])
 
     
 """
