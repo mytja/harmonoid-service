@@ -229,7 +229,7 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
 if __name__ == "__main__":
     import bjoern
 
-    bjoern.run(app, "0.0.0.0", os.environ["PORT"])
+    bjoern.run(app, "0.0.0.0", int(os.environ["PORT"]))
 
     
 """
