@@ -61,13 +61,13 @@ async def artistTracks(artistId):
     return returnResponse(result)
 
 @app.get("/lyrics")
-async def getLyrics(trackId, trackName=None):
+async def getLyrics(trackId=None, trackName=None):
     if not any((trackId, trackName)):
         raise HTTPException(422, "Neither trackId nor trackName is specified")
     if trackId and trackName:
         raise HTTPException(422, "Both trackId and trackName is specified")
     result = await harmonoidService.getLyrics(trackId, trackName)
-    return result
+    return returnResponse(result)
 
 
 @app.get("/trackDownload")
@@ -89,7 +89,7 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
         response = jsonable_encoder(response)
         responseCode = response["status_code"]
         print(f"[test] Status code: {responseCode}")
-        tracks = json.loads(response["body"])["tracks"]
+        tracks = json.loads(response["body"])["result"]
         if len(tracks) != 0 and tracks[0]["trackId"]:
             trackSearchTest = True
         else:
@@ -119,7 +119,7 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
         response = jsonable_encoder(response)
         responseCode = response["status_code"]
         print(f"[test] Status code: {responseCode}")
-        albums = json.loads(response["body"])["albums"]
+        albums = json.loads(response["body"])["result"]
         if len(albums) != 0 and albums[0]["albumId"]:
             albumSearchTest = True
         else:
@@ -149,8 +149,8 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
         response = jsonable_encoder(response)
         responseCode = response["status_code"]
         print(f"[test] Status code: {responseCode}")
-        artists = json.loads(response["body"])["artists"]
-        if len(artists) != 0 and artists[0]["artist_id"]:
+        artists = json.loads(response["body"])["result"]
+        if len(artists) != 0 and artists[0]["artistId"]:
             artistSearchTest = True
         else:
             artistSearchTest = False
@@ -160,7 +160,7 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
 
     print("[test] Testing /artistInfo")
     try:
-        response = await artistInfo(artists[0]["artist_id"])
+        response = await artistInfo(artists[0]["artistId"])
         response = jsonable_encoder(response)
         responseCode = response["status_code"]
         print(f"[test] Status code: {responseCode}")
@@ -170,26 +170,22 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
         else:
             artistInfoTest = False
     except Exception as e:
-        trackInfoTest = False
+        artistInfoTest = False
         print(f"[test] Exception: {e}")
         
     print("[test] Testing /lyrics")
     try:
         response = await getLyrics(lyricsTrackId, None)
         response = jsonable_encoder(response)
-        try:
-            responseCode = response["status_code"]
-            print(f"[test] Status code: {responseCode}")
-        except Exception as e:
-            print("[test] Exception: No status code!")
-            print(f"[test] Exception: Details: {e}")
+        responseCode = response["status_code"]
+        print(f"[test] Status code: {responseCode}")
         lyrics = json.loads(response["body"])
         if len(lyrics) != 0 and lyrics["lyrics"]:
-            lyricsSearchTest = True
+            lyricsTest = True
         else:
-            lyricsSearchTest = False
+            lyricsTest = False
     except Exception as e:
-        lyricsSearchTest = False
+        lyricsTest = False
         print(f"[test] Exception: {e}")
     
     print("[test] Testing /trackDownload")
@@ -205,7 +201,7 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
     else:
         trackDownloadTest = True
     
-    if all([trackSearchTest, trackInfoTest, albumSearchTest, albumInfoTest, artistSearchTest, artistInfoTest, lyricsSearchTest, trackDownloadTest]):
+    if all([trackSearchTest, trackInfoTest, albumSearchTest, albumInfoTest, artistSearchTest, artistInfoTest, lyricsTest, trackDownloadTest]):
         testSuccess = True
     else:
         testSuccess = False
@@ -223,16 +219,16 @@ async def test(trackName="NoCopyrightedSounds", albumName="NoCopyrightedSounds",
         "alubmInfo": albumInfoTest,
         "artistSearch": artistSearchTest,
         "artistInfo": artistInfoTest,
-        "lyricsSearch": lyricsSearchTest,
+        "lyrics": lyricsTest,
         "trackDownload": trackDownloadTest,
     }
     return returnResponse(response)
 
 
 if __name__ == "__main__":
-    import bjoern
+    import uvicorn
 
-    bjoern.run(app, "0.0.0.0", 8000)
+    uvicorn.run("main:app")
 
     
 """

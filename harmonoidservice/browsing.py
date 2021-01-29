@@ -193,14 +193,14 @@ class BrowsingHandler(BrowsingHandlerInternal):
                     {
                         "albumId": album["browseId"],
                         "albumName": album["title"],
-                        "year": int(album["year"]) if album["year"].isnumeric() else 0,
+                        "year": int(album["year"]) if album["year"] and album["year"].isnumeric() else 0,
                         "albumArtistName": album["artist"],
                         "albumArtHigh": albumArtHigh,
                         "albumArtMedium": albumArtMedium,
                         "albumArtLow": albumArtLow,
                     }
                 ]
-            return {"albums": albums}
+            return {"result": albums}
 
         if mode == "track":
             youtubeResult = await self.ytMusic.searchYoutube(keyword, "songs")
@@ -227,7 +227,7 @@ class BrowsingHandler(BrowsingHandlerInternal):
                             "albumArtLow": albumArtLow,
                         }
                     ]
-            return {"tracks": tracks}
+            return {"result": tracks}
 
         if mode == "artist":
             youtubeResult = await self.ytMusic.searchYoutube(keyword, "artists")
@@ -239,18 +239,18 @@ class BrowsingHandler(BrowsingHandlerInternal):
                 )
                 artists += [
                     {
-                        "artist_id": artist["browseId"],
-                        "artist_name": artist["artist"],
-                        "albumArtHigh": albumArtHigh,
-                        "albumArtMedium": albumArtMedium,
-                        "albumArtLow": albumArtLow,
+                        "artistId": artist["browseId"],
+                        "artistName": artist["artist"],
+                        "artistArtHigh": albumArtHigh,
+                        "artistArtMedium": albumArtMedium,
+                        "artistArtLow": albumArtLow,
                     }
                 ]
-            return {"artists": artists}
+            return {"result": artists}
 
     async def getLyrics(self, trackId, trackName):
         if not trackId:
-            trackId = await self.searchYoutube(trackName, "songs")[0]["videoId"]
+            trackId = (await self.searchYoutube(trackName, "track"))["result"][0]["trackId"]
         watchPlaylist = await self.ytMusic.getWatchPlaylist(trackId)
         watchPlaylistId = watchPlaylist["lyrics"]
         return await self.ytMusic.getLyrics(watchPlaylistId)

@@ -10,7 +10,7 @@ class Metadata(OggOpus):
         self.trackInfo = trackInfo
 
     async def add(self):
-        loop = asyncio.get_running_loop()
+        loop = asyncio.get_event_loop()
         await loop.run_in_executor(
             None, super().__init__, f"{self.trackInfo['trackId']}.ogg"
         )
@@ -62,7 +62,7 @@ class Metadata(OggOpus):
         Again, no official reference of this one at http://age.hobba.nl/audio/mirroredpages/ogg-tagging.html. Thus, unable to read.
         """
         self["tracktotal"] = [str(self.trackInfo["albumLength"])]
-        loop = asyncio.get_running_loop()
+        loop = asyncio.get_event_loop()
         await loop.run_in_executor(None, self.save)
 
         """
@@ -83,7 +83,7 @@ class MP3(MP3):
         self.art = art
 
     async def init(self):
-        loop = asyncio.get_running_loop()
+        loop = asyncio.get_event_loop()
         await loop.run_in_executor(None, super().__init__, self.filename)
 
         if self.art:
@@ -117,6 +117,6 @@ class MP3(MP3):
         self["TDRC"] = TDRC(encoding=3, text=self.trackInfoJSON["year"])
         self["TRCK"] = TRCK(encoding=3, text=str(self.trackInfoJSON["track_number"]))
 
-        loop = asyncio.get_running_loop()
+        loop = asyncio.get_event_loop()
         await loop.run_in_executor(None, self.save)
 """
